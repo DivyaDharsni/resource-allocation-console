@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Allocation Summary | Danprel Engineering Automation</title>
+    <meta name="description" content="Department-wise employee allocation and man-day capacity summary for Danprel Engineering Automation.">
+
+    <!-- Auth Guard -->
+    <script>
+        if (localStorage.getItem('danprel_auth') !== 'true') {
+            window.location.replace('login.html');
+        }
+    </script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+
+    <style>
+        /* ── DESIGN TOKENS (exact match with resource.html) ── */
+        :root {
+            --navy-dark:  #001f3f;
+            --navy-mid:   #003366;
+            --blue-accent:#005a9c;
+            --teal-bright:#14b8a6;
+            --gold:       #f59e0b;
+            --rose:       #e11d48;
+            --bg-neutral: #f1f5f9;
+            --card-shadow:0 10px 40px rgba(0,31,63,.08);
+            --radius-card:24px;
+            --free-color: #c7d2fe;   /* soft indigo for free/open */
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-neutral);
+            color: #1e293b;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* ══════════════════════════════════╗
+           HEADER (mirrors resource.html)    ║
+        ══════════════════════════════════╝ */
+        .app-header {
+            background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy-mid) 100%);
+            border-radius: var(--radius-card);
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 32px rgba(0,31,63,.25);
+            border: 1px solid rgba(255,255,255,.08);
+            position: relative;
+            overflow: hidden;
+        }
+        .app-header::before {
+            content:'';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 20% 50%, rgba(20,184,166,.12) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .brand-box { display:flex; align-items:center; gap:16px; position:relative; z-index:2; }
+        .brand-logo-wrap {
+            width:54px; height:54px; background:white; border-radius:14px;
+            display:flex; align-items:center; justify-content:center;
+            box-shadow:0 4px 16px rgba(0,0,0,.2); overflow:hidden; flex-shrink:0;
+        }
+        .brand-logo-wrap img { width:100%; height:100%; object-fit:contain; padding:4px; }
+        .brand-name  { font-size:1.05rem; font-weight:900; color:#fff; letter-spacing:.4px; }
+        .brand-sub   { font-size:.62rem; font-weight:600; color:var(--teal-bright); text-transform:uppercase; letter-spacing:1.5px; }
+
+        .header-center-title {
+            position: absolute;
+            left: 50%; transform: translateX(-50%);
+            background: rgba(255,255,255,.1);
+            border: 1px solid rgba(255,255,255,.18);
+            backdrop-filter: blur(8px);
+            color: white;
+            padding: 10px 28px;
+            border-radius: 100px;
+            font-weight: 800;
+            font-size: .82rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .header-right { display:flex; align-items:center; gap:12px; position:relative; z-index:2; }
+
+        .btn-nav {
+            background: rgba(255,255,255,.1);
+            border: 1px solid rgba(255,255,255,.2);
+            color: white;
+            padding: 10px 22px;
+            border-radius: 100px;
+            font-size: .8rem; font-weight:700;
+            text-decoration: none;
+            display: flex; align-items:center; gap:8px;
+            transition: all .25s;
+            white-space: nowrap;
+        }
+        .btn-nav:hover { background:white; color:var(--navy-dark); transform:translateY(-2px); }
+
+        .live-clock { color:rgba(255,255,255,.55); font-size:.68rem; font-weight:600; text-align:right; line-height:1.4; }
+
+        /* ══════════════════════════════════╗
+           FILTER BAR                        ║
+        ══════════════════════════════════╝ */
+        .filter-bar-wrap {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+        .filter-pill {
+            background: white;
+            border-radius: 100px;
+            box-shadow: 0 4px 24px rgba(0,31,63,.1);
+            border: 1px solid #e2e8f0;
+            padding: 10px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .fp-divider {
+            width: 1px; height: 28px;
+            background: #e2e8f0;
+        }
+        .fp-item { display:flex; align-items:center; gap:8px; }
+        .fp-label  { font-size:.7rem; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:.8px; white-space:nowrap; }
+        .fp-select, .fp-input {
+            border: 1.5px solid #e2e8f0;
+            border-radius: 100px;
+            padding: 6px 14px;
+            font-size: .8rem; font-weight:700;
+            color: var(--navy-dark);
+            background: #f8fafc;
+            outline: none;
+            transition: all .2s;
+            cursor: pointer;
+            min-width: 110px;
+        }
+        .fp-select:focus, .fp-input:focus {
+            border-color: var(--teal-bright);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(20,184,166,.12);
+        }
+        .fp-range-badge {
+            background: linear-gradient(135deg, var(--navy-dark), var(--navy-mid));
+            color: white;
+            padding: 6px 16px;
+            border-radius: 100px;
+            font-size: .72rem; font-weight:800;
+            white-space: nowrap;
+        }
+
+        /* ══════════════════════════════════╗
+           CHART CARD                        ║
+        ══════════════════════════════════╝ */
+        .chart-card {
+            background: white;
+            border-radius: var(--radius-card);
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(0,0,0,.05);
+            padding: 28px 32px 20px;
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+        .chart-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .chart-title {
+            font-size: 1.15rem; font-weight:900;
+            color: var(--navy-dark);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+        .chart-subtitle {
+            font-size: .72rem; font-weight:700;
+            color: var(--teal-bright);
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            margin-top: 3px;
+        }
+        .chart-legend {
+            display: flex; gap: 18px; align-items: center; flex-wrap:wrap;
+        }
+        .legend-item {
+            display: flex; align-items:center; gap:7px;
+            font-size: .72rem; font-weight:700; color:#475569;
+        }
+        .legend-dot {
+            width: 12px; height: 12px;
+            border-radius: 4px;
+            flex-shrink:0;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 420px;
+        }
+
+        /* Y-axis vertical label */
+        .y-axis-label {
+            position: absolute;
+            left: -28px;
+            top: 50%;
+            transform: translateY(-50%) rotate(-90deg);
+            font-size: .65rem; font-weight:800;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+
+        /* ══════════════════════════════════╗
+           DEPT SUMMARY CARDS               ║
+        ══════════════════════════════════╝ */
+        .section-heading {
+            font-size: .65rem; font-weight:900;
+            text-transform: uppercase; letter-spacing:1.5px;
+            color: #94a3b8;
+            display: flex; align-items:center; gap:8px;
+            margin-bottom: 16px; padding-left: 4px;
+        }
+        .section-heading::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e2e8f0;
+        }
+
+        .dept-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .dept-card {
+            background: white;
+            border-radius: 18px;
+            box-shadow: 0 4px 20px rgba(0,31,63,.06);
+            border: 1px solid rgba(0,0,0,.05);
+            padding: 20px;
+            transition: all .25s;
+            position: relative;
+            overflow: hidden;
+        }
+        .dept-card::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, var(--teal-bright), var(--navy-mid));
+            border-radius: 4px 0 0 4px;
+        }
+        .dept-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(0,31,63,.13);
+        }
+
+        .dc-dept-name {
+            font-size: .68rem; font-weight:900;
+            text-transform: uppercase; letter-spacing:.8px;
+            color: #64748b; margin-bottom:14px; padding-left:10px;
+        }
+
+        .dc-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+        .dc-stat {
+            flex: 1;
+            text-align: center;
+            padding: 10px 8px;
+            border-radius: 12px;
+            background: #f8fafc;
+            border: 1px solid #f1f5f9;
+        }
+        .dc-stat-val { font-size: 1.35rem; font-weight:900; line-height:1; }
+        .dc-stat-lbl { font-size:.58rem; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#94a3b8; margin-top:3px; }
+
+        .dc-formula {
+            margin-top: 12px;
+            padding: 8px 12px;
+            background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+            border: 1px solid #bbf7d0;
+            border-radius: 10px;
+            font-size: .7rem; font-weight:700;
+            color: #065f46;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ══════════════════════════════════╗
+           SUMMARY TOTALS BAR               ║
+        ══════════════════════════════════╝ */
+        .totals-bar {
+            background: linear-gradient(135deg, var(--navy-dark), var(--navy-mid));
+            border-radius: var(--radius-card);
+            padding: 20px 32px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 32px rgba(0,31,63,.25);
+            position: relative;
+            overflow: hidden;
+        }
+        .totals-bar::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 80% 50%, rgba(20,184,166,.15) 0%, transparent 50%);
+        }
+        .total-item {
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        .total-val { font-size: 2rem; font-weight:900; color:#fff; line-height:1; }
+        .total-lbl { font-size:.65rem; font-weight:700; color:var(--teal-bright); text-transform:uppercase; letter-spacing:1px; margin-top:4px; }
+
+        /* ══════════════════════════════════╗
+           RESPONSIVE                        ║
+        ══════════════════════════════════╝ */
+        @media (max-width: 992px) {
+            .app-header { flex-direction:column; gap:16px; padding:24px; }
+            .header-center-title { position:static; transform:none; width:100%; text-align:center; }
+            .filter-pill { border-radius: 20px; padding:16px; }
+            .chart-wrapper { height: 320px; }
+        }
+        @media (max-width: 600px) {
+            body { padding:12px; }
+            .app-header { padding:16px; }
+            .header-center-title { font-size:.7rem; display:none; }
+            .chart-card { padding:16px; }
+            .chart-wrapper { height: 280px; }
+            .dept-grid { grid-template-columns: 1fr; }
+            .totals-bar { padding:16px; }
+            .total-val { font-size:1.5rem; }
+            .y-axis-label { display:none; }
+        }
+
+        /* ── Scrollbar ── */
+        ::-webkit-scrollbar { width:6px; height:6px; }
+        ::-webkit-scrollbar-track { background:#f1f5f9; }
+        ::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:10px; }
+        ::-webkit-scrollbar-thumb:hover { background:var(--blue-accent); }
+    </style>
+</head>
+<body>
+
+    <!-- ═══════ HEADER ═══════ -->
+    <header class="app-header">
+        <div class="brand-box">
+            <div class="brand-logo-wrap">
+                <img src="asset/image.png" alt="Danprel Logo" onerror="this.src='https://placehold.co/54'">
+            </div>
+            <div>
+                <div class="brand-name">DANPREL</div>
+                <div class="brand-sub">Engineering Automation Pvt Ltd</div>
+            </div>
+        </div>
+
+        <div class="header-center-title">
+            <i class="bi bi-bar-chart-fill me-2"></i>Employee Allocation Summary
+        </div>
+
+        <div class="header-right">
+            <div class="live-clock" id="liveTime"></div>
+            <a href="resource.html" class="btn-nav">
+                <i class="bi bi-arrow-left-circle-fill"></i> Console
+            </a>
+        </div>
+    </header>
+
+    <!-- ═══════ FILTER BAR ═══════ -->
+    <div class="filter-bar-wrap">
+        <div class="filter-pill">
+            <div class="fp-item">
+                <i class="bi bi-calendar3" style="color:var(--teal-bright);font-size:1rem;"></i>
+                <span class="fp-label">Month</span>
+                <select id="selMonth" class="fp-select" onchange="handleYearMonthChange()">
+                    <option value="0">January</option>
+                    <option value="1">February</option>
+                    <option value="2">March</option>
+                    <option value="3">April</option>
+                    <option value="4">May</option>
+                    <option value="5">June</option>
+                    <option value="6">July</option>
+                    <option value="7">August</option>
+                    <option value="8">September</option>
+                    <option value="9">October</option>
+                    <option value="10">November</option>
+                    <option value="11">December</option>
+                </select>
+            </div>
+            <div class="fp-divider"></div>
+            <div class="fp-item">
+                <span class="fp-label">Year</span>
+                <select id="selYear" class="fp-select" onchange="handleYearMonthChange()"></select>
+            </div>
+            <div class="fp-divider"></div>
+            <div class="fp-item">
+                <i class="bi bi-calendar-range" style="color:#64748b;font-size:.9rem;"></i>
+                <span class="fp-label">From</span>
+                <input type="date" id="fromDate" class="fp-input" onchange="handleDateRangeChange()">
+            </div>
+            <div class="fp-item">
+                <span class="fp-label">To</span>
+                <input type="date" id="toDate" class="fp-input" onchange="handleDateRangeChange()">
+            </div>
+            <div class="fp-divider"></div>
+            <span class="fp-range-badge" id="rangeBadge">─ Days</span>
+        </div>
+    </div>
+
+    <!-- ═══════ SUMMARY TOTALS BAR ═══════ -->
+    <div class="totals-bar" id="totalsBar">
+        <div class="total-item">
+            <div class="total-val" id="tTotalEmp">─</div>
+            <div class="total-lbl">Total Employees</div>
+        </div>
+        <div class="total-item">
+            <div class="total-val" id="tAllocated" style="color:var(--teal-bright)">─</div>
+            <div class="total-lbl" style="color:#5eead4;">Allocated</div>
+        </div>
+        <div class="total-item">
+            <div class="total-val" id="tFree" style="color:#93c5fd">─</div>
+            <div class="total-lbl" style="color:#93c5fd;">Open for Work</div>
+        </div>
+        <div class="total-item">
+            <div class="total-val" id="tManDays" style="color:var(--gold)">─</div>
+            <div class="total-lbl" style="color:#fcd34d;">Total Man-Days</div>
+        </div>
+        <div class="total-item">
+            <div class="total-val" id="tDays" style="color:#c4b5fd">─</div>
+            <div class="total-lbl" style="color:#c4b5fd;">Period (Days)</div>
+        </div>
+    </div>
+
+    <!-- ═══════ CHART ═══════ -->
+    <div class="chart-card">
+        <div class="chart-card-header">
+            <div>
+                <div class="chart-title">Employee Allocation</div>
+                <div class="chart-subtitle" id="chartSubtitle">Loading…</div>
+            </div>
+            <!-- dynamic legend filled by JS -->
+            <div class="chart-legend" id="chartLegend" style="max-width:60%;flex-wrap:wrap;gap:8px 16px;"></div>
+        </div>
+        <div class="chart-wrapper">
+            <div class="y-axis-label">Total Employee Days Range</div>
+            <canvas id="manDayChart"></canvas>
+        </div>
+    </div>
+
+    <!-- ═══════ DEPT BREAKDOWN CARDS ═══════ -->
+    <div class="section-heading">
+        <i class="bi bi-diagram-3-fill" style="color:var(--teal-bright);"></i>
+        Department Breakdown
+    </div>
+    <div class="dept-grid" id="deptGrid"></div>
+
+    <script>
+    /* ══════════════════════════════════════════════════════
+       DATA STORE
+    ══════════════════════════════════════════════════════ */
+    let registryData    = [];
+    let assignmentsData = [];
+    let projectsData    = [];   // {code, name, ...}
+    let myChart         = null;
+
+    /* 16-colour curated palette for projects */
+    const PROJECT_PALETTE = [
+        '#6366f1','#f59e0b','#10b981','#ef4444','#3b82f6',
+        '#ec4899','#8b5cf6','#14b8a6','#f97316','#06b6d4',
+        '#84cc16','#a855f7','#e11d48','#64748b','#0ea5e9','#d97706'
+    ];
+    const FREE_COLOR = 'rgba(199,210,254,.75)';  // soft indigo = "open for work"
+
+    const MONTH_NAMES = ['January','February','March','April','May','June',
+                         'July','August','September','October','November','December'];
+
+    /* ══════════════════════════════════════════════════════
+       INIT
+    ══════════════════════════════════════════════════════ */
+    document.addEventListener('DOMContentLoaded', async () => {
+        updateClock();
+        setInterval(updateClock, 1000);
+        setupYearDropdown();
+
+        const now = new Date();
+        document.getElementById('selMonth').value = now.getMonth();
+
+        try {
+            const [mRes, aRes, pRes] = await Promise.all([
+                fetch('/api/members').then(r => r.json()),
+                fetch('/api/assignments').then(r => r.json()),
+                fetch('/api/projects').then(r => r.json())
+            ]);
+            registryData    = mRes;
+            assignmentsData = aRes;
+            projectsData    = pRes;
+        } catch (e) {
+            console.warn('Server offline. Using empty data.');
+            registryData    = [];
+            assignmentsData = [];
+            projectsData    = [];
+        }
+
+        updateFromToDates();
+        updateAnalysis();
+    });
+
+    /* ══════════════════════════════════════════════════════
+       CLOCK
+    ══════════════════════════════════════════════════════ */
+    function updateClock() {
+        const now = new Date();
+        const d = now.toLocaleDateString('en-GB', { weekday:'short', day:'2-digit', month:'short', year:'numeric' });
+        const t = now.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+        document.getElementById('liveTime').innerHTML = `${d}<br><span style="font-size:.85rem;font-weight:800;color:#fff;">${t}</span>`;
+    }
+
+    /* ══════════════════════════════════════════════════════
+       DROPDOWNS
+    ══════════════════════════════════════════════════════ */
+    function setupYearDropdown() {
+        const sel = document.getElementById('selYear');
+        const cur = new Date().getFullYear();
+        for (let y = cur - 1; y <= cur + 3; y++) {
+            const o = document.createElement('option');
+            o.value = y; o.textContent = y;
+            if (y === cur) o.selected = true;
+            sel.appendChild(o);
+        }
+    }
+
+    function updateFromToDates() {
+        const y = parseInt(document.getElementById('selYear').value);
+        const m = parseInt(document.getElementById('selMonth').value);
+        const first = new Date(y, m, 1);
+        const last  = new Date(y, m + 1, 0);
+        document.getElementById('fromDate').value = toISO(first);
+        document.getElementById('toDate').value   = toISO(last);
+        updateRangeBadge(first, last);
+    }
+
+    function handleYearMonthChange() { updateFromToDates(); updateAnalysis(); }
+    function handleDateRangeChange() {
+        const s = new Date(document.getElementById('fromDate').value);
+        const e = new Date(document.getElementById('toDate').value);
+        if (!isNaN(s) && !isNaN(e)) { updateRangeBadge(s, e); updateAnalysis(); }
+    }
+
+    function updateRangeBadge(start, end) {
+        const days = daysBetween(start, end);
+        document.getElementById('rangeBadge').textContent = `${days} Days`;
+        return days;
+    }
+
+    /* ══════════════════════════════════════════════════════
+       CORE ANALYSIS
+    ══════════════════════════════════════════════════════ */
+    function updateAnalysis() {
+        if (!registryData.length) return;
+
+        const from = new Date(document.getElementById('fromDate').value);
+        const to   = new Date(document.getElementById('toDate').value);
+        const days = daysBetween(from, to);
+
+        const y = parseInt(document.getElementById('selYear').value);
+        const m = parseInt(document.getElementById('selMonth').value);
+        document.getElementById('chartSubtitle').textContent =
+            `${MONTH_NAMES[m].toUpperCase()}-${y}`;
+
+        /* ── All unique departments (X-axis) ── */
+        const depts = [...new Set(registryData.map(r => r.dept))].sort();
+
+        /* ── All unique project codes active in range ── */
+        const activeProjCodes = [...new Set(
+            assignmentsData
+                .filter(a => new Date(a.start) <= to && new Date(a.end) >= from)
+                .map(a => a.projCode)
+        )].sort();
+
+        /* ── Per-department stats ── */
+        const deptStats = depts.map(dept => {
+            const members = registryData.filter(r => r.dept === dept);
+            const total   = members.length;
+
+            // which members from this dept are allocated in range?
+            const allocIds = new Set(
+                members
+                    .filter(r => assignmentsData.some(a =>
+                        a.empId === r.id &&
+                        new Date(a.start) <= to &&
+                        new Date(a.end)   >= from
+                    ))
+                    .map(r => r.id)
+            );
+            const allocated = allocIds.size;
+            const free      = total - allocated;
+
+            // per-project member counts for this dept
+            const byProject = {};
+            activeProjCodes.forEach(code => {
+                byProject[code] = members.filter(r =>
+                    assignmentsData.some(a =>
+                        a.empId === r.id && a.projCode === code &&
+                        new Date(a.start) <= to && new Date(a.end) >= from
+                    )
+                ).length;
+            });
+
+            return { dept, total, allocated, free, byProject,
+                     totalDays: total * days, freeDays: free * days, days };
+        });
+
+        /* ── Totals banner ── */
+        const sumTotal     = deptStats.reduce((a,d) => a + d.total,     0);
+        const sumAllocated = deptStats.reduce((a,d) => a + d.allocated, 0);
+        const sumFree      = deptStats.reduce((a,d) => a + d.free,      0);
+        const sumManDays   = deptStats.reduce((a,d) => a + d.totalDays, 0);
+
+        document.getElementById('tTotalEmp').textContent  = sumTotal;
+        document.getElementById('tAllocated').textContent = sumAllocated;
+        document.getElementById('tFree').textContent      = sumFree;
+        document.getElementById('tManDays').textContent   = sumManDays;
+        document.getElementById('tDays').textContent      = days;
+
+        renderChart(deptStats, activeProjCodes, days);
+        renderCards(deptStats, activeProjCodes);
+    }
+
+    /* ══════════════════════════════════════════════════════
+       CHART — stacked by PROJECT colour
+    ══════════════════════════════════════════════════════ */
+    function renderChart(deptStats, activeProjCodes, days) {
+        const ctx = document.getElementById('manDayChart').getContext('2d');
+        if (myChart) { myChart.destroy(); myChart = null; }
+
+        const labels = deptStats.map(d => d.dept);
+
+        /* One dataset per project */
+        const projectDatasets = activeProjCodes.map((code, i) => {
+            const color  = PROJECT_PALETTE[i % PROJECT_PALETTE.length];
+            const proj   = projectsData.find(p => p.code === code);
+            const pLabel = proj ? `${code} – ${proj.name}` : code;
+            return {
+                label: pLabel,
+                _code: code,
+                _color: color,
+                data: deptStats.map(d => (d.byProject[code] || 0) * days),
+                backgroundColor: hexToRgba(color, 0.82),
+                borderColor:     color,
+                borderWidth: 1,
+                borderRadius:    0,
+                borderSkipped:   false,
+            };
+        });
+
+        /* Free / open-for-work on top */
+        const freeDataset = {
+            label: 'Open for Work',
+            _code: '__free__',
+            _color: '#a5b4fc',
+            data: deptStats.map(d => d.freeDays),
+            backgroundColor: FREE_COLOR,
+            borderColor:     '#818cf8',
+            borderWidth:     1,
+            borderRadius:    { topLeft:7, topRight:7, bottomLeft:0, bottomRight:0 },
+            borderSkipped:   false,
+        };
+
+        const datasets = [...projectDatasets, freeDataset];
+
+        /* ── Build dynamic legend ── */
+        const legendEl = document.getElementById('chartLegend');
+        legendEl.innerHTML = datasets.map(ds => `
+            <div class="legend-item">
+                <div class="legend-dot" style="background:${ds._color};"></div>
+                ${ds.label}
+            </div>
+        `).join('');
+
+        /* ── Inner bar label plugin ── */
+        const innerLabelPlugin = {
+            id: 'innerLabels',
+            afterDraw(chart) {
+                const c2 = chart.ctx;
+                chart.data.datasets.forEach((dataset, dsIdx) => {
+                    const meta = chart.getDatasetMeta(dsIdx);
+                    if (meta.hidden) return;
+                    meta.data.forEach((bar, barIdx) => {
+                        const val = dataset.data[barIdx];
+                        if (!val || val < 1) return;
+                        const barH = Math.abs(bar.base - bar.y);
+                        if (barH < 20) return;
+
+                        // Figure out member count for this segment
+                        const ds = datasets[dsIdx];
+                        let count;
+                        if (ds._code === '__free__') {
+                            count = deptStats[barIdx].free;
+                        } else {
+                            count = deptStats[barIdx].byProject[ds._code] || 0;
+                        }
+                        if (!count) return;
+
+                        c2.save();
+                        c2.textAlign     = 'center';
+                        c2.textBaseline  = 'middle';
+                        const midY = bar.y + barH / 2;
+
+                        if (barH > 46) {
+                            c2.fillStyle = 'rgba(255,255,255,.9)';
+                            c2.font      = `bold 10px Inter`;
+                            const lbl = ds._code === '__free__' ? 'Open for work' : ds._code;
+                            c2.fillText(lbl, bar.x, midY - 7);
+                            c2.font      = `800 10px Inter`;
+                            c2.fillText(`mem : ${count}`, bar.x, midY + 7);
+                        } else {
+                            c2.fillStyle = 'rgba(255,255,255,.9)';
+                            c2.font      = `bold 9px Inter`;
+                            c2.fillText(`${count}`, bar.x, midY);
+                        }
+                        c2.restore();
+                    });
+                });
+            }
+        };
+
+        myChart = new Chart(ctx, {
+            type: 'bar',
+            data: { labels, datasets },
+            options: {
+                responsive:          true,
+                maintainAspectRatio: false,
+                interaction:         { mode:'index', intersect:false },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(0,31,63,.93)',
+                        titleColor:      '#fff',
+                        bodyColor:       'rgba(255,255,255,.85)',
+                        padding:         14,
+                        cornerRadius:    12,
+                        callbacks: {
+                            title(items) {
+                                return `Dept: ${items[0]?.label}`;
+                            },
+                            label(item) {
+                                const ds  = datasets[item.datasetIndex];
+                                const val = item.raw;
+                                if (!val) return null;
+                                const mem = ds._code === '__free__'
+                                    ? deptStats[item.dataIndex].free
+                                    : (deptStats[item.dataIndex].byProject[ds._code] || 0);
+                                return `  ${ds.label}: ${mem} mem × days = ${val}`;
+                            },
+                            afterBody(items) {
+                                const d = deptStats[items[0]?.dataIndex];
+                                if (!d) return [];
+                                return ['', `Total Members : ${d.total}`,
+                                        `Total Man-Days : ${d.totalDays}`];
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        stacked: true,
+                        grid:    { display: false },
+                        ticks:   { font:{ family:'Inter', weight:'700', size:11 }, color:'#475569', maxRotation:30 },
+                        border:  { color:'#e2e8f0' }
+                    },
+                    y: {
+                        stacked:      true,
+                        beginAtZero:  true,
+                        grid:         { color:'#f1f5f9', lineWidth:1.5 },
+                        ticks:        { font:{ family:'Inter', weight:'600', size:11 }, color:'#94a3b8', stepSize:50 },
+                        border:       { dash:[4,4], color:'#e2e8f0' }
+                    }
+                }
+            },
+            plugins: [innerLabelPlugin]
+        });
+    }
+
+    /* ══════════════════════════════════════════════════════
+       DEPT CARDS — show per-project breakdown
+    ══════════════════════════════════════════════════════ */
+    function renderCards(deptStats, activeProjCodes) {
+        const grid = document.getElementById('deptGrid');
+        grid.innerHTML = '';
+
+        deptStats.forEach(d => {
+            // Build project rows
+            const projRows = activeProjCodes
+                .map((code, i) => {
+                    const count = d.byProject[code] || 0;
+                    if (!count) return '';
+                    const color = PROJECT_PALETTE[i % PROJECT_PALETTE.length];
+                    const proj  = projectsData.find(p => p.code === code);
+                    const pName = proj ? proj.name : code;
+                    return `<div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+                        <div style="width:10px;height:10px;border-radius:3px;background:${color};flex-shrink:0;"></div>
+                        <span style="font-size:.7rem;font-weight:700;color:#475569;">${code}</span>
+                        <span style="font-size:.68rem;color:#94a3b8;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${pName}</span>
+                        <span style="font-size:.72rem;font-weight:800;color:var(--navy-dark);">${count} mem</span>
+                        <span style="font-size:.68rem;color:#64748b;">= ${count * d.days} days</span>
+                    </div>`;
+                }).join('');
+
+            const card = document.createElement('div');
+            card.className = 'dept-card';
+            card.innerHTML = `
+                <div class="dc-dept-name">
+                    <i class="bi bi-diagram-3-fill me-1" style="color:var(--teal-bright);"></i>
+                    ${d.dept}
+                </div>
+                <div class="dc-row">
+                    <div class="dc-stat">
+                        <div class="dc-stat-val" style="color:var(--navy-dark)">${d.total}</div>
+                        <div class="dc-stat-lbl">Total Members</div>
+                    </div>
+                    <div class="dc-stat">
+                        <div class="dc-stat-val" style="color:#6366f1">${d.allocated}</div>
+                        <div class="dc-stat-lbl">Allocated</div>
+                    </div>
+                    <div class="dc-stat">
+                        <div class="dc-stat-val" style="color:#a5b4fc">${d.free}</div>
+                        <div class="dc-stat-lbl">Open for Work</div>
+                    </div>
+                    <div class="dc-stat">
+                        <div class="dc-stat-val" style="color:var(--gold)">${d.totalDays}</div>
+                        <div class="dc-stat-lbl">Total Man-Days</div>
+                    </div>
+                </div>
+                ${projRows ? `<div style="border-top:1px solid #f1f5f9;margin-top:12px;padding-top:10px;">
+                    <div style="font-size:.6rem;font-weight:900;text-transform:uppercase;letter-spacing:.8px;color:#94a3b8;margin-bottom:4px;">Project Breakdown</div>
+                    ${projRows}
+                </div>` : ''}
+                <div class="dc-formula">
+                    <i class="bi bi-calculator-fill"></i>
+                    Total mem : ${d.total} &nbsp;|&nbsp;
+                    ${d.total} × ${d.days} days = <strong>${d.totalDays} man-days</strong>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    /* ══════════════════════════════════════════════════════
+       HELPERS
+    ══════════════════════════════════════════════════════ */
+    function daysBetween(a, b) {
+        return Math.max(1, Math.ceil(Math.abs(b - a) / 86400000) + 1);
+    }
+    function toISO(d) {
+        return d.toISOString().split('T')[0];
+    }
+    function hexToRgba(hex, alpha) {
+        const r = parseInt(hex.slice(1,3),16);
+        const g = parseInt(hex.slice(3,5),16);
+        const b = parseInt(hex.slice(5,7),16);
+        return `rgba(${r},${g},${b},${alpha})`;
+    }
+    </script>
+</body>
+</html>

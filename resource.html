@@ -1,0 +1,2965 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danprel Engineering Automation | Resource Allocation Console</title>
+    <!-- Authentication Security Check -->
+    <script>
+        if (localStorage.getItem('danprel_auth') !== 'true') {
+            window.location.replace('login.html');
+        }
+    </script>
+    <meta name="description"
+        content="Enterprise member allocation monitoring dashboard for Danprel Engineering Automation.">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --navy-dark: #001f3f;
+            --navy-mid: #003366;
+            --blue-accent: #005a9c;
+            --teal-bright: #14b8a6;
+            --gold: #f59e0b;
+            --bg-neutral: #f1f5f9;
+            --card-shadow: 0 10px 40px rgba(0, 31, 63, 0.08);
+            --radius-card: 24px;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-neutral);
+            color: #1e293b;
+            padding: 20px;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* ── HEADER ──────────────────────────────────────────── */
+        .app-header {
+            background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy-mid) 100%);
+            border-radius: var(--radius-card);
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 32px rgba(0, 31, 63, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .app-header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 20% 50%, rgba(20, 184, 166, 0.12) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .brand-box {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .brand-logo-wrap {
+            width: 54px;
+            height: 54px;
+            background: white;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .brand-logo-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 4px;
+        }
+
+        .brand-text-block {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .brand-name {
+            font-size: 1.05rem;
+            font-weight: 900;
+            color: #fff;
+            letter-spacing: 0.4px;
+            line-height: 1.1;
+        }
+
+        .brand-sub {
+            font-size: 0.62rem;
+            font-weight: 600;
+            color: var(--teal-bright);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .header-center-title {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(8px);
+            color: white;
+            padding: 10px 28px;
+            border-radius: 100px;
+            font-weight: 800;
+            font-size: 0.82rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        @media(max-width: 992px) {
+            .app-header {
+                flex-direction: column;
+                gap: 20px;
+                padding: 24px;
+                text-align: center;
+            }
+
+            .brand-box {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .header-center-title {
+                position: static;
+                transform: none;
+                order: 3;
+                width: 100%;
+                font-size: 0.75rem;
+            }
+
+            .header-right {
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+        }
+
+        @media(max-width: 600px) {
+            .brand-name {
+                font-size: 0.95rem;
+            }
+
+            .header-center-title {
+                display: none;
+            }
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-timestamp {
+            color: rgba(255, 255, 255, 0.55);
+            font-size: 0.68rem;
+            font-weight: 600;
+            text-align: right;
+            line-height: 1.4;
+        }
+
+        .btn-logout {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.25s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-logout:hover {
+            background: #e11d48;
+            border-color: #f43f5e;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(225, 29, 72, 0.3);
+        }
+
+        .btn-intel {
+            background: var(--blue-accent);
+            border: none;
+            color: #fff;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.25s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 14px rgba(0, 90, 156, 0.3);
+        }
+
+        .btn-intel:hover {
+            background: var(--teal-bright);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(20, 184, 166, 0.4);
+        }
+
+        .btn-add-project {
+            background: var(--teal-bright);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 100px;
+            font-weight: 800;
+            font-size: 0.78rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            cursor: pointer;
+            transition: all 0.25s;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 14px rgba(20, 184, 166, 0.4);
+        }
+
+        .btn-add-project:hover {
+            background: #0d9488;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(20, 184, 166, 0.5);
+        }
+
+        /* ── FILTER BAR ────────────────────────────────────────── */
+        .global-filter-bar {
+            background: #fff;
+            border-radius: 20px;
+            padding: 15px 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 20px rgba(0, 31, 63, 0.07);
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            flex-wrap: wrap;
+            max-width: 100%;
+        }
+
+        @media(max-width: 768px) {
+            .global-filter-bar {
+                border-radius: 24px;
+                padding: 20px;
+            }
+
+            .filter-divider {
+                display: none;
+            }
+        }
+
+        .filter-label {
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: var(--navy-mid);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-label .bi {
+            color: var(--blue-accent);
+        }
+
+        .filter-divider {
+            width: 1px;
+            height: 28px;
+            background: #e2e8f0;
+        }
+
+        .clean-select,
+        .clean-input {
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 5px 14px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            background: #f8fafc;
+            outline: none;
+            transition: 0.2s;
+            color: var(--navy-dark);
+        }
+
+        .clean-select:focus,
+        .clean-input:focus {
+            border-color: var(--blue-accent);
+            box-shadow: 0 0 0 3px rgba(0, 90, 156, 0.1);
+            background: white;
+        }
+
+        @media(max-width: 600px) {
+
+            .clean-select,
+            .clean-input {
+                width: 100% !important;
+                margin-bottom: 5px;
+            }
+
+            .filter-label {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
+
+        /* ── STAT CHIPS ──────────────────────────────────────── */
+        .stat-bar {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+
+        .stat-chip {
+            background: white;
+            border-radius: 16px;
+            padding: 14px 22px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: 0 4px 16px rgba(0, 31, 63, 0.06);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            flex: 1 1 200px;
+            min-width: 140px;
+        }
+
+        @media(max-width: 768px) {
+            .stat-chip {
+                padding: 10px 15px;
+            }
+
+            .stat-chip-value {
+                font-size: 1.1rem;
+            }
+        }
+
+        .stat-chip-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .sci-navy {
+            background: #e6f1ff;
+            color: var(--navy-mid);
+        }
+
+        .sci-teal {
+            background: #ccfbf1;
+            color: #0d9488;
+        }
+
+        .sci-gold {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .sci-rose {
+            background: #ffe4e6;
+            color: #e11d48;
+        }
+
+        .sci-violet {
+            background: #ede9fe;
+            color: #7c3aed;
+        }
+
+        .stat-chip-label {
+            font-size: 0.62rem;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+        }
+
+        .stat-chip-value {
+            font-size: 1.3rem;
+            font-weight: 900;
+            color: var(--navy-dark);
+            line-height: 1;
+        }
+
+        /* ── LAYOUT ────────────────────────────────────────────── */
+        .console-grid {
+            display: grid;
+            grid-template-columns: 460px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        @media(max-width: 1200px) {
+            .console-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .ui-card {
+                width: 100%;
+            }
+        }
+
+        .ui-card {
+            background: white;
+            border-radius: var(--radius-card);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+        }
+
+        .ui-card-header {
+            padding: 18px 24px;
+            background: #fafafa;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        @media(max-width: 500px) {
+            .ui-card-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        .card-title {
+            font-size: 0.68rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title .bi {
+            color: var(--blue-accent);
+            font-size: 0.9rem;
+        }
+
+        /* ── EXPORT BUTTON ───────────────────────────────────── */
+        .btn-export {
+            background: var(--navy-dark);
+            color: white;
+            border: none;
+            padding: 7px 16px;
+            border-radius: 100px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: 0.25s;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-export:hover {
+            background: var(--blue-accent);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(0, 31, 63, 0.25);
+        }
+
+        /* ── TABLE ─────────────────────────────────────────────── */
+        .registry-table th {
+            background: #f8fafc;
+            font-size: 0.62rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: #94a3b8;
+            padding: 14px 16px;
+            letter-spacing: 0.8px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .registry-table td {
+            padding: 12px 16px;
+            vertical-align: middle;
+            font-size: 0.83rem;
+            border-bottom: 1px solid #f8fafc;
+        }
+
+        .registry-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .role-badge {
+            padding: 4px 12px;
+            border-radius: 100px;
+            font-size: 0.65rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        .role-pm {
+            background: #e6f1ff;
+            color: var(--navy-mid);
+        }
+
+        .role-lead {
+            background: #ccfbf1;
+            color: #0d9488;
+        }
+
+        .role-member {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .action-btn {
+            background: #f1f5f9;
+            border: none;
+            color: var(--navy-mid);
+            padding: 6px 11px;
+            border-radius: 9px;
+            transition: 0.2s;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .action-btn:hover {
+            background: var(--navy-mid);
+            color: white;
+        }
+
+        .proj-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            background: #e6f1ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 6px;
+            padding: 2px 7px;
+            font-size: 0.6rem;
+            font-weight: 800;
+            color: var(--navy-mid);
+            margin: 1px;
+        }
+
+        @media(max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            .ui-card-header {
+                padding: 15px;
+            }
+
+            .registry-table th,
+            .registry-table td {
+                padding: 10px 8px;
+                font-size: 0.75rem;
+            }
+
+            .action-btn {
+                padding: 5px 8px;
+            }
+        }
+
+        /* ── GANTT ───────────────────────────────────────────── */
+        .gantt-pane {
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .gantt-sticky-head {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: white;
+        }
+
+        .m-row {
+            display: flex;
+            background: var(--navy-dark);
+            color: white;
+        }
+
+        .fix-col {
+            width: 190px;
+            min-width: 190px;
+            border-right: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .m-cell {
+            flex-shrink: 0;
+            text-align: center;
+            padding: 9px 0;
+            font-weight: 800;
+            font-size: 0.68rem;
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            overflow: hidden;
+        }
+
+        .w-row {
+            display: flex;
+            background: #f8fafc;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .w-fix-col {
+            width: 190px;
+            min-width: 190px;
+            border-right: 2px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            padding: 0 14px;
+            font-size: 0.6rem;
+            font-weight: 800;
+            color: #94a3b8;
+            text-transform: uppercase;
+        }
+
+        .w-cell {
+            flex-shrink: 0;
+            text-align: center;
+            padding: 4px 2px;
+            border-right: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+        }
+
+        .w-num {
+            font-size: 0.58rem;
+            font-weight: 900;
+            color: var(--navy-mid);
+        }
+
+        .w-date {
+            font-size: 0.5rem;
+            font-weight: 600;
+            color: #94a3b8;
+        }
+
+        .w-day {
+            font-size: 0.48rem;
+            font-weight: 800;
+            color: var(--teal-bright);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .g-row {
+            display: flex;
+            border-bottom: 1px solid #f1f5f9;
+            min-height: 62px;  /* single-lane rows; multi-lane grows dynamically */
+        }
+
+        .g-res-info {
+            width: 190px;
+            min-width: 190px;
+            padding: 14px 16px;
+            background: white;
+            position: sticky;
+            left: 0;
+            z-index: 10;
+            border-right: 2px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .g-res-name {
+            font-size: 0.83rem;
+            font-weight: 900;
+            color: var(--navy-dark);
+        }
+
+        .g-res-role {
+            font-size: 0.6rem;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 3px;
+        }
+
+        .g-track {
+            position: relative;
+            flex-grow: 1;
+            background-image: linear-gradient(to right, #f1f5f9 1px, transparent 1px);
+        }
+
+        .g-bar {
+            position: absolute;
+            height: 26px;
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.58rem;
+            font-weight: 900;
+            padding: 0 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            transition: 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            z-index: 5;
+        }
+
+        .g-bar:hover {
+            transform: translateY(-3px) scale(1.02);
+            filter: brightness(1.1);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.18);
+        }
+
+        .b-pm {
+            background: linear-gradient(135deg, #001f3f, #005a9c);
+        }
+
+        .b-lead {
+            background: linear-gradient(135deg, #14b8a6, #2dd4bf);
+        }
+
+        .b-member {
+            background: linear-gradient(135deg, #94a3b8, #cbd5e1);
+            color: #1e293b;
+        }
+
+        .b-date {
+            position: absolute;
+            bottom: -17px;
+            font-size: 0.52rem;
+            font-weight: 800;
+            color: #64748b;
+            white-space: nowrap;
+        }
+
+        /* grey out-of-range zone */
+        .g-grey-zone {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            z-index: 3;
+            pointer-events: none;
+            background: rgba(148, 163, 184, 0.22);
+        }
+
+        .g-grey-left {
+            left: 0;
+            border-right: 2px dashed rgba(148, 163, 184, 0.6);
+        }
+
+        .g-grey-right {
+            right: 0;
+            border-left: 2px dashed rgba(148, 163, 184, 0.6);
+        }
+
+        /* ── GANTT LEGEND ────────────────────────────────────── */
+        .gantt-legend {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .legend-label {
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        @media(max-width: 600px) {
+            .gantt-legend {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 10px;
+                width: 100%;
+            }
+        }
+
+        /* ── ADD MEMBER BUTTON ───────────────────────────────── */
+        .btn-add-member {
+            background: linear-gradient(135deg, var(--navy-mid), var(--blue-accent));
+            border: none;
+            color: white;
+            padding: 7px 14px;
+            border-radius: 100px;
+            font-weight: 800;
+            font-size: 0.72rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.25s;
+            letter-spacing: 0.3px;
+            box-shadow: 0 3px 10px rgba(0, 31, 63, 0.2);
+        }
+
+        .btn-add-member:hover {
+            filter: brightness(1.15);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(0, 31, 63, 0.3);
+        }
+
+        /* ── PIN MODAL ───────────────────────────────────────── */
+        .pin-digit {
+            width: 56px;
+            height: 64px;
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: 900;
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            background: #f8fafc;
+            transition: 0.2s;
+            outline: none;
+            caret-color: var(--blue-accent);
+        }
+
+        .pin-digit:focus {
+            border-color: var(--blue-accent);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(0, 90, 156, 0.15);
+        }
+
+        .pin-digit.filled {
+            border-color: var(--teal-bright);
+            background: #f0fdf4;
+            color: var(--navy-dark);
+        }
+
+        /* ── PROJECT BADGE (in table) ────────────────────────── */
+        .proj-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 6px;
+            padding: 3px 8px;
+            font-size: 0.6rem;
+            font-weight: 800;
+            color: var(--navy-mid);
+            margin: 2px;
+            white-space: nowrap;
+        }
+
+        /* ── POPUP ───────────────────────────────────────────── */
+        .overlay-dim {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 9998;
+            display: none;
+        }
+
+        .detail-card {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 580px;
+            max-width: 95vw;
+            background: white;
+            border-radius: 40px;
+            z-index: 9999;
+            display: none;
+            overflow: hidden;
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dc-top {
+            background: #004a8d;
+            /* Deep professional blue */
+            background: linear-gradient(135deg, #003366, #0056a0);
+            color: white;
+            padding: 32px 36px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        .dc-main {
+            padding: 32px 36px 36px;
+        }
+
+        .dc-timeline-bar {
+            height: 14px;
+            background: linear-gradient(90deg, var(--teal-bright), var(--gold));
+            border-radius: 20px;
+            margin-bottom: 28px;
+            box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+            position: relative;
+        }
+
+        .dc-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 18px;
+            background: #f8fafc;
+            border-radius: 14px;
+            margin-bottom: 10px;
+            border-left: 5px solid var(--navy-mid);
+        }
+
+        /* ── MODALS ──────────────────────────────────────────── */
+        .modal-content {
+            border-radius: 26px;
+            border: none;
+        }
+
+        .modal-hdr-dark {
+            background: var(--navy-dark);
+            color: white;
+            border-radius: 26px 26px 0 0;
+            padding: 22px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-lbl {
+            font-size: 0.62rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--blue-accent);
+            margin-bottom: 8px;
+        }
+
+        /* ── DROPDOWN ITEM ───────────────────────────────────── */
+        .proj-drop-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.15s;
+            border: 1px solid transparent;
+        }
+
+        .proj-drop-item:hover {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+        }
+
+        .proj-drop-code {
+            font-size: 0.7rem;
+            font-weight: 900;
+            color: var(--navy-mid);
+            background: #dbeafe;
+            padding: 3px 8px;
+            border-radius: 6px;
+        }
+
+        .proj-drop-name {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .proj-drop-dates {
+            font-size: 0.62rem;
+            color: #94a3b8;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        /* ── SCROLLBAR ───────────────────────────────────────── */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--blue-accent);
+        }
+
+        /* ── TOAST ────────────────────────────────────────────── */
+        .gantt-toast {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            background: var(--navy-dark);
+            color: white;
+            padding: 14px 22px;
+            border-radius: 14px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 8px 24px rgba(0, 31, 63, 0.4);
+            transform: translateY(80px);
+            opacity: 0;
+            transition: 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .gantt-toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* ── POPUP ANIMATION ─────────────────────────────────── */
+        @keyframes popupIn {
+            from {
+                transform: translate(-50%, -50%) scale(0.88);
+                opacity: 0;
+            }
+
+            to {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .detail-card.open {
+            animation: popupIn 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+
+        /* ── POPUP AVATAR ────────────────────────────────────── */
+        .dc-avatar {
+            width: 72px;
+            height: 72px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: white;
+            flex-shrink: 0;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .dc-role-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1.5px solid rgba(255, 255, 255, 0.25);
+            border-radius: 100px;
+            padding: 6px 16px;
+            font-size: 0.68rem;
+            font-weight: 800;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .dc-dept-tag {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 6px 14px;
+            font-size: 0.64rem;
+            font-weight: 800;
+            color: rgba(255, 255, 255, 0.9);
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            white-space: nowrap;
+        }
+
+        .dc-header-close {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 1.1rem;
+        }
+
+        .dc-header-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        /* ── POPUP STAT CELLS ────────────────────────────────── */
+        .dc-stat-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+        }
+
+        .dc-stat-cell {
+            background: #f8fafc;
+            text-align: center;
+            padding: 14px 8px;
+            border-right: 1px solid #e2e8f0;
+        }
+
+        .dc-stat-cell:last-child {
+            border-right: none;
+        }
+
+        .dc-stat-num {
+            font-size: 1.3rem;
+            font-weight: 900;
+            color: var(--navy-dark);
+            line-height: 1;
+        }
+
+        .dc-stat-lbl {
+            font-size: 0.55rem;
+            font-weight: 800;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-top: 4px;
+        }
+
+        /* ── POPUP TIMELINE ──────────────────────────────────── */
+        .dc-timeline-wrap {
+            margin-bottom: 20px;
+        }
+
+        .dc-tl-header {
+            font-size: 0.58rem;
+            font-weight: 800;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .dc-tl-track {
+            height: 10px;
+            border-radius: 100px;
+            background: #f1f5f9;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 6px;
+        }
+
+        .dc-tl-fill {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            border-radius: 100px;
+            background: linear-gradient(90deg, var(--teal-bright), var(--gold));
+        }
+
+        .dc-tl-dates {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.65rem;
+            font-weight: 800;
+            color: var(--navy-mid);
+        }
+
+        /* ── POPUP PROJECT CARDS ─────────────────────────────── */
+        .dc-proj-card {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            padding: 18px 20px;
+            border-radius: 20px;
+            border: 1px solid #f1f5f9;
+            background: #ffffff;
+            margin-bottom: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+        }
+
+        .dc-proj-card:hover {
+            border-color: #dbeafe;
+            transform: translateY(-2px) translateX(4px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .dc-proj-dot {
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.62rem;
+            font-weight: 900;
+            color: white;
+            text-align: center;
+            line-height: 1.2;
+            letter-spacing: 0.5px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .dc-proj-code {
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: #0f172a;
+            margin-bottom: 4px;
+        }
+
+        .dc-proj-dates-row {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dc-proj-days-num {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #003366;
+            line-height: 1;
+            text-align: right;
+        }
+
+        .dc-proj-days-lbl {
+            font-size: 0.6rem;
+            font-weight: 800;
+            color: #94a3b8;
+            text-transform: uppercase;
+            text-align: right;
+            margin-top: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .dc-empty-state {
+            text-align: center;
+            padding: 28px 0;
+        }
+
+        .dc-empty-state i {
+            font-size: 2.5rem;
+            color: #cbd5e1;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .dc-empty-state p {
+            font-size: 0.78rem;
+            color: #94a3b8;
+            font-weight: 600;
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <header class="app-header">
+        <div class="brand-box">
+            <div class="brand-logo-wrap">
+                <img src="asset/image.png" alt="Danprel Logo">
+            </div>
+            <div class="brand-text-block">
+                <div class="brand-name">DANPREL</div>
+                <div class="brand-sub">Engineering Automation Pvt Ltd</div>
+            </div>
+        </div>
+        <div class="header-center-title">
+            <i class="bi bi-grid-3x2-gap-fill me-2"></i>Resource Allocation Monitoring
+        </div>
+        <div class="header-right">
+            <div class="header-timestamp" id="liveTime"></div>
+            <a href="summary.html" class="btn-intel" title="Intelligence Hub" style="text-decoration:none;">
+                <i class="bi bi-cpu-fill"></i>
+            </a>
+            <button class="btn-logout" onclick="performLogout()" title="Logout">
+                <i class="bi bi-box-arrow-right"></i>
+            </button>
+            <button class="btn-add-project" onclick="openPinModal()">
+                <i class="bi bi-folder-plus"></i> Add Project
+            </button>
+        </div>
+    </header>
+
+    <!-- ===== STAT CHIPS ===== -->
+    <div class="stat-bar">
+        <div class="stat-chip">
+            <div class="stat-chip-icon sci-navy"><i class="bi bi-people-fill"></i></div>
+            <div>
+                <div class="stat-chip-label">Total Persons</div>
+                <div class="stat-chip-value" id="sc-total">0</div>
+            </div>
+        </div>
+        <div class="stat-chip">
+            <div class="stat-chip-icon sci-navy"><i class="bi bi-briefcase-fill"></i></div>
+            <div>
+                <div class="stat-chip-label">Project Managers</div>
+                <div class="stat-chip-value" id="sc-pm">0</div>
+            </div>
+        </div>
+        <div class="stat-chip">
+            <div class="stat-chip-icon sci-teal"><i class="bi bi-person-badge-fill"></i></div>
+            <div>
+                <div class="stat-chip-label">Dept. Leads</div>
+                <div class="stat-chip-value" id="sc-lead">0</div>
+            </div>
+        </div>
+        <div class="stat-chip">
+            <div class="stat-chip-icon sci-gold"><i class="bi bi-person-fill"></i></div>
+            <div>
+                <div class="stat-chip-label">Team Members</div>
+                <div class="stat-chip-value" id="sc-member">0</div>
+            </div>
+        </div>
+        <div class="stat-chip">
+            <div class="stat-chip-icon sci-violet"><i class="bi bi-kanban-fill"></i></div>
+            <div>
+                <div class="stat-chip-label">Projects Active</div>
+                <div class="stat-chip-value" id="sc-proj">0</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== FILTER BAR ===== -->
+    <div class="text-center mb-3">
+        <div class="global-filter-bar">
+            <div class="filter-label"><i class="bi bi-funnel-fill"></i> Department</div>
+            <select id="fDept" class="clean-select" onchange="renderUI()" style="width:170px;">
+                <option value="ALL">All Departments</option>
+                <option>Mechanical Design</option>
+                <option>Mechanical Assembly</option>
+                <option>Electrical Design</option>
+                <option>Electrical Assembly</option>
+                <option>Robot Programming</option>
+                <option>PLC Programming</option>
+                <option>LabVIEW Programming</option>
+            </select>
+            <div class="filter-divider"></div>
+            <div class="filter-divider"></div>
+            <div class="filter-label"><i class="bi bi-folder-fill"></i> Project</div>
+            <select id="fProject" class="clean-select" onchange="renderUI()" style="width:160px;">
+                <option value="ALL">All Projects</option>
+            </select>
+            <div class="filter-divider"></div>
+            <div class="filter-label"><i class="bi bi-calendar-range-fill"></i> Year</div>
+            <select id="fYear" class="clean-select" onchange="onYearChange()" style="width:100px;">
+                <option selected>2026</option>
+                <option>2027</option>
+                <option>2028</option>
+            </select>
+            <div class="filter-divider"></div>
+            <div class="filter-label"><i class="bi bi-calendar3"></i> From</div>
+            <input type="date" id="fFrom" class="clean-input" value="2026-01-01" onchange="renderUI()">
+            <div class="filter-label"><i class="bi bi-calendar3-range"></i> To</div>
+            <input type="date" id="fTo" class="clean-input" value="2026-12-31" onchange="renderUI()">
+        </div>
+    </div>
+
+    <!-- ===== MAIN GRID ===== -->
+    <div class="console-grid">
+
+        <!-- LEFT: Registry Table -->
+        <div class="ui-card">
+            <div class="ui-card-header">
+                <span class="card-title"><i class="bi bi-person-lines-fill"></i>Employees</span>
+                <div class="d-flex align-items-center gap-2">
+                    <span id="unitCounter" class="badge rounded-pill px-3 py-2"
+                        style="background:var(--navy-dark);font-size:0.7rem;">0 Members</span>
+                    <button class="btn-add-member" onclick="openAddMember()">
+                        <i class="bi bi-person-plus-fill"></i> Add Member
+                    </button>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table registry-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Emp ID</th>
+                            <th>Role</th>
+                            <th>Department</th>
+                            <th>Exp</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="registryTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- RIGHT: Gantt -->
+        <div class="ui-card" id="ganttCard">
+            <div class="ui-card-header bg-white">
+                <span class="card-title"><i class="bi bi-bar-chart-steps"></i>Timeline Visualization</span>
+                <div class="d-flex align-items-center gap-3">
+                    <button class="btn-export" onclick="exportGantt()">
+                        <i class="bi bi-download"></i> Export
+                    </button>
+                </div>
+            </div>
+            <div class="gantt-pane" id="ganttPane">
+                <div class="gantt-sticky-head">
+                    <div class="m-row" id="mHeader">
+                        <div class="fix-col"></div>
+                    </div>
+                    <div class="w-row" id="wHeader">
+                        <div class="w-fix-col">Week / Start</div>
+                    </div>
+                </div>
+                <div id="ganttBody"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== ADD MEMBER MODAL ===== -->
+    <div class="modal fade" id="addMemberModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-hdr-dark">
+                    <h5 class="fw-bold mb-0"><i class="bi bi-person-plus-fill me-2"></i>Add New Member</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4" style="background:#fafafa;">
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-7">
+                            <div class="section-lbl">Full Name</div>
+                            <input type="text" id="mName" class="form-control rounded-3 fw-bold">
+                        </div>
+                        <div class="col-5">
+                            <div class="section-lbl">Employee Code</div>
+                            <input type="text" id="mEmpId" class="form-control rounded-3 fw-bold"
+                                style="text-transform:uppercase;">
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <div class="section-lbl">Role</div>
+                            <select id="mRole" class="form-select rounded-3 fw-bold">
+                                <option value="PM">Project Manager</option>
+                                <option value="Lead">Department Lead</option>
+                                <option value="Member" selected>Team Member</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <div class="section-lbl">Experience</div>
+                            <input type="text" id="mExp" class="form-control rounded-3 fw-bold">
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="section-lbl">Department</div>
+                        <select id="mDept" class="form-select rounded-3 fw-bold">
+                            <option>Mechanical Design</option>
+                            <option>Mechanical Assembly</option>
+                            <option>Electrical Design</option>
+                            <option>Electrical Assembly</option>
+                            <option>Robot Programming</option>
+                            <option>PLC Programming</option>
+                            <option>LabVIEW Programming</option>
+                        </select>
+                    </div>
+
+                    <!-- Info note about permanent save -->
+                    <div class="d-flex align-items-start gap-2 p-3 rounded-3 mb-4"
+                        style="background:#f0fdf4;border:1px solid #bbf7d0;">
+                        <i class="bi bi-shield-fill-check mt-1" style="color:#16a34a;flex-shrink:0;"></i>
+                        <div class="small" style="color:#166534;font-weight:600;">
+                            Member will be saved <strong>permanently</strong> to
+                            <strong>resources.csv</strong>
+                        </div>
+                    </div>
+
+                    <button class="btn fw-900 w-100 py-3 rounded-pill" style="background:var(--navy-dark);color:white;"
+                        onclick="finalizeAddMember()">
+                        <i class="bi bi-person-check-fill me-2"></i>Save &amp; Add Member
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== EXPORT RANGE MODAL ===== -->
+    <div class="modal fade" id="exportRangeModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered" style="max-width:460px;">
+            <div class="modal-content border-0 shadow-lg" style="border-radius:1.5rem; overflow:hidden;">
+                <!-- Header -->
+                <div style="background:linear-gradient(135deg,#001f3f,#003366);padding:22px 28px;color:white;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="fw-800 mb-0"><i class="bi bi-download me-2"></i>Export Resource Data</h5>
+                            <div style="font-size:0.7rem;opacity:0.6;margin-top:4px;">Choose range, format and download</div>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                </div>
+                <div class="modal-body p-4" style="background:#fafafa;">
+                    <!-- Date Range -->
+                    <div class="section-lbl mb-2">Date Range</div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-6">
+                            <label class="form-label small fw-bold text-muted">From Date</label>
+                            <input type="date" id="exFrom" class="form-control rounded-3 fw-bold">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-bold text-muted">To Date</label>
+                            <input type="date" id="exTo" class="form-control rounded-3 fw-bold">
+                        </div>
+                    </div>
+
+                    <!-- Format Selector -->
+                    <div class="section-lbl mb-2">Export Format</div>
+                    <div class="d-flex gap-3 mb-4" id="formatBtns">
+                        <button class="flex-fill btn border rounded-3 py-4 format-opt active" id="fmtPdf" onclick="selectFormat('pdf')" style="transition:all .2s;">
+                            <i class="bi bi-file-earmark-pdf d-block mb-2" style="font-size:2rem;color:#ef4444;"></i>
+                            <span class="fw-800">PDF Report</span>
+                            <div style="font-size:0.65rem;color:#64748b;margin-top:4px;">Employees + Timeline</div>
+                        </button>
+                        <button class="flex-fill btn border rounded-3 py-4 format-opt" id="fmtCsv" onclick="selectFormat('csv')" style="transition:all .2s;">
+                            <i class="bi bi-file-earmark-spreadsheet d-block mb-2" style="font-size:2rem;color:#10b981;"></i>
+                            <span class="fw-800">CSV Spreadsheet</span>
+                            <div style="font-size:0.65rem;color:#64748b;margin-top:4px;">Employees + Timeline</div>
+                        </button>
+                    </div>
+
+                    <button class="btn fw-900 w-100 py-3 rounded-pill shadow-sm" style="background:var(--navy-dark);color:white;" onclick="executeExport()">
+                        <i class="bi bi-download me-2"></i>Download Export
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .format-opt.active {
+            background: #eff6ff !important;
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+        }
+        .format-opt:hover { background: #f8fafc; }
+    </style>
+
+    <!-- ===== EDIT MEMBER MODAL ===== -->
+    <div class="modal fade" id="editMemberModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-hdr-dark" style="background:var(--navy-mid);">
+                    <h5 class="fw-bold mb-0"><i class="bi bi-pencil-square me-2"></i>Edit Member Details</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4" style="background:#fafafa;">
+                    <input type="hidden" id="eIdx">
+                    <div class="row g-3 mb-3">
+                        <div class="col-7">
+                            <div class="section-lbl">Full Name</div>
+                            <input type="text" id="eName" class="form-control rounded-3 fw-bold">
+                        </div>
+                        <div class="col-5">
+                            <div class="section-lbl">Employee Code</div>
+                            <input type="text" id="eEmpId" class="form-control rounded-3 fw-bold bg-light" readonly
+                                title="Employee ID cannot be changed">
+                        </div>
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <div class="section-lbl">Role</div>
+                            <select id="eRole" class="form-select rounded-3 fw-bold">
+                                <option value="PM">Project Manager</option>
+                                <option value="Lead">Department Lead</option>
+                                <option value="Member">Team Member</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <div class="section-lbl">Experience</div>
+                            <input type="text" id="eExp" class="form-control rounded-3 fw-bold">
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <div class="section-lbl">Department</div>
+                        <select id="eDept" class="form-select rounded-3 fw-bold">
+                            <option>Mechanical Design</option>
+                            <option>Mechanical Assembly</option>
+                            <option>Electrical Design</option>
+                            <option>Electrical Assembly</option>
+                            <option>Robot Programming</option>
+                            <option>PLC Programming</option>
+                            <option>LabVIEW Programming</option>
+                        </select>
+                    </div>
+                    <button class="btn fw-900 w-100 py-3 rounded-pill" style="background:var(--navy-dark);color:white;"
+                        onclick="finalizeEditMember()">
+                        <i class="bi bi-save me-2"></i>Update Details
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== PIN MODAL ===== -->
+    <div class="modal fade" id="pinModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered" style="max-width:380px;">
+            <div class="modal-content" style="border-radius:28px;overflow:hidden;border:none;">
+                <div
+                    style="background:linear-gradient(135deg,var(--navy-dark),var(--blue-accent));padding:30px 32px;text-align:center;color:white;">
+                    <div
+                        style="width:64px;height:64px;background:rgba(255,255,255,0.15);border-radius:20px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
+                        <i class="bi bi-shield-lock-fill" style="font-size:1.8rem;"></i>
+                    </div>
+                    <h5 class="fw-900 mb-1">Authorization Required</h5>
+                    <div class="small" style="opacity:0.65;">Enter 4-digit access PIN to create a project</div>
+                </div>
+                <div style="padding:30px 32px;background:white;">
+                    <div class="d-flex gap-3 justify-content-center mb-3" id="pinInputRow">
+                        <input class="pin-digit" id="pin0" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]"
+                            autocomplete="off">
+                        <input class="pin-digit" id="pin1" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]"
+                            autocomplete="off">
+                        <input class="pin-digit" id="pin2" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]"
+                            autocomplete="off">
+                        <input class="pin-digit" id="pin3" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]"
+                            autocomplete="off">
+                    </div>
+                    <div id="pinError" class="alert alert-danger py-2 text-center small mb-3"
+                        style="display:none;border-radius:12px;">
+                        <i class="bi bi-x-circle me-1"></i> Incorrect PIN — please try again.
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-secondary flex-fill rounded-pill fw-bold"
+                            data-bs-dismiss="modal">Cancel</button>
+                        <button class="btn fw-900 flex-fill rounded-pill" onclick="checkPin()"
+                            style="background:var(--navy-dark);color:white;">
+                            <i class="bi bi-unlock-fill me-1"></i> Verify
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== ADD PROJECT MODAL ===== -->
+    <div class="modal fade" id="addProjectModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-hdr-dark">
+                    <h5 class="fw-bold mb-0"><i class="bi bi-folder-plus me-2"></i>Create New Project</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4" style="background:#fafafa;">
+                    <div class="mb-3">
+                        <div class="section-lbl">Project Name</div>
+                        <input type="text" id="projName" class="form-control rounded-3 fw-bold">
+                    </div>
+                    <div class="mb-3">
+                        <div class="section-lbl">Project Code</div>
+                        <input type="text" id="projCode" class="form-control rounded-3 fw-bold"
+                            style="text-transform:uppercase;">
+                    </div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-6">
+                            <div class="section-lbl">Actual Start Date</div>
+                            <input type="date" id="projStart" class="form-control rounded-3">
+                        </div>
+                        <div class="col-6">
+                            <div class="section-lbl">Actual End Date</div>
+                            <input type="date" id="projEnd" class="form-control rounded-3">
+                        </div>
+                    </div>
+
+                    <!-- Info note about permanent save -->
+                    <div class="d-flex align-items-start gap-2 p-3 rounded-3 mb-4"
+                        style="background:#f0fdf4;border:1px solid #bbf7d0;">
+                        <i class="bi bi-shield-fill-check mt-1" style="color:#16a34a;flex-shrink:0;"></i>
+                        <div class="small" style="color:#166534;font-weight:600;">
+                            Project will be saved <strong>permanently</strong> to
+                            <strong>projects.csv</strong>
+                        </div>
+                    </div>
+
+                    <button class="btn fw-900 w-100 py-3 rounded-pill" style="background:var(--navy-dark);color:white;"
+                        onclick="finalizeProject()">
+                        <i class="bi bi-check-circle me-2"></i>Create Project
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== ASSIGN MODAL ===== -->
+    <div class="modal fade" id="assignModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-hdr-dark">
+                    <h6 class="fw-bold mb-0">
+                        <i class="bi bi-link-45deg me-2"></i>Assign Project to
+                        <span id="targetName" class="ms-1" style="color:var(--teal-bright);"></span>
+                    </h6>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4" style="background:#fafafa;">
+                    <input type="hidden" id="targetIndex">
+
+                    <!-- Project selector -->
+                    <div class="mb-3">
+                        <div class="section-lbl">Select Project</div>
+                        <select id="aProjectSelect" class="form-select rounded-3 fw-bold"
+                            onchange="onAssignProjectChange()">
+                            <option value="">-- Select a Project --</option>
+                        </select>
+                    </div>
+
+                    <!-- Selected project info pill -->
+                    <div id="assignProjInfo" class="mb-3" style="display:none;">
+                        <div class="p-3 rounded-3" style="background:#e6f1ff;border:1px solid #bfdbfe;">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-folder-fill" style="color:var(--blue-accent);"></i>
+                                <span id="assignProjLabel" class="fw-900 small" style="color:var(--navy-mid);"></span>
+                            </div>
+                            <div id="assignProjDates" class="small text-muted mt-1 fw-600"></div>
+                        </div>
+                    </div>
+
+                    <!-- User-provided allocation dates -->
+                    <div class="p-3 rounded-3 mb-4" style="background:white;border:1px solid #e2e8f0;">
+                        <div class="section-lbl"><i class="bi bi-calendar-range me-1"></i>Resource Allocation Period
+                        </div>
+                        <div class="small text-muted mb-3" style="font-size:0.7rem;">Enter this resource's working dates
+                            for the selected project (can be different from the project timeline).</div>
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <label class="small fw-bold text-muted mb-1">START DATE</label>
+                                <input type="date" id="aStart" class="form-control rounded-3">
+                            </div>
+                            <div class="col-6">
+                                <label class="small fw-bold text-muted mb-1">END DATE</label>
+                                <input type="date" id="aEnd" class="form-control rounded-3">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- No projects message -->
+                    <div id="noProjectsMsg" class="text-center py-3" style="display:none;">
+                        <i class="bi bi-folder-x" style="font-size:2rem;color:#cbd5e1;"></i>
+                        <div class="small text-muted fw-bold mt-2">No projects created yet.<br>Click <strong>Add
+                                Project</strong> in the header first.</div>
+                    </div>
+
+                    <button class="btn fw-900 w-100 py-3 rounded-pill" style="background:var(--navy-dark);color:white;"
+                        onclick="finalizeAssign()">
+                        <i class="bi bi-check-circle me-2"></i>Authorize Assignment
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== DETAIL POPUP ===== -->
+    <div class="overlay-dim" id="dimOverlay" onclick="closePopup()"></div>
+    <div class="detail-card" id="popupCard">
+        <!-- Improved Header -->
+        <div class="dc-top">
+            <div class="d-flex align-items-center gap-4">
+                <div class="dc-avatar" id="pAvatar"></div>
+                <div>
+                    <h3 id="pName" class="fw-900 mb-2" style="font-size:1.6rem;letter-spacing:-0.4px;margin:0;"></h3>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="dc-role-badge" id="pRoleBadge"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex flex-column align-items-end gap-3">
+                <div class="dc-dept-tag" id="pDept"></div>
+                <div class="dc-header-close" onclick="closePopup()">
+                    <i class="bi bi-x"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Body -->
+        <div class="dc-main">
+            <!-- Section Label -->
+            <div
+                style="font-size:0.65rem;font-weight:900;text-transform:uppercase;letter-spacing:1.5px;color:#94a3b8;margin-bottom:18px;display:flex;align-items:center;gap:8px;">
+                <div
+                    style="width:24px;height:24px;border-radius:6px;background:#eff6ff;display:flex;align-items:center;justify-content:center;">
+                    <i class="bi bi-person-workspace" style="color:#0056a0;font-size:0.8rem;"></i>
+                </div>
+                ASSIGNED PROJECTS
+            </div>
+
+            <!-- Project Cards Container -->
+            <div id="pProjList" style="max-height:320px;overflow-y:auto;padding-right:4px;"></div>
+        </div>
+    </div>
+
+    <!-- ===== TOAST ===== -->
+    <div class="gantt-toast" id="ganttToast"></div>
+
+    <!-- Scripts -->
+    <script src="resources.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <script>
+        /* =========================================================
+           DATA & CONSTANTS
+        ========================================================= */
+        let registryData = [];
+        let projectRegistry = [];           // { id, name, code, start, end, days }
+        const ADMIN_PIN = '1234';        // ← Change this to your desired PIN
+        const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const DAY_ABBR = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const WEEK_W = 52;            // px width of every week column
+        const FIX_COL_W = 190;           // px width of the name stub column
+
+        /* =========================================================
+           PROJECT COLOR PALETTE (16 curated colors, stable per code)
+        ========================================================= */
+        const PROJECT_PALETTE = [
+            '#6366f1','#f59e0b','#10b981','#ef4444','#3b82f6',
+            '#ec4899','#8b5cf6','#14b8a6','#f97316','#06b6d4',
+            '#84cc16','#a855f7','#e11d48','#64748b','#0ea5e9','#d97706'
+        ];
+
+        /* Returns a stable colour for a project code */
+        function getProjectColor(code) {
+            // Look up the project's position in projectRegistry for stable colour
+            const idx = projectRegistry.findIndex(p => p.code === code);
+            const n   = idx >= 0 ? idx : Math.abs([...code].reduce((a,c) => a + c.charCodeAt(0), 0));
+            return PROJECT_PALETTE[n % PROJECT_PALETTE.length];
+        }
+
+        /* =========================================================
+           WEEK / MONTH HELPERS
+        ========================================================= */
+        function getWeeksOfYear(year) {
+            const weeks = [];
+            function makeWeek(num, startDate) {
+                const sm = startDate.getMonth();
+                const end = new Date(startDate.getTime() + 6 * 86400000);
+                const em = (end.getFullYear() === year) ? end.getMonth() : sm;
+                return {
+                    weekNum: num, date: new Date(startDate),
+                    label: startDate.getDate().toString().padStart(2, '0') + ' ' + MONTH_NAMES[sm],
+                    day: DAY_ABBR[startDate.getDay()], startMonth: sm, endMonth: em, shared: sm !== em
+                };
+            }
+            const jan1 = new Date(year, 0, 1);
+            weeks.push(makeWeek(1, jan1));
+            let d = new Date(year, 0, 2);
+            while (d.getDay() !== 1) d.setDate(d.getDate() + 1);
+            let wNum = 2;
+            while (d.getFullYear() === year) { weeks.push(makeWeek(wNum, d)); d.setDate(d.getDate() + 7); wNum++; }
+            return weeks;
+        }
+
+        function groupWeeksByMonth(weeks) {
+            const widths = new Array(12).fill(0);
+            weeks.forEach(w => {
+                if (w.shared) { widths[w.startMonth] += WEEK_W / 2; widths[w.endMonth] += WEEK_W / 2; }
+                else { widths[w.startMonth] += WEEK_W; }
+            });
+            return Array.from({ length: 12 }, (_, i) => ({ month: i, width: widths[i] })).filter(g => g.width > 0);
+        }
+
+        /* =========================================================
+           BAR POSITION - day-accurate via dateToPx()
+        ========================================================= */
+
+        /**
+         * Maps a Date to its exact horizontal pixel offset in the Gantt track.
+         * Handles Week-1 being shorter than 7 days by computing each week's
+         * actual day-count (wEnd - wStart) and using its own px-per-day ratio.
+         */
+        function dateToPx(date) {
+            const weeks = window._ganttWeeks;
+            if (!weeks || !weeks.length) return 0;
+            const d = new Date(date);
+            d.setHours(0, 0, 0, 0);
+
+            for (let i = 0; i < weeks.length; i++) {
+                const wStart = new Date(weeks[i].date);
+                wStart.setHours(0, 0, 0, 0);
+                const wEnd = i < weeks.length - 1
+                    ? (() => { const x = new Date(weeks[i+1].date); x.setHours(0,0,0,0); return x; })()
+                    : new Date(wStart.getTime() + 7 * 86400000);
+
+                if (d >= wStart && d < wEnd) {
+                    const daysInWeek   = (wEnd  - wStart) / 86400000;
+                    const daysIntoWeek = (d     - wStart) / 86400000;
+                    return i * WEEK_W + (daysIntoWeek / daysInWeek) * WEEK_W;
+                }
+            }
+            // Before first column
+            const first = new Date(weeks[0].date); first.setHours(0,0,0,0);
+            if (d < first) return 0;
+            // After last column
+            return weeks.length * WEEK_W;
+        }
+
+        function getBarStyle(startStr, endStr) {
+            const weeks = window._ganttWeeks;
+            if (!weeks || !weeks.length) return { left: '0px', width: '0px', display: 'none' };
+
+            // Parse as local midnight (prevents UTC timezone shift by 1 day)
+            const sDate = new Date(startStr + 'T00:00:00');
+            const eDate = new Date(endStr   + 'T00:00:00');
+
+            // Visible range boundaries
+            const origin = new Date(weeks[0].date);
+            origin.setHours(0, 0, 0, 0);
+            const visibleEnd = new Date(weeks[weeks.length - 1].date);
+            visibleEnd.setHours(0, 0, 0, 0);
+            visibleEnd.setDate(visibleEnd.getDate() + 7);
+
+            // End date is INCLUSIVE: bar should fill through the last day
+            const eDateInclusive = new Date(eDate);
+            eDateInclusive.setDate(eDateInclusive.getDate() + 1);
+
+            // Clip to visible range
+            const drawS = sDate          < origin     ? origin     : sDate;
+            const drawE = eDateInclusive > visibleEnd ? visibleEnd : eDateInclusive;
+
+            if (drawE <= drawS) return { left: '0px', width: '0px', display: 'none' };
+
+            const leftPx  = dateToPx(drawS);
+            const widthPx = dateToPx(drawE) - leftPx;
+
+            return {
+                left:    leftPx.toFixed(1)  + 'px',
+                width:   widthPx.toFixed(1) + 'px',
+                display: 'flex'
+            };
+        }
+
+        /* =========================================================
+           GREY ZONES (outside project date range)
+        ========================================================= */
+        function buildGreyZones(projects, trackW) {
+            if (!projects.length) return '';
+            const weeks = window._ganttWeeks;
+            if (!weeks || !weeks.length) return '';
+
+            // Find earliest start and latest end across all projects
+            const allS = projects.map(p => new Date(p.start + 'T00:00:00'));
+            const allE = projects.map(p => {
+                const d = new Date(p.end + 'T00:00:00');
+                d.setDate(d.getDate() + 1); // inclusive
+                return d;
+            });
+            const minS = new Date(Math.min(...allS));
+            const maxE = new Date(Math.max(...allE));
+
+            const leftPx  = Math.max(0, Math.min(trackW, dateToPx(minS)));
+            const rightPx = Math.max(0, Math.min(trackW, trackW - dateToPx(maxE)));
+
+            let html = '';
+            if (leftPx  > 1) html += `<div class="g-grey-zone g-grey-left"  style="width:${leftPx.toFixed(1)}px;"></div>`;
+            if (rightPx > 1) html += `<div class="g-grey-zone g-grey-right" style="width:${rightPx.toFixed(1)}px;"></div>`;
+            return html;
+        }
+
+        /* =========================================================
+           GANTT HEADERS
+        ========================================================= */
+        function buildGanttHeaders(year, start = null, end = null) {
+            let weeks = getWeeksOfYear(year);
+
+            // Filter to custom range if provided
+            if (start && end) {
+                const s = new Date(start), e = new Date(end);
+                weeks = weeks.filter(w => {
+                    const wEnd = new Date(w.date.getTime() + 7 * 86400000);
+                    return w.date <= e && wEnd >= s;
+                });
+            }
+
+            const groups = groupWeeksByMonth(weeks);
+            const mH = document.getElementById('mHeader');
+            const wH = document.getElementById('wHeader');
+            while (mH.children.length > 1) mH.removeChild(mH.lastChild);
+            while (wH.children.length > 1) wH.removeChild(wH.lastChild);
+
+            groups.forEach(g => {
+                const c = document.createElement('div'); c.className = 'm-cell';
+                c.style.width = c.style.minWidth = g.width + 'px'; c.style.flexShrink = '0';
+                c.textContent = MONTH_NAMES[g.month]; mH.appendChild(c);
+            });
+            weeks.forEach(w => {
+                const c = document.createElement('div'); c.className = 'w-cell';
+                c.style.width = c.style.minWidth = WEEK_W + 'px'; c.style.flexShrink = '0';
+                c.innerHTML = `<div class="w-num">W${w.weekNum}</div><div class="w-date">${w.label}</div><div class="w-day">${w.day}</div>`;
+                wH.appendChild(c);
+            });
+            window._ganttWeeks = weeks;
+
+            // Fix sticky-head clipping in overflow-x:auto container
+            const totalW = FIX_COL_W + weeks.length * WEEK_W;
+            const sh = document.querySelector('.gantt-sticky-head');
+            sh.style.minWidth = mH.style.minWidth = wH.style.minWidth = totalW + 'px';
+        }
+
+        /* =========================================================
+           STATS
+        ========================================================= */
+        function updateStats(data) {
+            document.getElementById('sc-total').textContent = data.length;
+            document.getElementById('sc-pm').textContent = data.filter(r => r.role === 'PM').length;
+            document.getElementById('sc-lead').textContent = data.filter(r => r.role === 'Lead').length;
+            document.getElementById('sc-member').textContent = data.filter(r => r.role === 'Member').length;
+            document.getElementById('sc-proj').textContent = projectRegistry.length;
+        }
+
+        /* =========================================================
+           CORE RENDER
+        ========================================================= */
+        function renderUI() {
+            const year = parseInt(document.getElementById('fYear').value);
+            const fDept = document.getElementById('fDept').value;
+            const fProj = document.getElementById('fProject').value;
+
+            // Filter people
+            const filtered = registryData.filter(r => {
+                const deptMatch = (fDept === 'ALL' || r.dept === fDept);
+                const projMatch = (fProj === 'ALL' || r.projects.some(p => p.code === fProj));
+                return deptMatch && projMatch;
+            });
+            document.getElementById('unitCounter').textContent = `${filtered.length} Members`;
+            updateStats(filtered);
+
+            /* ── TABLE ── */
+            document.getElementById('registryTableBody').innerHTML = filtered.map((r, i) => {
+                const oi = registryData.indexOf(r);
+                const rc = r.role === 'PM' ? 'role-pm' : (r.role === 'Lead' ? 'role-lead' : 'role-member');
+                const chips = r.projects.length
+                    ? r.projects.map(p => `<span class="proj-badge"><i class="bi bi-folder-fill" style="font-size:0.55rem;"></i>${p.code || p.name}</span>`).join('')
+                    : `<span class="small text-muted">—</span>`;
+
+                // Build dropdown items from projectRegistry
+                const ddItems = projectRegistry.length
+                    ? projectRegistry.map(p =>
+                        `<li><a class="dropdown-item small fw-bold" href="#" onclick="assignProject(${oi}, ${p.id}); return false;">
+                        <i class="bi bi-folder me-1 text-primary"></i>${p.code} – ${p.name}
+                        <span class="d-block text-muted fw-normal" style="font-size:0.6rem;">${p.start} → ${p.end}</span>
+                     </a></li>`).join('')
+                    : `<li><span class="dropdown-item small text-muted disabled">No projects yet</span></li>`;
+
+                return `<tr>
+                <td class="text-muted fw-700">${i + 1}</td>
+                <td><div class="fw-800" style="color:var(--navy-dark)">${r.name}</div></td>
+                <td><span class="badge bg-light text-dark border fw-bold small">${r.id}</span></td>
+                <td><span class="role-badge ${rc}">${r.role}</span></td>
+                <td><div class="small fw-700 text-muted">${r.dept}</div></td>
+                <td class="fw-700 text-muted">${r.exp}y</td>
+                <td class="text-center">
+                    <div class="d-flex align-items-center justify-content-center gap-1">
+                        <button class="action-btn" onclick="openAssign(${oi})" title="Assign Project">
+                            <i class="bi bi-folder-plus"></i>
+                        </button>
+                        <button class="action-btn" onclick="openEditMember(${oi})" title="Edit Member"><i class="bi bi-pencil-square"></i></button>
+                        <button class="action-btn" onclick="openPopup(${oi})" title="View Details"><i class="bi bi-eye"></i></button>
+                    </div>
+                </td>
+            </tr>`;
+            }).join('');
+
+            /* ── GANTT (per-project colours, vertically-stacked lanes) ── */
+            const weeks  = window._ganttWeeks || [];
+            const trackW = weeks.length * WEEK_W;
+            const LANE_H  = 30;   // height of each bar including gap
+            const BAR_H   = 24;   // actual visible bar height
+            const LANE_PAD = 6;   // top padding before first lane
+
+            document.getElementById('ganttBody').innerHTML = filtered.map(r => {
+                // 1. Filter by project filter
+                const myProjects = r.projects.filter(p => fProj === 'ALL' || p.code === fProj);
+
+                if (!myProjects.length) {
+                    // Empty row
+                    const rowH = LANE_PAD + LANE_H + LANE_PAD;
+                    const greyHtml = buildGreyZones(r.projects, trackW);
+                    return `<div class="g-row" style="min-height:${rowH}px;">
+                        <div class="g-res-info">
+                            <div class="g-res-name">${r.name}</div>
+                            <div class="g-res-role">${r.role} · ${r.dept.split(' ')[0]}</div>
+                        </div>
+                        <div class="g-track" style="min-width:${trackW}px;background-size:${WEEK_W}px 100%;height:${rowH}px;">
+                            ${greyHtml}
+                        </div>
+                    </div>`;
+                }
+
+                // 2. Lane assignment — greedy interval scheduling
+                //    Sort by start date, then assign each project to the
+                //    lowest lane whose last bar has ended before this one starts.
+                const sorted = [...myProjects].sort((a, b) => new Date(a.start) - new Date(b.start));
+                const laneEnds = [];   // laneEnds[i] = Date when lane i is free again
+                const laneOf   = [];   // laneOf[i]   = lane index assigned to sorted[i]
+
+                sorted.forEach((p, i) => {
+                    const pStart = new Date(p.start);
+                    let assigned = -1;
+                    for (let l = 0; l < laneEnds.length; l++) {
+                        if (laneEnds[l] <= pStart) { assigned = l; break; }
+                    }
+                    if (assigned === -1) { assigned = laneEnds.length; laneEnds.push(null); }
+                    laneEnds[assigned] = new Date(p.end);
+                    laneOf[i] = assigned;
+                });
+
+                const numLanes = laneEnds.length;
+                const rowH     = LANE_PAD + numLanes * LANE_H + LANE_PAD + 4;
+
+                // 3. Build HTML for each project bar
+                const fmt = ds => { const d = new Date(ds); return d.getDate() + '/' + (d.getMonth() + 1); };
+
+                const barsHtml = sorted.map((p, i) => {
+                    const bStyle = getBarStyle(p.start, p.end);
+                    if (bStyle.display === 'none') return '';
+
+                    const color   = getProjectColor(p.code);
+                    const lane    = laneOf[i];
+                    const topPx   = LANE_PAD + lane * LANE_H;
+                    const itemsJson = JSON.stringify([{ code: p.code, start: p.start, end: p.end }]).replace(/"/g, '&quot;');
+
+                    return `<div class="g-bar"
+                        style="left:${bStyle.left};width:${bStyle.width};top:${topPx}px;height:${BAR_H}px;
+                               background:linear-gradient(135deg,${color}dd,${color});
+                               box-shadow:0 3px 10px ${color}55;"
+                        onclick="openPopup(${registryData.indexOf(r)}, ${itemsJson})"
+                        title="${p.code}: ${p.start} → ${p.end}">
+                        ${p.code}
+                        <span class="b-date" style="left:0">${fmt(p.start)}</span>
+                        <span class="b-date" style="right:0">${fmt(p.end)}</span>
+                    </div>`;
+                }).join('');
+
+                const greyHtml = buildGreyZones(r.projects, trackW);
+
+                return `<div class="g-row" style="min-height:${rowH}px;">
+                    <div class="g-res-info">
+                        <div class="g-res-name">${r.name}</div>
+                        <div class="g-res-role">${r.role} · ${r.dept.split(' ')[0]}</div>
+                    </div>
+                    <div class="g-track" style="min-width:${trackW}px;background-size:${WEEK_W}px 100%;height:${rowH}px;">
+                        ${greyHtml}${barsHtml}
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        /* =========================================================
+           YEAR CHANGE
+        ========================================================= */
+        function onYearChange() {
+            const yr = parseInt(document.getElementById('fYear').value);
+            document.getElementById('fFrom').value = yr + '-01-01';
+            document.getElementById('fTo').value = yr + '-12-31';
+            buildGanttHeaders(yr);
+            renderUI();
+        }
+
+        /* =========================================================
+           PIN FLOW
+        ========================================================= */
+        function openPinModal() {
+            document.querySelectorAll('.pin-digit').forEach(x => { x.value = ''; x.classList.remove('filled'); });
+            document.getElementById('pinError').style.display = 'none';
+            new bootstrap.Modal(document.getElementById('pinModal')).show();
+            setTimeout(() => document.getElementById('pin0').focus(), 400);
+        }
+
+        function checkPin() {
+            const pin = ['pin0', 'pin1', 'pin2', 'pin3'].map(id => document.getElementById(id).value).join('');
+            if (pin === ADMIN_PIN) {
+                bootstrap.Modal.getInstance(document.getElementById('pinModal')).hide();
+                setTimeout(() => {
+                    document.getElementById('projName').value = '';
+                    document.getElementById('projCode').value = '';
+                    document.getElementById('projStart').value = '';
+                    document.getElementById('projEnd').value = '';
+                    new bootstrap.Modal(document.getElementById('addProjectModal')).show();
+                }, 350);
+            } else {
+                document.getElementById('pinError').style.display = 'block';
+                document.querySelectorAll('.pin-digit').forEach(x => { x.value = ''; x.classList.remove('filled'); });
+                document.getElementById('pin0').focus();
+            }
+        }
+
+        /* Auto-advance PIN inputs */
+        function initPinInputs() {
+            const inputs = ['pin0', 'pin1', 'pin2', 'pin3'].map(id => document.getElementById(id));
+            inputs.forEach((inp, i) => {
+                inp.addEventListener('input', () => {
+                    // Only allow digits
+                    inp.value = inp.value.replace(/\D/g, '').slice(-1);
+                    if (inp.value) {
+                        inp.classList.add('filled');
+                        if (i < 3) inputs[i + 1].focus();
+                        else checkPin();
+                    } else {
+                        inp.classList.remove('filled');
+                    }
+                });
+                inp.addEventListener('keydown', e => {
+                    if (e.key === 'Backspace' && !inp.value && i > 0) { inputs[i - 1].focus(); inputs[i - 1].classList.remove('filled'); }
+                });
+            });
+        }
+
+        /* =========================================================
+           PROJECT CREATION
+        ========================================================= */
+        async function finalizeProject() {
+            const name = document.getElementById('projName').value.trim();
+            const code = document.getElementById('projCode').value.trim().toUpperCase();
+            const start = document.getElementById('projStart').value;
+            const end = document.getElementById('projEnd').value;
+            if (!name || !code || !start || !end) return alert('All project fields are required.');
+            if (new Date(end) <= new Date(start)) return alert('End date must be after start date.');
+
+            // Check for duplicate project code in memory
+            if (projectRegistry.some(p => p.code.toUpperCase() === code)) {
+                return alert(`Project code "${code}" already exists.`);
+            }
+
+            const days = Math.ceil((new Date(end) - new Date(start)) / 86400000);
+            const newProject = { id: Date.now(), name, code, start, end, days };
+
+            try {
+                // POST to server → permanently appends to projects.csv
+                const res = await fetch('/api/add-project', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, code, start, end, days })
+                });
+                const data = await res.json();
+
+                if (res.status === 409) {
+                    return alert(`Project code "${code}" already exists in projects.csv.`);
+                }
+                if (!res.ok) {
+                    return alert('Could not save project: ' + (data.error || 'Server error'));
+                }
+
+                // Add to in-memory registry and re-render
+                projectRegistry.push(newProject);
+                syncProjectFilter();
+                renderUI();
+                bootstrap.Modal.getInstance(document.getElementById('addProjectModal')).hide();
+                showToast(`<i class="bi bi-check-circle-fill me-2" style="color:var(--teal-bright)"></i>Project <strong>${code}</strong> saved to projects.csv!`);
+
+            } catch (e) {
+                // Server not running — still add to memory but warn user
+                projectRegistry.push(newProject);
+                renderUI();
+                bootstrap.Modal.getInstance(document.getElementById('addProjectModal')).hide();
+                showToast(`<i class="bi bi-exclamation-triangle-fill me-2" style="color:var(--gold)"></i><strong>${code}</strong> created (server offline — not saved to CSV)`);
+            }
+        }
+
+        /* =========================================================
+           EDIT MEMBER
+        ========================================================= */
+        function openEditMember(idx) {
+            const r = registryData[idx];
+            document.getElementById('eIdx').value = idx;
+            document.getElementById('eName').value = r.name;
+            document.getElementById('eEmpId').value = r.id;
+            document.getElementById('eRole').value = r.role;
+            document.getElementById('eExp').value = r.exp;
+            document.getElementById('eDept').value = r.dept || 'Mechanical Assembly';
+
+            new bootstrap.Modal(document.getElementById('editMemberModal')).show();
+        }
+
+        async function finalizeEditMember() {
+            const idx = document.getElementById('eIdx').value;
+            const id = document.getElementById('eEmpId').value;
+            const name = document.getElementById('eName').value.trim();
+            const role = document.getElementById('eRole').value;
+            const exp = document.getElementById('eExp').value.trim() || '0';
+            const dept = document.getElementById('eDept').value;
+
+            if (!name) return alert('Name is required.');
+
+            try {
+                const res = await fetch('/api/update-member', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, name, role, exp, dept })
+                });
+
+                if (res.ok) {
+                    // Update in-memory data
+                    const member = registryData[idx];
+                    member.name = name;
+                    member.role = role;
+                    member.exp = exp;
+                    member.dept = dept;
+
+                    renderUI();
+                    bootstrap.Modal.getInstance(document.getElementById('editMemberModal')).hide();
+                    showToast(`<i class="bi bi-check-circle-fill me-2" style="color:var(--teal-bright)"></i>Details for <strong>${name}</strong> updated successfully!`);
+                } else {
+                    const errData = await res.json();
+                    alert('❌ Error: ' + (errData.error || 'Server rejected the update.'));
+                }
+            } catch (e) {
+                alert('Server connection error. Detail not updated on disk.');
+            }
+        }
+        function openAssign(empIdx) {
+            const r = registryData[empIdx];
+            document.getElementById('targetName').textContent = r.name;
+            document.getElementById('targetIndex').value = empIdx;
+
+            // Reset fields
+            document.getElementById('aStart').value = '';
+            document.getElementById('aEnd').value = '';
+            document.getElementById('assignProjInfo').style.display = 'none';
+
+            // Populate project dropdown
+            const sel = document.getElementById('aProjectSelect');
+            sel.innerHTML = '<option value="">-- Select a Project --</option>';
+
+            const noMsg = document.getElementById('noProjectsMsg');
+            if (projectRegistry.length === 0) {
+                noMsg.style.display = 'block';
+                sel.style.display = 'none';
+            } else {
+                noMsg.style.display = 'none';
+                sel.style.display = 'block';
+                projectRegistry.forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = p.id;
+                    opt.textContent = `${p.code}  –  ${p.name}`;
+                    sel.appendChild(opt);
+                });
+            }
+            new bootstrap.Modal(document.getElementById('assignModal')).show();
+        }
+
+        function onAssignProjectChange() {
+            const id = Number(document.getElementById('aProjectSelect').value);
+            const proj = projectRegistry.find(p => p.id === id);
+            const info = document.getElementById('assignProjInfo');
+            if (proj) {
+                document.getElementById('assignProjLabel').textContent = `${proj.code} — ${proj.name}`;
+                document.getElementById('assignProjDates').textContent = `Project timeline: ${proj.start}  →  ${proj.end}  (${proj.days} days)`;
+                info.style.display = 'block';
+            } else {
+                info.style.display = 'none';
+            }
+        }
+
+        async function finalizeAssign() {
+            const empIdx = document.getElementById('targetIndex').value;
+            const id = Number(document.getElementById('aProjectSelect').value);
+            const start = document.getElementById('aStart').value;
+            const end = document.getElementById('aEnd').value;
+            const proj = projectRegistry.find(p => p.id === id);
+
+            if (!proj) return alert('Please select a project.');
+            if (!start) return alert('Please enter a start date.');
+            if (!end) return alert('Please enter an end date.');
+            if (new Date(end) <= new Date(start)) return alert('End date must be after start date.');
+
+            const days = Math.ceil((new Date(end) - new Date(start)) / 86400000);
+            const target = registryData[empIdx];
+
+            try {
+                const res = await fetch('/api/add-assignment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        empId: target.id,
+                        projCode: proj.code,
+                        start, end, days
+                    })
+                });
+
+                if (!res.ok) {
+                    const data = await res.json();
+                    return alert('Could not save assignment: ' + (data.error || 'Server error'));
+                }
+
+                // Update in-memory
+                target.projects.push({
+                    name: proj.name, code: proj.code, projectId: proj.id,
+                    start, end, days
+                });
+                renderUI();
+                bootstrap.Modal.getInstance(document.getElementById('assignModal')).hide();
+                showToast(`<i class="bi bi-check-circle-fill me-2" style="color:var(--teal-bright)"></i>Assigned <strong>${proj.code}</strong> to <strong>${target.name}</strong>`);
+
+            } catch (e) {
+                // Background save failed, but we update UI anyway (fallback)
+                target.projects.push({ name: proj.name, code: proj.code, projectId: proj.id, start, end, days });
+                renderUI();
+                bootstrap.Modal.getInstance(document.getElementById('assignModal')).hide();
+                showToast(`<i class="bi bi-exclamation-triangle-fill me-2" style="color:var(--gold)"></i>Assignment created (server offline — not saved to CSV)`);
+            }
+        }
+
+        /* =========================================================
+           DETAIL POPUP
+        ========================================================= */
+        function openPopup(idx, filterItems = null) {
+            const r = registryData[idx];
+
+            // ── Avatar initials + color
+            const initials = r.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+            const avatarBg = r.role === 'PM' ? '#003d8f' : r.role === 'Lead' ? '#0d9488' : '#475569';
+            const elAvatar = document.getElementById('pAvatar');
+            elAvatar.textContent = initials;
+            elAvatar.style.background = avatarBg;
+
+            // ── Name
+            document.getElementById('pName').textContent = r.name;
+
+            // ── Role badge with icon
+            const roleIcons = { PM: 'bi-briefcase-fill', Lead: 'bi-person-badge-fill', Member: 'bi-person-fill' };
+            document.getElementById('pRoleBadge').innerHTML =
+                `<i class="bi ${roleIcons[r.role] || 'bi-person-fill'}"></i> ${r.role}`;
+
+            // ── Department
+            document.getElementById('pDept').textContent = r.dept;
+
+            // ── Project cards (filtered by cluster if requested)
+            const projectsToShow = filterItems
+                ? r.projects.filter(p => filterItems.some(f => f.code === p.code && f.start === p.start && f.end === p.end))
+                : r.projects;
+
+            const fmtShort = ds => {
+                const d = new Date(ds);
+                return d.getDate().toString().padStart(2, '0') + ' ' +
+                    MONTH_NAMES[d.getMonth()] + ' ' + d.getFullYear();
+            };
+
+            document.getElementById('pProjList').innerHTML = projectsToShow.length
+                ? projectsToShow.map(p => {
+                    const color = getProjectColor(p.code);
+                    const codeShort = (p.code || p.name).slice(0, 6).toUpperCase();
+                    return `<div class="dc-proj-card">
+                        <div class="dc-proj-dot" style="background:${color};">${codeShort}</div>
+                        <div style="flex:1;min-width:0;">
+                            <div class="dc-proj-code">${p.code} <span style="font-weight:400;opacity:0.4;margin:0 6px;">—</span> <span style="font-weight:700;">${p.name}</span></div>
+                            <div class="dc-proj-dates-row">
+                                <span style="opacity:0.6;">→</span>
+                                ${fmtShort(p.start)}
+                                <span style="opacity:0.6;margin:0 4px;">→</span>
+                                ${fmtShort(p.end)}
+                            </div>
+                        </div>
+                        <div style="flex-shrink:0;text-align:right;">
+                            <div class="dc-proj-days-num">${p.days}</div>
+                            <div class="dc-proj-days-lbl">DAYS</div>
+                        </div>
+                    </div>`;
+                }).join('')
+                : `<div class="dc-empty-state">
+                    <i class="bi bi-folder-x"></i>
+                    <p>No projects assigned yet.</p>
+                   </div>`;
+
+            const card = document.getElementById('popupCard');
+            card.classList.remove('open');
+            document.getElementById('dimOverlay').style.display = 'block';
+            card.style.display = 'block';
+            // Trigger animation
+            requestAnimationFrame(() => card.classList.add('open'));
+        }
+
+        function closePopup() {
+            document.getElementById('dimOverlay').style.display = 'none';
+            document.getElementById('popupCard').style.display = 'none';
+            document.getElementById('popupCard').classList.remove('open');
+        }
+
+        /* =========================================================
+           EXPORT — CSV & PDF (Employees + Timeline)
+        ========================================================= */
+        let _exportFormat = 'pdf';
+
+        function selectFormat(fmt) {
+            _exportFormat = fmt;
+            ['pdf', 'csv'].forEach(f => {
+                const btn = document.getElementById('fmt' + f.charAt(0).toUpperCase() + f.slice(1));
+                if (btn) btn.classList.toggle('active', f === fmt);
+            });
+        }
+
+        function exportGantt() {
+            // Pre-fill date range from current filter
+            document.getElementById('exFrom').value = document.getElementById('fFrom').value;
+            document.getElementById('exTo').value   = document.getElementById('fTo').value;
+            // Default to PDF
+            selectFormat('pdf');
+            new bootstrap.Modal(document.getElementById('exportRangeModal')).show();
+        }
+
+        /* ── Helper: build the combined data rows ── */
+        function buildExportRows(rangeFrom, rangeTo) {
+            const s = new Date(rangeFrom);
+            const e = new Date(rangeTo);
+            // Apply the same dept/role/project filters the user has set
+            const fDept = document.getElementById('fDept').value;
+            const fProj = document.getElementById('fProject').value;
+
+            return registryData.filter(r => {
+                const deptOk = fDept === 'ALL' || r.dept === fDept;
+                const projOk = fProj === 'ALL' || r.projects.some(p => p.code === fProj);
+                return deptOk && projOk;
+            }).flatMap(r => {
+                // Timeline assignments that overlap the export range
+                const assignments = r.projects.filter(
+                    p => new Date(p.start) <= e && new Date(p.end) >= s
+                );
+                if (assignments.length) {
+                    return assignments.map((p, i) => ({
+                        sn:       i === 0 ? '' : '',   // filled differently per format
+                        name:     r.name,
+                        empId:    r.id,
+                        dept:     r.dept,
+                        role:     r.role,
+                        exp:      r.exp,
+                        projCode: p.code,
+                        projName: p.name,
+                        start:    p.start,
+                        end:      p.end,
+                        days:     p.days,
+                        status:   'Assigned'
+                    }));
+                } else {
+                    return [{
+                        sn: '', name: r.name, empId: r.id, dept: r.dept,
+                        role: r.role, exp: r.exp,
+                        projCode: '—', projName: '—', start: '—', end: '—',
+                        days: '—', status: 'Free'
+                    }];
+                }
+            });
+        }
+
+        async function executeExport() {
+            const rangeFrom = document.getElementById('exFrom').value;
+            const rangeTo   = document.getElementById('exTo').value;
+            const fmt       = _exportFormat;
+
+            if (!rangeFrom || !rangeTo) return alert('Please select both From and To dates.');
+            if (new Date(rangeTo) < new Date(rangeFrom)) return alert('"To" date must be after "From" date.');
+
+            bootstrap.Modal.getInstance(document.getElementById('exportRangeModal')).hide();
+
+            const rows = buildExportRows(rangeFrom, rangeTo);
+            const genDate = new Date().toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'});
+            const rangeLabel = `${rangeFrom}  →  ${rangeTo}`;
+
+            /* ────────────── CSV EXPORT ────────────── */
+            if (fmt === 'csv') {
+                showToast('<i class="bi bi-hourglass-split me-2"></i>Building CSV…');
+                try {
+                    // Section 1 — Employee Directory
+                    const emp_header = 'SECTION 1: EMPLOYEE DIRECTORY';
+                    const emp_cols   = 'S.No,Name,Employee ID,Department,Role,Experience (Yrs)';
+                    // Unique employees (de-dup by empId)
+                    const seen = new Set();
+                    const empRows = [];
+                    let sn = 1;
+                    rows.forEach(r => {
+                        if (!seen.has(r.empId)) {
+                            seen.add(r.empId);
+                            empRows.push([sn++, r.name, r.empId, r.dept, r.role, r.exp]);
+                        }
+                    });
+
+                    // Section 2 — Timeline Assignments
+                    const tl_header = 'SECTION 2: TIMELINE ASSIGNMENTS';
+                    const tl_cols   = 'S.No,Name,Employee ID,Department,Role,Project Code,Project Name,Start Date,End Date,Duration (Days),Status';
+                    const tlRows = rows.map((r, i) => [
+                        i + 1, r.name, r.empId, r.dept, r.role,
+                        r.projCode, r.projName, r.start, r.end, r.days, r.status
+                    ]);
+
+                    const escape = v => `"${String(v).replace(/"/g, '""')}"`;
+                    const lines = [
+                        `"DANPREL Engineering Automation"`,
+                        `"Resource Deployment Report"`,
+                        `"Period: ${rangeLabel}"`,
+                        `"Generated: ${genDate}"`,
+                        '',
+                        escape(emp_header),
+                        emp_cols,
+                        ...empRows.map(r => r.map(escape).join(',')),
+                        '',
+                        escape(tl_header),
+                        tl_cols,
+                        ...tlRows.map(r => r.map(escape).join(','))
+                    ];
+
+                    const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+                    const url  = URL.createObjectURL(blob);
+                    const a    = document.createElement('a');
+                    a.href     = url;
+                    a.download = `Danprel_Export_${rangeFrom}_to_${rangeTo}.csv`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    showToast('<i class="bi bi-check-circle-fill me-2" style="color:var(--teal-bright)"></i>CSV downloaded!');
+                } catch (err) {
+                    console.error(err);
+                    showToast('<i class="bi bi-exclamation-circle me-2" style="color:#f87171"></i>CSV export failed.');
+                }
+                return;
+            }
+
+            /* ────────────── PDF EXPORT ────────────── */
+            if (fmt === 'pdf') {
+                showToast('<i class="bi bi-hourglass-split me-2"></i>Building PDF report…');
+                try {
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+                    const PW = doc.internal.pageSize.getWidth();
+
+                    /* ── PDF Cover / Header ── */
+                    doc.setFillColor(0, 31, 63);
+                    doc.rect(0, 0, PW, 38, 'F');
+                    doc.setTextColor(255, 255, 255);
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(17);
+                    doc.text('DANPREL Engineering Automation', 14, 14);
+                    doc.setFontSize(10);
+                    doc.setFont('helvetica', 'normal');
+                    doc.text('Resource Deployment Report  |  Period: ' + rangeLabel, 14, 22);
+                    doc.text('Generated: ' + genDate, 14, 29);
+
+                    // Section label helper
+                    const drawSectionLabel = (text, y) => {
+                        doc.setFillColor(240, 245, 255);
+                        doc.rect(0, y - 6, PW, 10, 'F');
+                        doc.setTextColor(0, 31, 63);
+                        doc.setFont('helvetica', 'bold');
+                        doc.setFontSize(10);
+                        doc.text(text, 14, y);
+                    };
+
+                    /* ── SECTION 1: Employee Directory ── */
+                    drawSectionLabel('SECTION 1 — Employee Directory', 46);
+
+                    const seen2 = new Set();
+                    const empBody = [];
+                    let sn2 = 1;
+                    rows.forEach(r => {
+                        if (!seen2.has(r.empId)) {
+                            seen2.add(r.empId);
+                            empBody.push([sn2++, r.name, r.empId, r.dept, r.role, r.exp + ' yrs']);
+                        }
+                    });
+
+                    doc.autoTable({
+                        startY: 50,
+                        head: [['#', 'Name', 'Employee ID', 'Department', 'Role', 'Experience']],
+                        body: empBody,
+                        theme: 'grid',
+                        headStyles:  { fillColor: [0, 51, 102], textColor: 255, fontStyle: 'bold', fontSize: 8 },
+                        bodyStyles:  { fontSize: 8, textColor: [30, 41, 59] },
+                        columnStyles: { 0: { halign: 'center', cellWidth: 12 }, 2: { cellWidth: 32 } },
+                        alternateRowStyles: { fillColor: [248, 250, 252] },
+                        margin: { left: 14, right: 14 },
+                    });
+
+                    /* ── SECTION 2: Timeline Assignments ── */
+                    doc.addPage();
+
+                    // Re-draw header band on new page
+                    doc.setFillColor(0, 31, 63);
+                    doc.rect(0, 0, PW, 18, 'F');
+                    doc.setTextColor(255, 255, 255);
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(11);
+                    doc.text('DANPREL Engineering Automation  —  Timeline Assignments', 14, 11);
+
+                    drawSectionLabel('SECTION 2 — Timeline Visualization (Project Assignments)', 26);
+
+                    const tlBody = rows.map((r, i) => [
+                        i + 1, r.name, r.empId, r.dept, r.role,
+                        r.projCode, r.projName, r.start, r.end,
+                        r.days === '—' ? '—' : r.days + ' days',
+                        r.status
+                    ]);
+
+                    // Color assigned vs free rows
+                    doc.autoTable({
+                        startY: 30,
+                        head: [['#','Name','Emp ID','Department','Role','Proj Code','Project Name','Start','End','Duration','Status']],
+                        body: tlBody,
+                        theme: 'striped',
+                        headStyles:  { fillColor: [0, 51, 102], textColor: 255, fontStyle: 'bold', fontSize: 7.5 },
+                        bodyStyles:  { fontSize: 7.5, textColor: [30, 41, 59] },
+                        columnStyles: {
+                            0:  { halign: 'center', cellWidth: 10 },
+                            4:  { cellWidth: 16 },
+                            5:  { cellWidth: 22 },
+                            9:  { cellWidth: 20 },
+                            10: { cellWidth: 18, halign: 'center' }
+                        },
+                        alternateRowStyles: { fillColor: [248, 250, 252] },
+                        didParseCell: (data) => {
+                            if (data.section === 'body' && data.column.index === 10) {
+                                const val = data.cell.raw;
+                                if (val === 'Free') {
+                                    data.cell.styles.textColor = [5, 150, 105];
+                                    data.cell.styles.fontStyle = 'bold';
+                                } else if (val === 'Assigned') {
+                                    data.cell.styles.textColor = [2, 86, 155];
+                                    data.cell.styles.fontStyle = 'bold';
+                                }
+                            }
+                        },
+                        margin: { left: 14, right: 14 },
+                    });
+
+                    // Page numbers
+                    const totalPages = doc.internal.pages.length - 1;
+                    for (let pg = 1; pg <= totalPages; pg++) {
+                        doc.setPage(pg);
+                        doc.setFont('helvetica', 'normal');
+                        doc.setFontSize(7);
+                        doc.setTextColor(148, 163, 184);
+                        doc.text(`Page ${pg} of ${totalPages}  |  Danprel Engineering Automation  |  Confidential`,
+                            PW / 2, doc.internal.pageSize.getHeight() - 5, { align: 'center' });
+                    }
+
+                    doc.save(`Danprel_Report_${rangeFrom}_to_${rangeTo}.pdf`);
+                    showToast('<i class="bi bi-check-circle-fill me-2" style="color:var(--teal-bright)"></i>PDF report downloaded!');
+                } catch (err) {
+                    console.error(err);
+                    showToast('<i class="bi bi-exclamation-circle me-2" style="color:#f87171"></i>PDF export failed.');
+                }
+                return;
+            }
+        }
+
+        /* =========================================================
+           TOAST HELPER
+        ========================================================= */
+        let _toastTimer;
+        function showToast(html) {
+            const t = document.getElementById('ganttToast');
+            t.innerHTML = html; t.classList.add('show');
+            clearTimeout(_toastTimer);
+            _toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        /* =========================================================
+           LIVE CLOCK
+        ========================================================= */
+        function updateClock() {
+            const now = new Date();
+            const d = now.toLocaleDateString('en-GB', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' });
+            const t = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            document.getElementById('liveTime').innerHTML = `${d}<br><span style="font-size:0.8rem;font-weight:800;color:#fff;">${t}</span>`;
+        }
+
+        /* =========================================================
+           ADD MEMBER — saves permanently to resources.csv via server
+        ========================================================= */
+        function openAddMember() {
+            ['mName', 'mEmpId', 'mExp'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('mRole').value = 'Member';
+            document.getElementById('mDept').selectedIndex = 0;
+            new bootstrap.Modal(document.getElementById('addMemberModal')).show();
+        }
+
+        async function finalizeAddMember() {
+            const name = document.getElementById('mName').value.trim();
+            const id = document.getElementById('mEmpId').value.trim().toUpperCase();
+            const role = document.getElementById('mRole').value;
+            const dept = document.getElementById('mDept').value;
+            const exp = document.getElementById('mExp').value.trim() || '0';
+
+            if (!name) return alert('Please enter the member name.');
+            if (!id) return alert('Please enter the employee code.');
+            if (registryData.some(r => r.id === id)) {
+                return alert(`Employee code ${id} already exists in the list.`);
+            }
+
+            try {
+                // POST to server → permanently appends to resources.csv
+                const res = await fetch('/api/add-member', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, id, dept, role, exp })
+                });
+                const data = await res.json();
+
+                if (!res.ok) {
+                    return alert('Could not save: ' + (data.error || 'Server error'));
+                }
+
+                // Add to in-memory list and re-render immediately
+                registryData.push({ name, id, dept, role, exp, projects: [] });
+                renderUI();
+                bootstrap.Modal.getInstance(document.getElementById('addMemberModal')).hide();
+                showToast(`<i class="bi bi-person-check-fill me-2" style="color:var(--teal-bright)"></i><strong>${name}</strong> saved permanently to resources.csv!`);
+
+            } catch (e) {
+                alert('❌ Server not reachable.\n\nPlease start the server first:\n   Double-click  start.bat\n   Then open:  http://localhost:3000');
+            }
+        }
+
+        /* =========================================================
+           INIT — loads members from API (server) or resources.js fallback
+        ========================================================= */
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // Load members from server (reads resources.csv)
+                const res = await fetch('/api/members');
+                const members = await res.json();
+                members.forEach(r => {
+                    if (!registryData.some(x => x.id === r.id)) {
+                        registryData.push({ ...r, projects: [] });
+                    }
+                });
+            } catch (e) {
+                // Fallback: load from resources.js when opened as file://
+                if (Array.isArray(window.INITIAL_RESOURCES)) {
+                    window.INITIAL_RESOURCES.forEach(r => {
+                        if (!registryData.some(x => x.id === r.id)) registryData.push(r);
+                    });
+                }
+            }
+
+            try {
+                const pRes = await fetch('/api/projects');
+                const savedProjects = await pRes.json();
+                savedProjects.forEach((p, idx) => {
+                    // Avoid duplicates (code-based check)
+                    if (!projectRegistry.some(x => x.code.toUpperCase() === p.code.toUpperCase())) {
+                        projectRegistry.push({
+                            id: Date.now() + idx,
+                            name: p.name,
+                            code: p.code,
+                            start: p.start,
+                            end: p.end,
+                            days: p.days
+                        });
+                    }
+                });
+            } catch (e) { }
+
+            // Load saved assignments from assignments.csv via server
+            try {
+                const aRes = await fetch('/api/assignments');
+                const savedAssignments = await aRes.json();
+                savedAssignments.forEach(a => {
+                    const res = registryData.find(x => x.id === a.empId);
+                    const proj = projectRegistry.find(p => p.code === a.projCode);
+                    if (res) {
+                        res.projects.push({
+                            name: proj ? proj.name : a.projCode,
+                            code: a.projCode,
+                            projectId: proj ? proj.id : null,
+                            start: a.start,
+                            end: a.end,
+                            days: a.days
+                        });
+                    }
+                });
+            } catch (e) { }
+
+            initPinInputs();
+            syncProjectFilter();
+            const year = parseInt(document.getElementById('fYear').value);
+            buildGanttHeaders(year);
+            renderUI();
+            updateClock();
+            setInterval(updateClock, 1000);
+        });
+
+        function syncProjectFilter() {
+            const sel = document.getElementById('fProject');
+            const current = sel.value;
+            sel.innerHTML = '<option value="ALL">All Projects</option>';
+            projectRegistry.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.code;
+                opt.textContent = `${p.code} – ${p.name}`;
+                sel.appendChild(opt);
+            });
+            sel.value = current || 'ALL';
+            if (sel.selectedIndex === -1) sel.value = 'ALL';
+        }
+        function performLogout() {
+            localStorage.removeItem('danprel_auth');
+            window.location.replace('login.html');
+        }
+    </script>
+</body>
+
+</html>

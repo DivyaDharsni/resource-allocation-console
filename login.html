@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Danprel Engineering Automation</title>
+    <meta name="description" content="Secure portal login for Danprel Engineering Automation Resource Allocation Console.">
+    
+    <!-- Fonts and Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --navy-dark: #001f3f;
+            --navy-mid: #003366;
+            --blue-accent: #0088ff;
+            --teal-bright: #14b8a6;
+            --white: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-light: #e2e8f0;
+            --glass-bg: rgba(255, 255, 255, 0.95);
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at top right, #002d5a, #001021);
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* ── DECORATIVE ELEMENTS ── */
+        .bg-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: -1;
+        }
+
+        .glow {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: var(--blue-accent);
+            filter: blur(150px);
+            opacity: 0.15;
+            border-radius: 50%;
+            z-index: -1;
+            top: -100px;
+            right: -100px;
+        }
+
+        /* ── LOGIN CARD ── */
+        .login-card {
+            background: var(--glass-bg);
+            width: 100%;
+            max-width: 460px;
+            border-radius: 32px;
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: cardEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            backdrop-filter: blur(10px);
+        }
+
+        @keyframes cardEntrance {
+            from {
+                opacity: 0;
+                transform: translateY(40px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* ── TOP ACCENT ── */
+        .card-accent {
+            height: 8px;
+            background: linear-gradient(90deg, var(--navy-dark), var(--blue-accent), var(--teal-bright));
+        }
+
+        /* ── HEADER ── */
+        .card-header {
+            padding: 50px 50px 20px;
+            text-align: center;
+        }
+
+        .logo-box {
+            width: 72px;
+            height: 72px;
+            background: white;
+            border-radius: 20px;
+            margin: 0 auto 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-light);
+            padding: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .logo-box:hover {
+            transform: translateY(-5px);
+        }
+
+        .logo-box img {
+            max-width: 100%;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .company-name {
+            font-size: 1.75rem;
+            font-weight: 900;
+            color: var(--navy-dark);
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
+        }
+
+        .company-sub {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--teal-bright);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* ── BODY ── */
+        .card-body {
+            padding: 10px 50px 50px;
+        }
+
+        .auth-label {
+            display: block;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .auth-label::after {
+            content: '';
+            display: block;
+            width: 40px;
+            height: 4px;
+            background: var(--blue-accent);
+            border-radius: 2px;
+            margin: 10px auto 0;
+        }
+
+        /* ── FORM ── */
+        .input-group {
+            margin-bottom: 24px;
+        }
+
+        .field-label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--navy-dark);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            padding-left: 4px;
+        }
+
+        .input-container {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            transition: color 0.3s ease;
+        }
+
+        .input-field {
+            width: 100%;
+            height: 56px;
+            background: #f8fafc;
+            border: 2.5px solid #f1f5f9;
+            border-radius: 16px;
+            padding: 0 16px 0 52px;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--navy-dark);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            background: white;
+            border-color: var(--blue-accent);
+            box-shadow: 0 10px 20px rgba(0, 136, 255, 0.1);
+        }
+
+        .input-field:focus + .input-icon {
+            color: var(--blue-accent);
+        }
+
+        .btn-submit {
+            width: 100%;
+            height: 56px;
+            background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy-mid) 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 1rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(0, 31, 63, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0, 31, 63, 0.3);
+            filter: brightness(1.1);
+        }
+
+        .btn-submit:active {
+            transform: translateY(-1px);
+        }
+
+        /* ── ERROR ALERT ── */
+        .err-msg {
+            display: none;
+            background: #fff1f2;
+            color: #e11d48;
+            padding: 14px 20px;
+            border-radius: 14px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid #ffe4e6;
+            animation: shake 0.4s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* ── FOOTER ── */
+        .card-footer {
+            padding: 24px;
+            background: rgba(248, 250, 252, 0.5);
+            border-top: 1px solid var(--border-light);
+            text-align: center;
+        }
+
+        .footer-text {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        /* ── SPINNER ── */
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 480px) {
+            .login-card { border-radius: 24px; }
+            .card-header, .card-body { padding-left: 30px; padding-right: 30px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-pattern"></div>
+    <div class="glow"></div>
+
+    <div class="login-card">
+        <div class="card-accent"></div>
+        
+        <header class="card-header">
+            <div class="logo-box">
+                <img src="asset/image.png" alt="Danprel Logo" onerror="this.src='https://via.placeholder.com/72?text=D'">
+            </div>
+            <h1 class="company-name">DANPREL</h1>
+            <p class="company-sub">Engineering Automation</p>
+        </header>
+
+        <main class="card-body">
+            <p class="auth-label">Resource Management Console</p>
+
+            <div id="errAlert" class="err-msg">
+                <i class="bi bi-shield-lock-fill"></i>
+                <span id="errorTxt">Authentication failed. Check credentials.</span>
+            </div>
+
+            <form id="loginForm">
+                <div class="input-group">
+                    <label class="field-label" for="username">Username</label>
+                    <div class="input-container">
+                        <input type="text" id="username" class="input-field" placeholder="danprelresource" required autocomplete="off">
+                        <i class="bi bi-person-fill input-icon"></i>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label class="field-label" for="password">Security Key</label>
+                    <div class="input-container">
+                        <input type="password" id="password" class="input-field" placeholder="••••••••" required>
+                        <i class="bi bi-key-fill input-icon"></i>
+                    </div>
+                </div>
+
+                <button type="submit" id="submitBtn" class="btn-submit">
+                    <span id="btnTxt">Initialization Session</span>
+                    <i class="bi bi-arrow-right-circle-fill"></i>
+                </button>
+            </form>
+        </main>
+
+        <footer class="card-footer">
+            <p class="footer-text">© 2026 Danprel Engineering Automation Pvt Ltd. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        const VALID_USER = 'danprelresource';
+        const VALID_PASS = 'danprel';
+
+        const loginForm = document.getElementById('loginForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const btnTxt = document.getElementById('btnTxt');
+        const errAlert = document.getElementById('errAlert');
+        const passwordInput = document.getElementById('password');
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            errAlert.style.display = 'none';
+            const user = document.getElementById('username').value.trim();
+            const pass = passwordInput.value.trim();
+
+            // Set loading
+            submitBtn.disabled = true;
+            btnTxt.innerHTML = '<span class="spinner"></span>';
+            const btnIcon = submitBtn.querySelector('.bi');
+            if(btnIcon) btnIcon.style.display = 'none';
+
+            setTimeout(() => {
+                if (user === VALID_USER && pass === VALID_PASS) {
+                    localStorage.setItem('danprel_auth', 'true');
+                    window.location.href = 'resource.html';
+                } else {
+                    submitBtn.disabled = false;
+                    btnTxt.textContent = 'Intitalization Session';
+                    if(btnIcon) btnIcon.style.display = 'block';
+                    errAlert.style.display = 'flex';
+                    passwordInput.value = '';
+                    passwordInput.focus();
+                }
+            }, 1200);
+        });
+
+        // Clear error on input
+        document.querySelectorAll('.input-field').forEach(input => {
+            input.addEventListener('input', () => {
+                errAlert.style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
