@@ -321,6 +321,47 @@ const server = http.createServer(async (req, res) => {
         }
     }
 
+    // ── API: POST /api/update-assignment ──
+    if (urlPath === '/api/update-assignment' && req.method === 'POST') {
+        try {
+            const body = await readBody(req);
+            const data = JSON.parse(body); // { empId, projCode, oldStart, oldEnd, newStart, newEnd, days }
+
+            if (!data.empId || !data.projCode || !data.oldStart || !data.newStart) {
+                return json(res, 400, { error: 'Missing required fields for update' });
+            }
+
+            const assignments = readAssignmentsCSV();
+            const idx = assignments.findIndex(a => 
+                a.empId === data.empId && 
+                a.projCode === data.projCode && 
+                a.start === data.oldStart && 
+                a.end === data.oldEnd
+            );
+
+            if (idx === -1) {
+                return json(res, 404, { error: 'Original assignment not found in CSV' });
+            }
+
+            // Update record
+            assignments[idx].start = data.newStart;
+            assignments[idx].end = data.newEnd;
+            assignments[idx].days = data.days || Math.ceil((new Date(data.newEnd) - new Date(data.newStart)) / 86400000);
+
+            // Write back entire file
+            let content = 'Employee ID,Project Code,Start Date,End Date,Duration (Days)\n';
+            assignments.forEach(a => {
+                content += `${a.empId},${a.projCode},${a.start},${a.end},${a.days}\n`;
+            });
+            fs.writeFileSync(ASSIGNMENTS_CSV_FILE, content, 'utf8');
+
+            return json(res, 200, { success: true, assignment: assignments[idx] });
+
+        } catch (e) {
+            return json(res, 400, { error: 'Update failed: ' + e.message });
+        }
+    }
+
     // ── Static files ──
     const relative = urlPath === '/' ? 'resource.html' : urlPath.slice(1);
     const filePath = path.join(ROOT_DIR, relative);

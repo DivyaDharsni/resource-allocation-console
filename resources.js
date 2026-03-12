@@ -17,7 +17,7 @@
  *    • Software Development
  *
  *  Allowed values for Role:
- *    • PM        (Project Manager)
+ *    • Head      (Department Head)
  *    • Lead      (Department Lead)
  *    • Member    (Team Member)
  *
@@ -30,7 +30,7 @@
 
 const RESOURCE_CSV = `
 Name,Employee ID,Department,Role,Experience(Yrs)
-Arjun Mehta,EMP001,Mechanical Assembly,PM,10
+Arjun Mehta,EMP001,Mechanical Assembly,Head,10
 Priya Sharma,EMP002,Electrical Integration,Lead,7
 Ravi Kumar,EMP003,Software Development,Member,5
 Sneha Patel,EMP004,Mechanical Assembly,Lead,8

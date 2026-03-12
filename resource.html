@@ -29,6 +29,10 @@
             --bg-neutral: #f1f5f9;
             --card-shadow: 0 10px 40px rgba(0, 31, 63, 0.08);
             --radius-card: 24px;
+            --left-panel-width: 460px;
+            /* Adjustable via JS */
+            --gantt-sidebar-width: 190px;
+            /* Adjustable via JS */
         }
 
         *,
@@ -190,8 +194,8 @@
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: #fff;
-            width: 44px;
-            height: 44px;
+            width: 42px;
+            height: 42px;
             border-radius: 50%;
             font-size: 1.1rem;
             cursor: pointer;
@@ -236,7 +240,8 @@
             background: var(--teal-bright);
             border: none;
             color: white;
-            padding: 10px 20px;
+            height: 42px;
+            padding: 0 24px;
             border-radius: 100px;
             font-weight: 800;
             font-size: 0.78rem;
@@ -253,6 +258,43 @@
             background: #0d9488;
             transform: translateY(-1px);
             box-shadow: 0 8px 20px rgba(20, 184, 166, 0.5);
+        }
+
+        .btn-summary-nav {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            height: 42px;
+            padding: 0 24px;
+            border-radius: 100px;
+            font-weight: 800;
+            font-size: 0.78rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            text-decoration: none;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(8px);
+        }
+
+        .btn-summary-nav:hover {
+            background: white;
+            color: var(--navy-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            border-color: white;
+        }
+
+        .btn-summary-nav i {
+            font-size: 1rem;
+            color: var(--teal-bright);
+            transition: all 0.3s;
+        }
+
+        .btn-summary-nav:hover i {
+            color: var(--navy-dark);
+            transform: scale(1.1);
         }
 
         /* ── FILTER BAR ────────────────────────────────────────── */
@@ -420,19 +462,71 @@
 
         /* ── LAYOUT ────────────────────────────────────────────── */
         .console-grid {
-            display: grid;
-            grid-template-columns: 460px 1fr;
-            gap: 24px;
+            display: flex;
+            gap: 0;
             align-items: start;
+            min-height: 100vh;
+        }
+
+        .left-side {
+            width: var(--left-panel-width);
+            min-width: 320px;
+            max-width: 800px;
+            flex-shrink: 0;
+        }
+
+        .resizer-v {
+            width: 8px;
+            cursor: col-resize;
+            align-self: stretch;
+            background: transparent;
+            border-radius: 10px;
+            transition: all 0.3s;
+            margin: 0 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .resizer-v:hover,
+        .resizer-v.active {
+            background: rgba(0, 90, 156, 0.1);
+        }
+
+        .resizer-v::after {
+            content: "";
+            width: 2px;
+            height: 40px;
+            background: #cbd5e1;
+            border-radius: 2px;
+            transition: 0.3s;
+        }
+
+        .resizer-v:hover::after,
+        .resizer-v.active::after {
+            background: var(--blue-accent);
+            height: 80px;
+        }
+
+        .right-side {
+            flex: 1;
+            min-width: 0;
         }
 
         @media(max-width: 1200px) {
             .console-grid {
-                grid-template-columns: 1fr;
+                flex-direction: column;
             }
 
-            .ui-card {
-                width: 100%;
+            .left-side,
+            .right-side {
+                width: 100% !important;
+                max-width: none !important;
+            }
+
+            .resizer-v {
+                display: none;
             }
         }
 
@@ -532,7 +626,7 @@
             letter-spacing: 0.5px;
         }
 
-        .role-pm {
+        .role-head {
             background: #e6f1ff;
             color: var(--navy-mid);
         }
@@ -617,8 +711,8 @@
         }
 
         .fix-col {
-            width: 190px;
-            min-width: 190px;
+            width: var(--gantt-sidebar-width);
+            min-width: var(--gantt-sidebar-width);
             border-right: 2px solid rgba(255, 255, 255, 0.1);
         }
 
@@ -641,8 +735,8 @@
         }
 
         .w-fix-col {
-            width: 190px;
-            min-width: 190px;
+            width: var(--gantt-sidebar-width);
+            min-width: var(--gantt-sidebar-width);
             border-right: 2px solid #e2e8f0;
             display: flex;
             align-items: center;
@@ -651,6 +745,21 @@
             font-weight: 800;
             color: #94a3b8;
             text-transform: uppercase;
+            position: relative;
+        }
+
+        .gantt-side-resizer {
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            cursor: col-resize;
+            z-index: 105;
+        }
+
+        .gantt-side-resizer:hover {
+            background: var(--teal-bright);
         }
 
         .w-cell {
@@ -688,12 +797,13 @@
         .g-row {
             display: flex;
             border-bottom: 1px solid #f1f5f9;
-            min-height: 62px;  /* single-lane rows; multi-lane grows dynamically */
+            min-height: 62px;
+            /* single-lane rows; multi-lane grows dynamically */
         }
 
         .g-res-info {
-            width: 190px;
-            min-width: 190px;
+            width: var(--gantt-sidebar-width);
+            min-width: var(--gantt-sidebar-width);
             padding: 14px 16px;
             background: white;
             position: sticky;
@@ -728,22 +838,24 @@
 
         .g-bar {
             position: absolute;
-            height: 26px;
-            border-radius: 7px;
+            height: 38px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 0.58rem;
+            font-size: 0.65rem;
             font-weight: 900;
-            padding: 0 10px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+            padding: 0 5px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
             cursor: pointer;
             transition: 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             z-index: 5;
+            flex-direction: column;
+            line-height: 1.1;
         }
 
         .g-bar:hover {
@@ -752,7 +864,7 @@
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.18);
         }
 
-        .b-pm {
+        .b-head {
             background: linear-gradient(135deg, #001f3f, #005a9c);
         }
 
@@ -767,11 +879,25 @@
 
         .b-date {
             position: absolute;
-            bottom: -17px;
-            font-size: 0.52rem;
-            font-weight: 800;
-            color: #64748b;
+            font-size: 0.48rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.9);
             white-space: nowrap;
+            bottom: 3px;
+        }
+
+        .b-date-start {
+            left: 6px;
+        }
+
+        .b-date-end {
+            right: 6px;
+        }
+
+        .b-proj-code {
+            margin-top: -8px;
+            font-size: 0.7rem;
+            letter-spacing: 0.3px;
         }
 
         /* grey out-of-range zone */
@@ -1241,6 +1367,27 @@
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
         }
 
+        .btn-edit-assign {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            color: #64748b;
+            padding: 8px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 10px;
+        }
+
+        .btn-edit-assign:hover {
+            background: var(--navy-dark);
+            color: white;
+            border-color: var(--navy-dark);
+            transform: scale(1.1);
+        }
+
         .dc-proj-dot {
             width: 64px;
             height: 64px;
@@ -1310,6 +1457,381 @@
             font-weight: 600;
             margin: 0;
         }
+
+        /* ── ASSIGN DATE PICKER ───────────────────────────────── */
+        .assign-date-section {
+            background: #f8fafc;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 20px;
+            transition: border-color 0.2s;
+        }
+
+        .assign-date-section:focus-within {
+            border-color: var(--blue-accent);
+            box-shadow: 0 0 0 4px rgba(0, 90, 156, 0.08);
+        }
+
+        .assign-date-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.65rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--navy-mid);
+            margin-bottom: 10px;
+        }
+
+        .assign-date-note {
+            background: linear-gradient(135deg, #ecfdf5, #f0fdf4);
+            border: 1px solid #bbf7d0;
+            border-radius: 10px;
+            padding: 9px 13px;
+            font-size: 0.68rem;
+            font-weight: 600;
+            color: #15803d;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            margin-bottom: 16px;
+        }
+
+        .assign-date-note i {
+            color: #16a34a;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+
+        .assign-date-grid {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+        }
+
+        .assign-date-field {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .assign-date-arrow {
+            flex-shrink: 0;
+            padding-bottom: 10px;
+            color: var(--blue-accent);
+            font-size: 1.3rem;
+            opacity: 0.6;
+        }
+
+        .assign-date-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.6rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--navy-mid);
+            margin-bottom: 6px;
+            flex-wrap: wrap;
+        }
+
+        .today-badge {
+            margin-left: auto;
+            background: var(--teal-bright);
+            color: white;
+            font-size: 0.55rem;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 100px;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+        }
+
+        .assign-date-input {
+            width: 100%;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 10px 14px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+            color: var(--navy-dark);
+            background: white;
+            outline: none;
+            transition: all 0.2s;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        .assign-date-input:focus {
+            border-color: var(--blue-accent);
+            box-shadow: 0 0 0 4px rgba(0, 90, 156, 0.12);
+            background: #f0f7ff;
+        }
+
+        .assign-date-input::-webkit-calendar-picker-indicator {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23005a9c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E");
+            background-size: 16px;
+            background-repeat: no-repeat;
+            background-position: center;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .assign-date-input::-webkit-calendar-picker-indicator:hover {
+            opacity: 1;
+        }
+
+        .assign-date-hint {
+            font-size: 0.6rem;
+            font-weight: 700;
+            color: #94a3b8;
+            margin-top: 5px;
+            padding-left: 2px;
+            transition: color 0.2s;
+        }
+
+        .assign-duration-preview {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 14px;
+            background: linear-gradient(135deg, #e6f1ff, #f0f7ff);
+            border: 1.5px solid #bfdbfe;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: var(--navy-mid);
+            animation: fadeSlideIn 0.3s ease;
+        }
+
+        .assign-duration-preview i {
+            color: var(--blue-accent);
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ══════════════════════════════════════════════════
+           RESPONSIVE — full device-width coverage
+           1200px → tablet landscape
+           992px  → tablet portrait
+           768px  → large phone / small tablet
+           576px  → standard phone
+           400px  → small phone
+        ══════════════════════════════════════════════════ */
+
+        /* ── 1200px: start compressing the left panel ── */
+        @media (max-width: 1200px) {
+            .console-grid { flex-direction: column; }
+            .left-side, .right-side {
+                width: 100% !important;
+                max-width: none !important;
+                min-width: 0 !important;
+            }
+            .resizer-v { display: none; }
+            :root { --left-panel-width: 100% !important; }
+        }
+
+        /* ── 992px: tablet portrait ── */
+        @media (max-width: 992px) {
+            body { padding: 14px; }
+
+            .app-header {
+                flex-direction: column;
+                gap: 14px;
+                padding: 20px 18px;
+                text-align: center;
+            }
+            .brand-box { flex-direction: column; }
+            .header-center-title {
+                position: static;
+                transform: none;
+                width: 100%;
+                font-size: 0.75rem;
+                padding: 8px 18px;
+            }
+            .header-right {
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            .header-timestamp { display: none; }
+
+            /* stat chips: 2-per-row */
+            .stat-bar { gap: 10px; }
+            .stat-chip { flex: 1 1 calc(50% - 10px); min-width: 140px; padding: 12px 16px; }
+            .stat-chip-value { font-size: 1.15rem; }
+            .stat-chip-icon { width: 36px; height: 36px; font-size: 1rem; }
+
+            /* filter bar */
+            .global-filter-bar {
+                padding: 14px 16px;
+                gap: 10px;
+                border-radius: 18px;
+            }
+            .filter-divider { display: none; }
+            .clean-select, .clean-input { font-size: 0.75rem; padding: 5px 10px; }
+
+            /* table */
+            .registry-table th, .registry-table td { padding: 10px 8px; font-size: 0.75rem; }
+
+            /* Gantt */
+            .gantt-pane { -webkit-overflow-scrolling: touch; }
+            .ui-card-header { padding: 14px 16px; flex-wrap: wrap; gap: 10px; }
+            .card-title { font-size: 0.62rem; }
+
+            /* popup card */
+            .detail-card { width: 92vw; border-radius: 28px; }
+            .dc-top { padding: 24px 22px; flex-wrap: wrap; gap: 10px; }
+            .dc-main { padding: 22px; }
+            .dc-proj-code { font-size: 0.95rem; }
+            .dc-proj-days-num { font-size: 1.2rem; }
+        }
+
+        /* ── 768px: large phones / small tablets ── */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+
+            /* header */
+            .app-header { padding: 16px 14px; gap: 12px; border-radius: 18px; }
+            .brand-logo-wrap { width: 44px; height: 44px; border-radius: 12px; }
+            .brand-name { font-size: 0.92rem; }
+            .brand-sub { font-size: 0.55rem; letter-spacing: 1px; }
+            .header-center-title { display: none; }
+            .btn-add-project, .btn-summary-nav {
+                height: 36px;
+                padding: 0 14px;
+                font-size: 0.72rem;
+            }
+            .btn-logout { width: 36px; height: 36px; font-size: 0.95rem; }
+
+            /* stat chips: 2-per-row tighter */
+            .stat-bar { gap: 8px; }
+            .stat-chip { flex: 1 1 calc(50% - 8px); padding: 10px 12px; gap: 10px; border-radius: 14px; }
+            .stat-chip-icon { width: 32px; height: 32px; font-size: 0.9rem; border-radius: 10px; }
+            .stat-chip-value { font-size: 1.05rem; }
+            .stat-chip-label { font-size: 0.55rem; }
+
+            /* filter bar: stacked */
+            .global-filter-bar { border-radius: 18px; padding: 12px 14px; gap: 8px; }
+            .filter-label { font-size: 0.65rem; }
+            .clean-select, .clean-input { font-size: 0.72rem; width: 100% !important; }
+
+            /* Table: hide less critical columns */
+            .registry-table th:nth-child(6),
+            .registry-table td:nth-child(6) { display: none; }  /* hide Exp column */
+            .registry-table th, .registry-table td { padding: 9px 6px; font-size: 0.72rem; }
+            .role-badge { font-size: 0.58rem; padding: 3px 8px; }
+            .proj-badge { font-size: 0.55rem; padding: 2px 5px; }
+            .action-btn { padding: 5px 8px; font-size: 0.8rem; }
+
+            /* Gantt card */
+            #ganttCard .ui-card-header { flex-direction: column; align-items: flex-start; }
+            .gantt-legend { gap: 8px; flex-wrap: wrap; }
+            .legend-label { font-size: 0.6rem; }
+            .legend-dot { width: 8px; height: 8px; }
+
+            /* popup card */
+            .detail-card { width: 96vw; max-width: 96vw; border-radius: 22px; }
+            .dc-top { padding: 20px 18px; }
+            .dc-main { padding: 18px; }
+            .dc-avatar { width: 56px; height: 56px; font-size: 1.2rem; }
+            h3#pName { font-size: 1.25rem !important; }
+            .dc-role-badge { font-size: 0.6rem; padding: 5px 12px; }
+            .dc-dept-tag { font-size: 0.58rem; padding: 5px 10px; }
+            .dc-proj-card { padding: 14px 14px; gap: 12px; }
+            .dc-proj-dot { width: 48px; height: 48px; border-radius: 12px; font-size: 0.55rem; }
+
+            /* assign modal date grid */
+            .assign-date-grid { flex-direction: column; gap: 8px; }
+            .assign-date-arrow { padding-bottom: 0; text-align: center; }
+
+            /* modals */
+            .modal-content { border-radius: 20px; }
+            .modal-hdr-dark { padding: 16px 20px; border-radius: 20px 20px 0 0; }
+            .modal-body { padding: 18px !important; }
+        }
+
+        /* ── 576px: standard phones ── */
+        @media (max-width: 576px) {
+            body { padding: 8px; }
+
+            /* header: compact single row */
+            .app-header { padding: 12px 12px; border-radius: 16px; }
+            .brand-logo-wrap { width: 38px; height: 38px; }
+            .brand-name { font-size: 0.85rem; }
+            .btn-add-project span,
+            .btn-summary-nav span { display: none; }  /* icon-only on tiny screens */
+            .btn-add-project, .btn-summary-nav { padding: 0 12px; }
+
+            /* stat chips: full-width on very small */
+            .stat-chip { flex: 1 1 calc(50% - 6px); padding: 8px 10px; border-radius: 12px; }
+            .stat-chip-value { font-size: 0.95rem; }
+
+            /* filter bar: fully vertical */
+            .global-filter-bar { padding: 10px 12px; gap: 6px; border-radius: 16px; }
+
+            /* table: further hide columns */
+            .registry-table th:nth-child(5),
+            .registry-table td:nth-child(5) { display: none; }  /* hide Dept column */
+            .registry-table th, .registry-table td { padding: 8px 5px; font-size: 0.68rem; }
+
+            /* Gantt: reduce sidebar width */
+            :root { --gantt-sidebar-width: 130px; }
+            .g-res-name { font-size: 0.72rem; }
+            .g-res-role { font-size: 0.52rem; }
+
+            /* popup */
+            .detail-card { width: 98vw; inset: auto; top: 50%; left: 50%; border-radius: 18px; }
+            .dc-top { flex-direction: column; align-items: flex-start; gap: 12px; }
+            .dc-stat-row { grid-template-columns: repeat(2, 1fr); }
+            .dc-proj-code { font-size: 0.85rem; }
+            .dc-proj-days-num { font-size: 1rem; }
+
+            /* modals */
+            .modal-dialog { margin: 8px; }
+            .modal-body { padding: 14px !important; }
+        }
+
+        /* ── 400px: very small phones ── */
+        @media (max-width: 400px) {
+            body { padding: 6px; }
+
+            .app-header { padding: 10px; border-radius: 14px; gap: 8px; }
+            .brand-name { font-size: 0.78rem; }
+            .stat-chip { flex: 1 1 100%; }  /* single column */
+            .stat-bar { gap: 6px; }
+
+            .ui-card-header { padding: 10px 12px; }
+            .registry-table th, .registry-table td { padding: 7px 4px; font-size: 0.62rem; }
+
+            :root { --gantt-sidebar-width: 110px; }
+            .g-res-name { font-size: 0.65rem; }
+
+            .detail-card { border-radius: 14px; }
+            .dc-top { padding: 14px; }
+            .dc-main { padding: 14px; }
+            h3#pName { font-size: 1.05rem !important; }
+        }
     </style>
 </head>
 
@@ -1327,18 +1849,19 @@
             </div>
         </div>
         <div class="header-center-title">
-            <i class="bi bi-grid-3x2-gap-fill me-2"></i>Resource Allocation Monitoring
+            <i class="bi bi-grid-3x2-gap-fill me-2"></i>Resource Allocation Dashboard
         </div>
         <div class="header-right">
             <div class="header-timestamp" id="liveTime"></div>
-            <a href="summary.html" class="btn-intel" title="Intelligence Hub" style="text-decoration:none;">
-                <i class="bi bi-cpu-fill"></i>
+            <button class="btn-add-project" onclick="openPinModal()">
+                <i class="bi bi-folder-plus"></i> Add Project
+            </button>
+
+            <a href="summary.html" class="btn-summary-nav">
+                <i class="bi bi-graph-up-arrow"></i> Summary
             </a>
             <button class="btn-logout" onclick="performLogout()" title="Logout">
                 <i class="bi bi-box-arrow-right"></i>
-            </button>
-            <button class="btn-add-project" onclick="openPinModal()">
-                <i class="bi bi-folder-plus"></i> Add Project
             </button>
         </div>
     </header>
@@ -1355,8 +1878,8 @@
         <div class="stat-chip">
             <div class="stat-chip-icon sci-navy"><i class="bi bi-briefcase-fill"></i></div>
             <div>
-                <div class="stat-chip-label">Project Managers</div>
-                <div class="stat-chip-value" id="sc-pm">0</div>
+                <div class="stat-chip-label">Heads</div>
+                <div class="stat-chip-value" id="sc-head">0</div>
             </div>
         </div>
         <div class="stat-chip">
@@ -1421,55 +1944,65 @@
     <div class="console-grid">
 
         <!-- LEFT: Registry Table -->
-        <div class="ui-card">
-            <div class="ui-card-header">
-                <span class="card-title"><i class="bi bi-person-lines-fill"></i>Employees</span>
-                <div class="d-flex align-items-center gap-2">
-                    <span id="unitCounter" class="badge rounded-pill px-3 py-2"
-                        style="background:var(--navy-dark);font-size:0.7rem;">0 Members</span>
-                    <button class="btn-add-member" onclick="openAddMember()">
-                        <i class="bi bi-person-plus-fill"></i> Add Member
-                    </button>
+        <div class="left-side" id="leftPanel">
+            <div class="ui-card">
+                <div class="ui-card-header">
+                    <span class="card-title"><i class="bi bi-person-lines-fill"></i>Employees</span>
+                    <div class="d-flex align-items-center gap-2">
+                        <span id="unitCounter" class="badge rounded-pill px-3 py-2"
+                            style="background:var(--navy-dark);font-size:0.7rem;">0 Members</span>
+                        <button class="btn-add-member" onclick="openAddMember()">
+                            <i class="bi bi-person-plus-fill"></i> Add Member
+                        </button>
+                    </div>
                 </div>
-            </div>
-            <div class="table-responsive">
-                <table class="table registry-table mb-0">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Name</th>
-                            <th>Emp ID</th>
-                            <th>Role</th>
-                            <th>Department</th>
-                            <th>Exp</th>
-                            <th class="text-center">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="registryTableBody"></tbody>
-                </table>
+                <div class="table-responsive">
+                    <table class="table registry-table mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Name</th>
+                                <th>Emp ID</th>
+                                <th>Role</th>
+                                <th>Department</th>
+                                <th>Exp</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="registryTableBody"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
+        <!-- SPLITTER -->
+        <div class="resizer-v" id="mainResizer"></div>
+
         <!-- RIGHT: Gantt -->
-        <div class="ui-card" id="ganttCard">
-            <div class="ui-card-header bg-white">
-                <span class="card-title"><i class="bi bi-bar-chart-steps"></i>Timeline Visualization</span>
-                <div class="d-flex align-items-center gap-3">
-                    <button class="btn-export" onclick="exportGantt()">
-                        <i class="bi bi-download"></i> Export
-                    </button>
-                </div>
-            </div>
-            <div class="gantt-pane" id="ganttPane">
-                <div class="gantt-sticky-head">
-                    <div class="m-row" id="mHeader">
-                        <div class="fix-col"></div>
-                    </div>
-                    <div class="w-row" id="wHeader">
-                        <div class="w-fix-col">Week / Start</div>
+        <div class="right-side" id="rightPanel">
+            <div class="ui-card" id="ganttCard">
+                <div class="ui-card-header bg-white">
+                    <span class="card-title"><i class="bi bi-bar-chart-steps"></i>Timeline Visualization</span>
+                    <div class="d-flex align-items-center gap-3">
+                        <button class="btn-export" onclick="exportGantt()">
+                            <i class="bi bi-download"></i> Export
+                        </button>
                     </div>
                 </div>
-                <div id="ganttBody"></div>
+                <div class="gantt-pane" id="ganttPane">
+                    <div class="gantt-sticky-head">
+                        <div class="m-row" id="mHeader">
+                            <div class="fix-col"></div>
+                        </div>
+                        <div class="w-row" id="wHeader">
+                            <div class="w-fix-col">
+                                Week / Start
+                                <div class="gantt-side-resizer" id="ganttSideResizer"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="ganttBody"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -1500,7 +2033,7 @@
                         <div class="col-6">
                             <div class="section-lbl">Role</div>
                             <select id="mRole" class="form-select rounded-3 fw-bold">
-                                <option value="PM">Project Manager</option>
+                                <option value="Head">Head</option>
                                 <option value="Lead">Department Lead</option>
                                 <option value="Member" selected>Team Member</option>
                             </select>
@@ -1552,7 +2085,8 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h5 class="fw-800 mb-0"><i class="bi bi-download me-2"></i>Export Resource Data</h5>
-                            <div style="font-size:0.7rem;opacity:0.6;margin-top:4px;">Choose range, format and download</div>
+                            <div style="font-size:0.7rem;opacity:0.6;margin-top:4px;">Choose range, format and download
+                            </div>
                         </div>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
@@ -1574,19 +2108,23 @@
                     <!-- Format Selector -->
                     <div class="section-lbl mb-2">Export Format</div>
                     <div class="d-flex gap-3 mb-4" id="formatBtns">
-                        <button class="flex-fill btn border rounded-3 py-4 format-opt active" id="fmtPdf" onclick="selectFormat('pdf')" style="transition:all .2s;">
+                        <button class="flex-fill btn border rounded-3 py-4 format-opt active" id="fmtPdf"
+                            onclick="selectFormat('pdf')" style="transition:all .2s;">
                             <i class="bi bi-file-earmark-pdf d-block mb-2" style="font-size:2rem;color:#ef4444;"></i>
                             <span class="fw-800">PDF Report</span>
                             <div style="font-size:0.65rem;color:#64748b;margin-top:4px;">Employees + Timeline</div>
                         </button>
-                        <button class="flex-fill btn border rounded-3 py-4 format-opt" id="fmtCsv" onclick="selectFormat('csv')" style="transition:all .2s;">
-                            <i class="bi bi-file-earmark-spreadsheet d-block mb-2" style="font-size:2rem;color:#10b981;"></i>
+                        <button class="flex-fill btn border rounded-3 py-4 format-opt" id="fmtCsv"
+                            onclick="selectFormat('csv')" style="transition:all .2s;">
+                            <i class="bi bi-file-earmark-spreadsheet d-block mb-2"
+                                style="font-size:2rem;color:#10b981;"></i>
                             <span class="fw-800">CSV Spreadsheet</span>
                             <div style="font-size:0.65rem;color:#64748b;margin-top:4px;">Employees + Timeline</div>
                         </button>
                     </div>
 
-                    <button class="btn fw-900 w-100 py-3 rounded-pill shadow-sm" style="background:var(--navy-dark);color:white;" onclick="executeExport()">
+                    <button class="btn fw-900 w-100 py-3 rounded-pill shadow-sm"
+                        style="background:var(--navy-dark);color:white;" onclick="executeExport()">
                         <i class="bi bi-download me-2"></i>Download Export
                     </button>
                 </div>
@@ -1598,9 +2136,12 @@
         .format-opt.active {
             background: #eff6ff !important;
             border-color: #3b82f6 !important;
-            box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
         }
-        .format-opt:hover { background: #f8fafc; }
+
+        .format-opt:hover {
+            background: #f8fafc;
+        }
     </style>
 
     <!-- ===== EDIT MEMBER MODAL ===== -->
@@ -1628,7 +2169,7 @@
                         <div class="col-6">
                             <div class="section-lbl">Role</div>
                             <select id="eRole" class="form-select rounded-3 fw-bold">
-                                <option value="PM">Project Manager</option>
+                                <option value="Head">Head</option>
                                 <option value="Lead">Department Lead</option>
                                 <option value="Member">Team Member</option>
                             </select>
@@ -1783,20 +2324,34 @@
                     </div>
 
                     <!-- User-provided allocation dates -->
-                    <div class="p-3 rounded-3 mb-4" style="background:white;border:1px solid #e2e8f0;">
-                        <div class="section-lbl"><i class="bi bi-calendar-range me-1"></i>Resource Allocation Period
+                    <div class="assign-date-section mb-4">
+                        <div class="assign-date-header">
+                            <i class="bi bi-calendar-range-fill" style="color:var(--teal-bright);"></i>
+                            <span>Resource Allocation Period</span>
                         </div>
-                        <div class="small text-muted mb-3" style="font-size:0.7rem;">Enter this resource's working dates
-                            for the selected project (can be different from the project timeline).</div>
-                        <div class="row g-3">
-                            <div class="col-6">
-                                <label class="small fw-bold text-muted mb-1">START DATE</label>
-                                <input type="date" id="aStart" class="form-control rounded-3">
+
+                        <div class="assign-date-grid">
+                            <div class="assign-date-field">
+                                <label class="assign-date-label">
+                                    <i class="bi bi-calendar-check"></i> START DATE
+                                </label>
+                                <input type="date" id="aStart" class="assign-date-input" onchange="onStartDateChange()">
+
                             </div>
-                            <div class="col-6">
-                                <label class="small fw-bold text-muted mb-1">END DATE</label>
-                                <input type="date" id="aEnd" class="form-control rounded-3">
+                            <div class="assign-date-arrow">
+                                <i class="bi bi-arrow-right-circle-fill"></i>
                             </div>
+                            <div class="assign-date-field">
+                                <label class="assign-date-label">
+                                    <i class="bi bi-calendar-x"></i> END DATE
+                                </label>
+                                <input type="date" id="aEnd" class="assign-date-input"
+                                    onchange="updateDurationPreview()">
+                            </div>
+                        </div>
+                        <div class="assign-duration-preview" id="durationPreview" style="display:none;">
+                            <i class="bi bi-clock-history"></i>
+                            <span id="durationText">─</span>
                         </div>
                     </div>
 
@@ -1810,6 +2365,50 @@
                     <button class="btn fw-900 w-100 py-3 rounded-pill" style="background:var(--navy-dark);color:white;"
                         onclick="finalizeAssign()">
                         <i class="bi bi-check-circle me-2"></i>Authorize Assignment
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== EDIT ASSIGNMENT MODAL ===== -->
+    <div class="modal fade" id="editAssignModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-hdr-dark" style="background:var(--navy-mid);">
+                    <h6 class="fw-bold mb-0">
+                        <i class="bi bi-calendar-event me-2"></i>Edit Assignment Timeline
+                    </h6>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4" style="background:#fafafa;">
+                    <input type="hidden" id="editEmpId">
+                    <input type="hidden" id="editProjCode">
+                    <input type="hidden" id="oldStart">
+                    <input type="hidden" id="oldEnd">
+
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center gap-2 p-3 rounded-3"
+                            style="background:#f1f5f9;border:1px solid #e2e8f0;">
+                            <i class="bi bi-folder-fill" style="color:var(--blue-accent);"></i>
+                            <span id="editProjName" class="fw-800" style="color:var(--navy-dark);"></span>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-6">
+                            <label class="small fw-bold text-muted mb-1">NEW START DATE</label>
+                            <input type="date" id="newAStart" class="form-control rounded-3">
+                        </div>
+                        <div class="col-6">
+                            <label class="small fw-bold text-muted mb-1">NEW END DATE</label>
+                            <input type="date" id="newAEnd" class="form-control rounded-3">
+                        </div>
+                    </div>
+
+                    <button class="btn fw-900 w-100 py-3 rounded-pill" style="background:var(--navy-dark);color:white;"
+                        onclick="saveEditedAssignment()">
+                        <i class="bi bi-save me-2"></i>Update Timeline
                     </button>
                 </div>
             </div>
@@ -1874,22 +2473,22 @@
         const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         const DAY_ABBR = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
         const WEEK_W = 52;            // px width of every week column
-        const FIX_COL_W = 190;           // px width of the name stub column
+        let FIX_COL_W = 190;           // px width of the name stub column (Adjustable)
 
         /* =========================================================
            PROJECT COLOR PALETTE (16 curated colors, stable per code)
         ========================================================= */
         const PROJECT_PALETTE = [
-            '#6366f1','#f59e0b','#10b981','#ef4444','#3b82f6',
-            '#ec4899','#8b5cf6','#14b8a6','#f97316','#06b6d4',
-            '#84cc16','#a855f7','#e11d48','#64748b','#0ea5e9','#d97706'
+            '#6366f1', '#f59e0b', '#10b981', '#ef4444', '#3b82f6',
+            '#ec4899', '#8b5cf6', '#14b8a6', '#f97316', '#06b6d4',
+            '#84cc16', '#a855f7', '#e11d48', '#64748b', '#0ea5e9', '#d97706'
         ];
 
         /* Returns a stable colour for a project code */
         function getProjectColor(code) {
             // Look up the project's position in projectRegistry for stable colour
             const idx = projectRegistry.findIndex(p => p.code === code);
-            const n   = idx >= 0 ? idx : Math.abs([...code].reduce((a,c) => a + c.charCodeAt(0), 0));
+            const n = idx >= 0 ? idx : Math.abs([...code].reduce((a, c) => a + c.charCodeAt(0), 0));
             return PROJECT_PALETTE[n % PROJECT_PALETTE.length];
         }
 
@@ -1945,17 +2544,17 @@
                 const wStart = new Date(weeks[i].date);
                 wStart.setHours(0, 0, 0, 0);
                 const wEnd = i < weeks.length - 1
-                    ? (() => { const x = new Date(weeks[i+1].date); x.setHours(0,0,0,0); return x; })()
+                    ? (() => { const x = new Date(weeks[i + 1].date); x.setHours(0, 0, 0, 0); return x; })()
                     : new Date(wStart.getTime() + 7 * 86400000);
 
                 if (d >= wStart && d < wEnd) {
-                    const daysInWeek   = (wEnd  - wStart) / 86400000;
-                    const daysIntoWeek = (d     - wStart) / 86400000;
+                    const daysInWeek = (wEnd - wStart) / 86400000;
+                    const daysIntoWeek = (d - wStart) / 86400000;
                     return i * WEEK_W + (daysIntoWeek / daysInWeek) * WEEK_W;
                 }
             }
             // Before first column
-            const first = new Date(weeks[0].date); first.setHours(0,0,0,0);
+            const first = new Date(weeks[0].date); first.setHours(0, 0, 0, 0);
             if (d < first) return 0;
             // After last column
             return weeks.length * WEEK_W;
@@ -1967,7 +2566,7 @@
 
             // Parse as local midnight (prevents UTC timezone shift by 1 day)
             const sDate = new Date(startStr + 'T00:00:00');
-            const eDate = new Date(endStr   + 'T00:00:00');
+            const eDate = new Date(endStr + 'T00:00:00');
 
             // Visible range boundaries
             const origin = new Date(weeks[0].date);
@@ -1981,17 +2580,17 @@
             eDateInclusive.setDate(eDateInclusive.getDate() + 1);
 
             // Clip to visible range
-            const drawS = sDate          < origin     ? origin     : sDate;
+            const drawS = sDate < origin ? origin : sDate;
             const drawE = eDateInclusive > visibleEnd ? visibleEnd : eDateInclusive;
 
             if (drawE <= drawS) return { left: '0px', width: '0px', display: 'none' };
 
-            const leftPx  = dateToPx(drawS);
+            const leftPx = dateToPx(drawS);
             const widthPx = dateToPx(drawE) - leftPx;
 
             return {
-                left:    leftPx.toFixed(1)  + 'px',
-                width:   widthPx.toFixed(1) + 'px',
+                left: leftPx.toFixed(1) + 'px',
+                width: widthPx.toFixed(1) + 'px',
                 display: 'flex'
             };
         }
@@ -2014,11 +2613,11 @@
             const minS = new Date(Math.min(...allS));
             const maxE = new Date(Math.max(...allE));
 
-            const leftPx  = Math.max(0, Math.min(trackW, dateToPx(minS)));
+            const leftPx = Math.max(0, Math.min(trackW, dateToPx(minS)));
             const rightPx = Math.max(0, Math.min(trackW, trackW - dateToPx(maxE)));
 
             let html = '';
-            if (leftPx  > 1) html += `<div class="g-grey-zone g-grey-left"  style="width:${leftPx.toFixed(1)}px;"></div>`;
+            if (leftPx > 1) html += `<div class="g-grey-zone g-grey-left"  style="width:${leftPx.toFixed(1)}px;"></div>`;
             if (rightPx > 1) html += `<div class="g-grey-zone g-grey-right" style="width:${rightPx.toFixed(1)}px;"></div>`;
             return html;
         }
@@ -2068,7 +2667,7 @@
         ========================================================= */
         function updateStats(data) {
             document.getElementById('sc-total').textContent = data.length;
-            document.getElementById('sc-pm').textContent = data.filter(r => r.role === 'PM').length;
+            document.getElementById('sc-head').textContent = data.filter(r => r.role === 'Head').length;
             document.getElementById('sc-lead').textContent = data.filter(r => r.role === 'Lead').length;
             document.getElementById('sc-member').textContent = data.filter(r => r.role === 'Member').length;
             document.getElementById('sc-proj').textContent = projectRegistry.length;
@@ -2088,13 +2687,23 @@
                 const projMatch = (fProj === 'ALL' || r.projects.some(p => p.code === fProj));
                 return deptMatch && projMatch;
             });
+
+            // Role priority: Head (1), Lead (2), Member (3)
+            const rolePriority = { 'Head': 1, 'Lead': 2, 'Member': 3 };
+            filtered.sort((a, b) => {
+                const pA = rolePriority[a.role] || 99;
+                const pB = rolePriority[b.role] || 99;
+                if (pA !== pB) return pA - pB;
+                return a.name.localeCompare(b.name);
+            });
+
             document.getElementById('unitCounter').textContent = `${filtered.length} Members`;
             updateStats(filtered);
 
             /* ── TABLE ── */
             document.getElementById('registryTableBody').innerHTML = filtered.map((r, i) => {
                 const oi = registryData.indexOf(r);
-                const rc = r.role === 'PM' ? 'role-pm' : (r.role === 'Lead' ? 'role-lead' : 'role-member');
+                const rc = r.role === 'Head' ? 'role-head' : (r.role === 'Lead' ? 'role-lead' : 'role-member');
                 const chips = r.projects.length
                     ? r.projects.map(p => `<span class="proj-badge"><i class="bi bi-folder-fill" style="font-size:0.55rem;"></i>${p.code || p.name}</span>`).join('')
                     : `<span class="small text-muted">—</span>`;
@@ -2128,11 +2737,11 @@
             }).join('');
 
             /* ── GANTT (per-project colours, vertically-stacked lanes) ── */
-            const weeks  = window._ganttWeeks || [];
+            const weeks = window._ganttWeeks || [];
             const trackW = weeks.length * WEEK_W;
-            const LANE_H  = 30;   // height of each bar including gap
-            const BAR_H   = 24;   // actual visible bar height
-            const LANE_PAD = 6;   // top padding before first lane
+            const LANE_H = 48;   // height of each bar including gap
+            const BAR_H = 38;   // actual visible bar height
+            const LANE_PAD = 10;   // top padding before first lane
 
             document.getElementById('ganttBody').innerHTML = filtered.map(r => {
                 // 1. Filter by project filter
@@ -2158,7 +2767,7 @@
                 //    lowest lane whose last bar has ended before this one starts.
                 const sorted = [...myProjects].sort((a, b) => new Date(a.start) - new Date(b.start));
                 const laneEnds = [];   // laneEnds[i] = Date when lane i is free again
-                const laneOf   = [];   // laneOf[i]   = lane index assigned to sorted[i]
+                const laneOf = [];   // laneOf[i]   = lane index assigned to sorted[i]
 
                 sorted.forEach((p, i) => {
                     const pStart = new Date(p.start);
@@ -2172,7 +2781,7 @@
                 });
 
                 const numLanes = laneEnds.length;
-                const rowH     = LANE_PAD + numLanes * LANE_H + LANE_PAD + 4;
+                const rowH = LANE_PAD + numLanes * LANE_H + LANE_PAD + 4;
 
                 // 3. Build HTML for each project bar
                 const fmt = ds => { const d = new Date(ds); return d.getDate() + '/' + (d.getMonth() + 1); };
@@ -2181,9 +2790,9 @@
                     const bStyle = getBarStyle(p.start, p.end);
                     if (bStyle.display === 'none') return '';
 
-                    const color   = getProjectColor(p.code);
-                    const lane    = laneOf[i];
-                    const topPx   = LANE_PAD + lane * LANE_H;
+                    const color = getProjectColor(p.code);
+                    const lane = laneOf[i];
+                    const topPx = LANE_PAD + lane * LANE_H;
                     const itemsJson = JSON.stringify([{ code: p.code, start: p.start, end: p.end }]).replace(/"/g, '&quot;');
 
                     return `<div class="g-bar"
@@ -2192,9 +2801,9 @@
                                box-shadow:0 3px 10px ${color}55;"
                         onclick="openPopup(${registryData.indexOf(r)}, ${itemsJson})"
                         title="${p.code}: ${p.start} → ${p.end}">
-                        ${p.code}
-                        <span class="b-date" style="left:0">${fmt(p.start)}</span>
-                        <span class="b-date" style="right:0">${fmt(p.end)}</span>
+                        <div class="b-proj-code">${p.code}</div>
+                        <span class="b-date b-date-start">${fmt(p.start)}</span>
+                        <span class="b-date b-date-end">${fmt(p.end)}</span>
                     </div>`;
                 }).join('');
 
@@ -2379,10 +2988,16 @@
             document.getElementById('targetName').textContent = r.name;
             document.getElementById('targetIndex').value = empIdx;
 
-            // Reset fields
-            document.getElementById('aStart').value = '';
-            document.getElementById('aEnd').value = '';
+            // Set today as min for start date, reset fields
+            const today = new Date().toISOString().split('T')[0];
+            const aStart = document.getElementById('aStart');
+            const aEnd = document.getElementById('aEnd');
+            aStart.value = '';
+            aEnd.value = '';
+            aStart.min = today;
+            aEnd.min = today;
             document.getElementById('assignProjInfo').style.display = 'none';
+            document.getElementById('durationPreview').style.display = 'none';
 
             // Populate project dropdown
             const sel = document.getElementById('aProjectSelect');
@@ -2415,6 +3030,36 @@
                 info.style.display = 'block';
             } else {
                 info.style.display = 'none';
+            }
+        }
+
+        function onStartDateChange() {
+            const aStart = document.getElementById('aStart');
+            const aEnd = document.getElementById('aEnd');
+            const startVal = aStart.value;
+
+            if (startVal) {
+                // End date must be at least start date
+                aEnd.min = startVal;
+                // If end date is before new start, reset it
+                if (aEnd.value && aEnd.value < startVal) {
+                    aEnd.value = '';
+                }
+            }
+            updateDurationPreview();
+        }
+
+        function updateDurationPreview() {
+            const s = document.getElementById('aStart').value;
+            const e = document.getElementById('aEnd').value;
+            const preview = document.getElementById('durationPreview');
+            const durText = document.getElementById('durationText');
+            if (s && e && e >= s) {
+                const days = Math.ceil((new Date(e) - new Date(s)) / 86400000);
+                preview.style.display = 'flex';
+                durText.textContent = `${days} day${days !== 1 ? 's' : ''} selected  (${new Date(s + 'T00:00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}  →  ${new Date(e + 'T00:00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })})`;
+            } else {
+                preview.style.display = 'none';
             }
         }
 
@@ -2468,6 +3113,71 @@
         }
 
         /* =========================================================
+           EDIT ASSIGNMENT
+        ========================================================= */
+        function openEditAssignment(empId, projCode, projName, start, end) {
+            closePopup();
+            document.getElementById('editEmpId').value = empId;
+            document.getElementById('editProjCode').value = projCode;
+            document.getElementById('editProjName').textContent = projName;
+            document.getElementById('oldStart').value = start;
+            document.getElementById('oldEnd').value = end;
+            document.getElementById('newAStart').value = start;
+            document.getElementById('newAEnd').value = end;
+
+            new bootstrap.Modal(document.getElementById('editAssignModal')).show();
+        }
+
+        async function saveEditedAssignment() {
+            const empId = document.getElementById('editEmpId').value;
+            const projCode = document.getElementById('editProjCode').value;
+            const oldS = document.getElementById('oldStart').value;
+            const oldE = document.getElementById('oldEnd').value;
+            const newS = document.getElementById('newAStart').value;
+            const newE = document.getElementById('newAEnd').value;
+
+            if (!newS || !newE) return alert('Please select both dates.');
+            if (new Date(newE) <= new Date(newS)) return alert('End date must be after start date.');
+
+            const days = Math.ceil((new Date(newE) - new Date(newS)) / 86400000);
+
+            try {
+                const res = await fetch('/api/update-assignment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        empId, projCode, oldStart: oldS, oldEnd: oldE,
+                        newStart: newS, newEnd: newE, days
+                    })
+                });
+
+                if (!res.ok) {
+                    const data = await res.json();
+                    return alert('Update failed: ' + (data.error || 'Server error'));
+                }
+
+                // Update in-memory
+                const target = registryData.find(r => r.id === empId);
+                if (target) {
+                    const p = target.projects.find(proj => proj.code === projCode && proj.start === oldS && proj.end === oldE);
+                    if (p) {
+                        p.start = newS;
+                        p.end = newE;
+                        p.days = days;
+                    }
+                }
+
+                renderUI();
+                bootstrap.Modal.getInstance(document.getElementById('editAssignModal')).hide();
+                showToast(`<i class="bi bi-check-circle-fill me-2" style="color:var(--teal-bright)"></i>Timeline updated for <strong>${projCode}</strong>`);
+
+            } catch (e) {
+                console.error(e);
+                alert('Connection error. Could not update assignment.');
+            }
+        }
+
+        /* =========================================================
            DETAIL POPUP
         ========================================================= */
         function openPopup(idx, filterItems = null) {
@@ -2475,7 +3185,7 @@
 
             // ── Avatar initials + color
             const initials = r.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-            const avatarBg = r.role === 'PM' ? '#003d8f' : r.role === 'Lead' ? '#0d9488' : '#475569';
+            const avatarBg = r.role === 'Head' ? '#003d8f' : r.role === 'Lead' ? '#0d9488' : '#475569';
             const elAvatar = document.getElementById('pAvatar');
             elAvatar.textContent = initials;
             elAvatar.style.background = avatarBg;
@@ -2484,7 +3194,7 @@
             document.getElementById('pName').textContent = r.name;
 
             // ── Role badge with icon
-            const roleIcons = { PM: 'bi-briefcase-fill', Lead: 'bi-person-badge-fill', Member: 'bi-person-fill' };
+            const roleIcons = { Head: 'bi-briefcase-fill', Lead: 'bi-person-badge-fill', Member: 'bi-person-fill' };
             document.getElementById('pRoleBadge').innerHTML =
                 `<i class="bi ${roleIcons[r.role] || 'bi-person-fill'}"></i> ${r.role}`;
 
@@ -2521,6 +3231,9 @@
                             <div class="dc-proj-days-num">${p.days}</div>
                             <div class="dc-proj-days-lbl">DAYS</div>
                         </div>
+                        <button class="btn-edit-assign" onclick="openEditAssignment('${r.id}', '${p.code}', '${p.name}', '${p.start}', '${p.end}')" title="Edit Timeline">
+                            <i class="bi bi-pencil-square"></i>
+                        </button>
                     </div>`;
                 }).join('')
                 : `<div class="dc-empty-state">
@@ -2558,7 +3271,7 @@
         function exportGantt() {
             // Pre-fill date range from current filter
             document.getElementById('exFrom').value = document.getElementById('fFrom').value;
-            document.getElementById('exTo').value   = document.getElementById('fTo').value;
+            document.getElementById('exTo').value = document.getElementById('fTo').value;
             // Default to PDF
             selectFormat('pdf');
             new bootstrap.Modal(document.getElementById('exportRangeModal')).show();
@@ -2577,31 +3290,34 @@
                 const projOk = fProj === 'ALL' || r.projects.some(p => p.code === fProj);
                 return deptOk && projOk;
             }).flatMap(r => {
-                // Timeline assignments that overlap the export range
-                const assignments = r.projects.filter(
-                    p => new Date(p.start) <= e && new Date(p.end) >= s
-                );
+                // Focus on assignments that overlap the export range 
+                // AND match the current project filter (if one is active)
+                const assignments = r.projects.filter(p => {
+                    const dateOk = new Date(p.start + 'T00:00:00') <= e && new Date(p.end + 'T00:00:00') >= s;
+                    const codeOk = fProj === 'ALL' || p.code === fProj;
+                    return dateOk && codeOk;
+                });
+
                 if (assignments.length) {
-                    return assignments.map((p, i) => ({
-                        sn:       i === 0 ? '' : '',   // filled differently per format
-                        name:     r.name,
-                        empId:    r.id,
-                        dept:     r.dept,
-                        role:     r.role,
-                        exp:      r.exp,
+                    return assignments.map(p => ({
+                        name: r.name,
+                        empId: r.id,
+                        dept: r.dept,
+                        role: r.role,
+                        exp: r.exp,
                         projCode: p.code,
                         projName: p.name,
-                        start:    p.start,
-                        end:      p.end,
-                        days:     p.days,
-                        status:   'Assigned'
+                        start: p.start,
+                        end: p.end,
+                        days: p.days,
+                        status: 'Assigned'
                     }));
                 } else {
                     return [{
-                        sn: '', name: r.name, empId: r.id, dept: r.dept,
+                        name: r.name, empId: r.id, dept: r.dept,
                         role: r.role, exp: r.exp,
-                        projCode: '—', projName: '—', start: '—', end: '—',
-                        days: '—', status: 'Free'
+                        projCode: '-', projName: '-', start: '-', end: '-',
+                        days: '-', status: 'Free'
                     }];
                 }
             });
@@ -2609,8 +3325,8 @@
 
         async function executeExport() {
             const rangeFrom = document.getElementById('exFrom').value;
-            const rangeTo   = document.getElementById('exTo').value;
-            const fmt       = _exportFormat;
+            const rangeTo = document.getElementById('exTo').value;
+            const fmt = _exportFormat;
 
             if (!rangeFrom || !rangeTo) return alert('Please select both From and To dates.');
             if (new Date(rangeTo) < new Date(rangeFrom)) return alert('"To" date must be after "From" date.');
@@ -2618,189 +3334,133 @@
             bootstrap.Modal.getInstance(document.getElementById('exportRangeModal')).hide();
 
             const rows = buildExportRows(rangeFrom, rangeTo);
-            const genDate = new Date().toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'});
+            const genDate = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
             const rangeLabel = `${rangeFrom}  →  ${rangeTo}`;
 
-            /* ────────────── CSV EXPORT ────────────── */
+            /* ── CSV / EXCEL ── */
             if (fmt === 'csv') {
-                showToast('<i class="bi bi-hourglass-split me-2"></i>Building CSV…');
+                showToast('<i class="bi bi-hourglass-split me-2"></i>Building Excel CSV…');
                 try {
-                    // Section 1 — Employee Directory
-                    const emp_header = 'SECTION 1: EMPLOYEE DIRECTORY';
-                    const emp_cols   = 'S.No,Name,Employee ID,Department,Role,Experience (Yrs)';
-                    // Unique employees (de-dup by empId)
-                    const seen = new Set();
-                    const empRows = [];
-                    let sn = 1;
-                    rows.forEach(r => {
-                        if (!seen.has(r.empId)) {
-                            seen.add(r.empId);
-                            empRows.push([sn++, r.name, r.empId, r.dept, r.role, r.exp]);
-                        }
-                    });
+                    // Use ="value" trick to force Excel to treat it as string and NOT hide with #
+                    const escape = v => `="${String(v || '').replace(/"/g, '""')}"`;
 
-                    // Section 2 — Timeline Assignments
-                    const tl_header = 'SECTION 2: TIMELINE ASSIGNMENTS';
-                    const tl_cols   = 'S.No,Name,Employee ID,Department,Role,Project Code,Project Name,Start Date,End Date,Duration (Days),Status';
+                    const fmtDateCSV = ds => {
+                        if (!ds || ds === '-' || ds === '—') return '-';
+                        const d = new Date(ds + 'T00:00:00');
+                        if (isNaN(d)) return ds;
+                        // Format: 09 Mar 26 (shorter to fit narrow columns)
+                        return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: '2-digit' });
+                    };
+
                     const tlRows = rows.map((r, i) => [
-                        i + 1, r.name, r.empId, r.dept, r.role,
-                        r.projCode, r.projName, r.start, r.end, r.days, r.status
+                        i + 1,
+                        r.name,
+                        r.empId,
+                        r.dept,
+                        r.role,
+                        r.projCode,
+                        r.projName,
+                        fmtDateCSV(r.start),
+                        fmtDateCSV(r.end),
+                        r.days,
+                        r.status
                     ]);
 
-                    const escape = v => `"${String(v).replace(/"/g, '""')}"`;
                     const lines = [
                         `"DANPREL Engineering Automation"`,
-                        `"Resource Deployment Report"`,
-                        `"Period: ${rangeLabel}"`,
+                        `"Resource Deployment Master Report"`,
+                        `"Range: ${rangeFrom} to ${rangeTo}"`,
                         `"Generated: ${genDate}"`,
                         '',
-                        escape(emp_header),
-                        emp_cols,
-                        ...empRows.map(r => r.map(escape).join(',')),
+                        `"SECTION 1: TIMELINE ASSIGNMENTS"`,
+                        `"S.No","Name","ID","Dept","Role","Code","Project","Start","End","Days","Status"`,
+                        ...tlRows.map(row => row.map((cell, idx) => {
+                            // Only apply the Excel formula trick to Dates and IDs/Names to ensure they show up as text
+                            if (idx >= 1 && idx <= 8) return `="${String(cell).replace(/"/g, '""')}"`;
+                            return `"${String(cell).replace(/"/g, '""')}"`;
+                        }).join(',')),
                         '',
-                        escape(tl_header),
-                        tl_cols,
-                        ...tlRows.map(r => r.map(escape).join(','))
+                        `"End of Report"`
                     ];
 
-                    const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
-                    const url  = URL.createObjectURL(blob);
-                    const a    = document.createElement('a');
-                    a.href     = url;
-                    a.download = `Danprel_Export_${rangeFrom}_to_${rangeTo}.csv`;
-                    a.click();
-                    URL.revokeObjectURL(url);
-                    showToast('<i class="bi bi-check-circle-fill me-2" style="color:var(--teal-bright)"></i>CSV downloaded!');
+                    const blob = new Blob(['\ufeff', lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a'); a.href = url;
+                    a.download = `Danprel_Deployment_${rangeFrom}.csv`;
+                    a.click(); URL.revokeObjectURL(url);
+                    showToast('<i class="bi bi-check-circle-fill me-2" style="color:var(--teal-bright)"></i>Excel CSV optimized!');
                 } catch (err) {
                     console.error(err);
-                    showToast('<i class="bi bi-exclamation-circle me-2" style="color:#f87171"></i>CSV export failed.');
+                    showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Export failed.');
                 }
                 return;
             }
 
-            /* ────────────── PDF EXPORT ────────────── */
+            /* ── PDF REPORT ── */
             if (fmt === 'pdf') {
                 showToast('<i class="bi bi-hourglass-split me-2"></i>Building PDF report…');
                 try {
                     const { jsPDF } = window.jspdf;
                     const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
                     const PW = doc.internal.pageSize.getWidth();
+                    const PH = doc.internal.pageSize.getHeight();
 
-                    /* ── PDF Cover / Header ── */
-                    doc.setFillColor(0, 31, 63);
-                    doc.rect(0, 0, PW, 38, 'F');
-                    doc.setTextColor(255, 255, 255);
-                    doc.setFont('helvetica', 'bold');
-                    doc.setFontSize(17);
-                    doc.text('DANPREL Engineering Automation', 14, 14);
-                    doc.setFontSize(10);
-                    doc.setFont('helvetica', 'normal');
-                    doc.text('Resource Deployment Report  |  Period: ' + rangeLabel, 14, 22);
-                    doc.text('Generated: ' + genDate, 14, 29);
+                    // Page 1: Table Timeline
+                    doc.setFillColor(0, 31, 63); doc.rect(0, 0, PW, 38, 'F');
+                    doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(18);
+                    doc.text('DANPREL Engineering Automation', 14, 15);
+                    doc.setFontSize(10); doc.setFont('helvetica', 'normal');
+                    doc.text('Timeline Deployment Report  |  Timeframe: ' + rangeLabel, 14, 23);
+                    doc.text('Generated: ' + genDate, 14, 30);
 
-                    // Section label helper
                     const drawSectionLabel = (text, y) => {
-                        doc.setFillColor(240, 245, 255);
-                        doc.rect(0, y - 6, PW, 10, 'F');
-                        doc.setTextColor(0, 31, 63);
-                        doc.setFont('helvetica', 'bold');
-                        doc.setFontSize(10);
+                        doc.setFillColor(241, 245, 249); doc.rect(0, y - 6, PW, 10, 'F');
+                        doc.setTextColor(0, 31, 63); doc.setFont('helvetica', 'bold'); doc.setFontSize(10);
                         doc.text(text, 14, y);
                     };
 
-                    /* ── SECTION 1: Employee Directory ── */
-                    drawSectionLabel('SECTION 1 — Employee Directory', 46);
-
-                    const seen2 = new Set();
-                    const empBody = [];
-                    let sn2 = 1;
-                    rows.forEach(r => {
-                        if (!seen2.has(r.empId)) {
-                            seen2.add(r.empId);
-                            empBody.push([sn2++, r.name, r.empId, r.dept, r.role, r.exp + ' yrs']);
-                        }
-                    });
-
-                    doc.autoTable({
-                        startY: 50,
-                        head: [['#', 'Name', 'Employee ID', 'Department', 'Role', 'Experience']],
-                        body: empBody,
-                        theme: 'grid',
-                        headStyles:  { fillColor: [0, 51, 102], textColor: 255, fontStyle: 'bold', fontSize: 8 },
-                        bodyStyles:  { fontSize: 8, textColor: [30, 41, 59] },
-                        columnStyles: { 0: { halign: 'center', cellWidth: 12 }, 2: { cellWidth: 32 } },
-                        alternateRowStyles: { fillColor: [248, 250, 252] },
-                        margin: { left: 14, right: 14 },
-                    });
-
-                    /* ── SECTION 2: Timeline Assignments ── */
-                    doc.addPage();
-
-                    // Re-draw header band on new page
-                    doc.setFillColor(0, 31, 63);
-                    doc.rect(0, 0, PW, 18, 'F');
-                    doc.setTextColor(255, 255, 255);
-                    doc.setFont('helvetica', 'bold');
-                    doc.setFontSize(11);
-                    doc.text('DANPREL Engineering Automation  —  Timeline Assignments', 14, 11);
-
-                    drawSectionLabel('SECTION 2 — Timeline Visualization (Project Assignments)', 26);
-
+                    drawSectionLabel('SECTION 1 — Assignment List', 46);
                     const tlBody = rows.map((r, i) => [
-                        i + 1, r.name, r.empId, r.dept, r.role,
-                        r.projCode, r.projName, r.start, r.end,
-                        r.days === '—' ? '—' : r.days + ' days',
-                        r.status
+                        i + 1, r.name, r.empId, r.dept, r.role, r.projCode, r.projName, r.start, r.end,
+                        r.days === '—' ? '—' : r.days + 'd', r.status
                     ]);
-
-                    // Color assigned vs free rows
                     doc.autoTable({
-                        startY: 30,
-                        head: [['#','Name','Emp ID','Department','Role','Proj Code','Project Name','Start','End','Duration','Status']],
-                        body: tlBody,
-                        theme: 'striped',
-                        headStyles:  { fillColor: [0, 51, 102], textColor: 255, fontStyle: 'bold', fontSize: 7.5 },
-                        bodyStyles:  { fontSize: 7.5, textColor: [30, 41, 59] },
-                        columnStyles: {
-                            0:  { halign: 'center', cellWidth: 10 },
-                            4:  { cellWidth: 16 },
-                            5:  { cellWidth: 22 },
-                            9:  { cellWidth: 20 },
-                            10: { cellWidth: 18, halign: 'center' }
-                        },
-                        alternateRowStyles: { fillColor: [248, 250, 252] },
-                        didParseCell: (data) => {
-                            if (data.section === 'body' && data.column.index === 10) {
-                                const val = data.cell.raw;
-                                if (val === 'Free') {
-                                    data.cell.styles.textColor = [5, 150, 105];
-                                    data.cell.styles.fontStyle = 'bold';
-                                } else if (val === 'Assigned') {
-                                    data.cell.styles.textColor = [2, 86, 155];
-                                    data.cell.styles.fontStyle = 'bold';
-                                }
-                            }
-                        },
-                        margin: { left: 14, right: 14 },
+                        startY: 52, head: [['#', 'Name', 'Emp ID', 'Dept', 'Role', 'Code', 'Project Name', 'Start', 'End', 'Dur', 'Status']],
+                        body: tlBody, theme: 'striped', headStyles: { fillColor: [0, 51, 102], fontSize: 7 },
+                        bodyStyles: { fontSize: 7 }, margin: { left: 14, right: 14 }
                     });
 
-                    // Page numbers
-                    const totalPages = doc.internal.pages.length - 1;
-                    for (let pg = 1; pg <= totalPages; pg++) {
-                        doc.setPage(pg);
-                        doc.setFont('helvetica', 'normal');
-                        doc.setFontSize(7);
-                        doc.setTextColor(148, 163, 184);
-                        doc.text(`Page ${pg} of ${totalPages}  |  Danprel Engineering Automation  |  Confidential`,
-                            PW / 2, doc.internal.pageSize.getHeight() - 5, { align: 'center' });
+                    // Page 3: Gantt Visualization
+                    doc.addPage();
+                    doc.setFillColor(0, 31, 63); doc.rect(0, 0, PW, 18, 'F');
+                    doc.setTextColor(255, 255, 255);
+                    doc.text('DANPREL Engineering Automation  —  Timeline Visualization Chart', 14, 11);
+                    drawSectionLabel('SECTION 3 — Interactive Deployment Timeline', 26);
+
+                    const ganttEl = document.getElementById('ganttPane');
+                    const canvas = await html2canvas(ganttEl, {
+                        scale: 1.5, useCORS: true, backgroundColor: '#ffffff',
+                        width: ganttEl.scrollWidth, height: ganttEl.scrollHeight,
+                        windowWidth: ganttEl.scrollWidth, windowHeight: ganttEl.scrollHeight
+                    });
+                    const imgData = canvas.toDataURL('image/png');
+                    const imgW = PW - 28;
+                    const imgH = (canvas.height * imgW) / canvas.width;
+                    if (imgH > PH - 40) {
+                        doc.addImage(imgData, 'PNG', 14, 32, imgW, PH - 45);
+                    } else {
+                        doc.addImage(imgData, 'PNG', 14, 32, imgW, imgH);
                     }
 
-                    doc.save(`Danprel_Report_${rangeFrom}_to_${rangeTo}.pdf`);
-                    showToast('<i class="bi bi-check-circle-fill me-2" style="color:var(--teal-bright)"></i>PDF report downloaded!');
-                } catch (err) {
-                    console.error(err);
-                    showToast('<i class="bi bi-exclamation-circle me-2" style="color:#f87171"></i>PDF export failed.');
-                }
+                    // Footer
+                    const totalPages = doc.internal.pages.length - 1;
+                    for (let pg = 1; pg <= totalPages; pg++) {
+                        doc.setPage(pg); doc.setFontSize(8); doc.setTextColor(150);
+                        doc.text(`Page ${pg} of ${totalPages}  |  Danprel Confidential`, PW / 2, PH - 6, { align: 'center' });
+                    }
+                    doc.save(`Danprel_Resource_Report_${rangeFrom}.pdf`);
+                    showToast('<i class="bi bi-check-circle-fill me-2" style="color:var(--teal-bright)"></i>Professional PDF report saved!');
+                } catch (err) { console.error(err); showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>PDF export error.'); }
                 return;
             }
         }
@@ -2959,6 +3619,80 @@
             localStorage.removeItem('danprel_auth');
             window.location.replace('login.html');
         }
+
+        /* =========================================================
+           ADJUSTABLE CONTAINERS (RESIZING LOGIC)
+        ========================================================= */
+        function initResizableContainers() {
+            const mainResizer = document.getElementById('mainResizer');
+            const leftPanel = document.getElementById('leftPanel');
+            const ganttResizer = document.getElementById('ganttSideResizer');
+
+            // ── Main Page Splitter ──
+            if (mainResizer && leftPanel) {
+                let isDragging = false;
+                mainResizer.addEventListener('mousedown', (e) => {
+                    isDragging = true;
+                    mainResizer.classList.add('active');
+                    document.body.style.cursor = 'col-resize';
+                    document.body.style.userSelect = 'none';
+                });
+                document.addEventListener('mousemove', (e) => {
+                    if (!isDragging) return;
+                    let nw = e.clientX - 20; // subtracting body padding
+                    if (nw < 300) nw = 300;
+                    if (nw > 800) nw = 800;
+                    leftPanel.style.width = nw + 'px';
+                    document.documentElement.style.setProperty('--left-panel-width', nw + 'px');
+                });
+                document.addEventListener('mouseup', () => {
+                    if (isDragging) {
+                        isDragging = false;
+                        mainResizer.classList.remove('active');
+                        document.body.style.cursor = '';
+                        document.body.style.userSelect = '';
+                    }
+                });
+            }
+
+            // ── Gantt Sidebar Splitter ──
+            if (ganttResizer) {
+                let isDraggingGantt = false;
+                ganttResizer.addEventListener('mousedown', (e) => {
+                    e.stopPropagation();
+                    isDraggingGantt = true;
+                    document.body.style.cursor = 'col-resize';
+                    document.body.style.userSelect = 'none';
+                });
+                document.addEventListener('mousemove', (e) => {
+                    if (!isDraggingGantt) return;
+                    // Position relative to Gantt container start
+                    const ganttPane = document.getElementById('ganttPane');
+                    const rect = ganttPane.getBoundingClientRect();
+                    let nw = e.clientX - rect.left;
+                    if (nw < 120) nw = 120;
+                    if (nw > 400) nw = 400;
+
+                    // Update global constant and CSS variable
+                    FIX_COL_W = nw;
+                    document.documentElement.style.setProperty('--gantt-sidebar-width', nw + 'px');
+
+                    // Re-render headers to adjust sticky head width
+                    const year = parseInt(document.getElementById('fYear').value);
+                    buildGanttHeaders(year);
+                });
+                document.addEventListener('mouseup', () => {
+                    if (isDraggingGantt) {
+                        isDraggingGantt = false;
+                        document.body.style.cursor = '';
+                        document.body.style.userSelect = '';
+                    }
+                });
+            }
+        }
+
+        // Initialize after DOM loads
+        window.addEventListener('DOMContentLoaded', initResizableContainers);
     </script>
 </body>
 

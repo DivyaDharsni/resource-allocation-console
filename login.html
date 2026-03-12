@@ -1,411 +1,459 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | Danprel Engineering Automation</title>
-    <meta name="description" content="Secure portal login for Danprel Engineering Automation Resource Allocation Console.">
-    
-    <!-- Fonts and Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <meta name="description"
+        content="Secure portal login for Danprel Engineering Automation Resource Allocation Console.">
+
+    <!-- Google Fonts: Outfit for a modern, industrial feel -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
     <style>
         :root {
-            --navy-dark: #001f3f;
-            --navy-mid: #003366;
-            --blue-accent: #0088ff;
-            --teal-bright: #14b8a6;
-            --white: #ffffff;
-            --text-main: #1e293b;
+            --brand-primary: #002d5a;
+            --brand-secondary: #001021;
+            --accent-blue: #0ea5e9;
+            --accent-teal: #14b8a6;
+            --text-main: #0f172a;
             --text-muted: #64748b;
-            --border-light: #e2e8f0;
-            --glass-bg: rgba(255, 255, 255, 0.95);
+            --white: #ffffff;
+            --error: #ef4444;
+            --input-bg: #f8fafc;
+            --border: #e2e8f0;
         }
 
-        *, *::before, *::after {
+        * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background: radial-gradient(circle at top right, #002d5a, #001021);
-            color: var(--text-main);
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, var(--brand-secondary) 0%, var(--brand-primary) 100%);
+            height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
             overflow: hidden;
             position: relative;
         }
 
-        /* ── DECORATIVE ELEMENTS ── */
-        .bg-pattern {
+        /* ── BACKGROUND ART ── */
+        .bg-mesh {
             position: absolute;
-            top: 0;
-            left: 0;
+            inset: 0;
+            background-image:
+                radial-gradient(at 0% 0%, hsla(199, 100%, 50%, 0.15) 0, transparent 50%),
+                radial-gradient(at 100% 100%, hsla(174, 100%, 50%, 0.1) 0, transparent 50%);
+            z-index: 0;
+        }
+
+        .bg-grid {
+            position: absolute;
+            inset: 0;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: 1;
+        }
+
+        /* ── CARD ── */
+        .login-wrap {
+            position: relative;
+            z-index: 10;
             width: 100%;
-            height: 100%;
-            background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-            background-size: 40px 40px;
-            z-index: -1;
+            max-width: 440px;
+            padding: 20px;
         }
 
-        .glow {
-            position: absolute;
-            width: 500px;
-            height: 500px;
-            background: var(--blue-accent);
-            filter: blur(150px);
-            opacity: 0.15;
-            border-radius: 50%;
-            z-index: -1;
-            top: -100px;
-            right: -100px;
-        }
-
-        /* ── LOGIN CARD ── */
         .login-card {
-            background: var(--glass-bg);
-            width: 100%;
-            max-width: 460px;
-            border-radius: 32px;
-            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            animation: cardEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            animation: slideUp 0.6s ease-out;
         }
 
-        @keyframes cardEntrance {
+        @keyframes slideUp {
             from {
                 opacity: 0;
-                transform: translateY(40px) scale(0.95);
+                transform: translateY(20px);
             }
+
             to {
                 opacity: 1;
-                transform: translateY(0) scale(1);
+                transform: translateY(0);
             }
         }
 
-        /* ── TOP ACCENT ── */
-        .card-accent {
-            height: 8px;
-            background: linear-gradient(90deg, var(--navy-dark), var(--blue-accent), var(--teal-bright));
+        .top-accent {
+            height: 6px;
+            background: linear-gradient(90deg, var(--brand-primary), var(--accent-blue), var(--accent-teal));
         }
 
-        /* ── HEADER ── */
-        .card-header {
-            padding: 50px 50px 20px;
+        header {
+            padding: 40px 40px 20px;
             text-align: center;
         }
 
         .logo-box {
-            width: 72px;
-            height: 72px;
-            background: white;
+            width: 80px;
+            height: 80px;
+            background: #fff;
             border-radius: 20px;
-            margin: 0 auto 24px;
+            margin: 0 auto 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            border: 1px solid var(--border-light);
-            padding: 10px;
-            transition: transform 0.3s ease;
-        }
-
-        .logo-box:hover {
-            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border);
+            padding: 12px;
         }
 
         .logo-box img {
             max-width: 100%;
-            height: auto;
             object-fit: contain;
         }
 
-        .company-name {
-            font-size: 1.75rem;
-            font-weight: 900;
-            color: var(--navy-dark);
+        .brand-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--brand-primary);
             letter-spacing: -0.5px;
-            margin-bottom: 6px;
-        }
-
-        .company-sub {
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: var(--teal-bright);
             text-transform: uppercase;
-            letter-spacing: 2px;
         }
 
-        /* ── BODY ── */
-        .card-body {
-            padding: 10px 50px 50px;
-        }
-
-        .auth-label {
-            display: block;
-            text-align: center;
-            font-size: 0.9rem;
+        .brand-subtitle {
+            font-size: 0.8rem;
             font-weight: 600;
-            color: var(--text-muted);
-            margin-bottom: 30px;
-            position: relative;
-        }
-
-        .auth-label::after {
-            content: '';
-            display: block;
-            width: 40px;
-            height: 4px;
-            background: var(--blue-accent);
-            border-radius: 2px;
-            margin: 10px auto 0;
+            color: var(--accent-teal);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-top: 2px;
         }
 
         /* ── FORM ── */
-        .input-group {
-            margin-bottom: 24px;
+        .card-content {
+            padding: 10px 40px 40px;
         }
 
-        .field-label {
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .label {
             display: block;
             font-size: 0.75rem;
-            font-weight: 800;
-            color: var(--navy-dark);
+            font-weight: 700;
+            color: var(--text-main);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
             margin-bottom: 8px;
-            padding-left: 4px;
+            padding-left: 2px;
         }
 
-        .input-container {
+        .control {
             position: relative;
         }
 
-        .input-icon {
+        .icon {
             position: absolute;
-            left: 18px;
+            left: 16px;
             top: 50%;
             transform: translateY(-50%);
             color: var(--text-muted);
             font-size: 1.1rem;
-            transition: color 0.3s ease;
+            pointer-events: none;
         }
 
-        .input-field {
+        .input {
             width: 100%;
-            height: 56px;
-            background: #f8fafc;
-            border: 2.5px solid #f1f5f9;
-            border-radius: 16px;
-            padding: 0 16px 0 52px;
+            height: 54px;
+            background: var(--input-bg);
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            padding: 0 16px 0 48px;
             font-family: inherit;
             font-size: 1rem;
-            font-weight: 600;
-            color: var(--navy-dark);
+            font-weight: 500;
+            color: var(--text-main);
+            transition: all 0.2s ease;
+        }
+
+        .input:focus {
             outline: none;
-            transition: all 0.3s ease;
+            border-color: var(--brand-primary);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(0, 45, 90, 0.05);
         }
 
-        .input-field:focus {
-            background: white;
-            border-color: var(--blue-accent);
-            box-shadow: 0 10px 20px rgba(0, 136, 255, 0.1);
+        .toggle-pass {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 5px;
+            transition: color 0.2s;
         }
 
-        .input-field:focus + .input-icon {
-            color: var(--blue-accent);
+        .toggle-pass:hover {
+            color: var(--brand-primary);
         }
 
-        .btn-submit {
+        /* ── OPTIONS ── */
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            user-select: none;
+        }
+
+        .remember-me input {
+            cursor: pointer;
+            accent-color: var(--brand-primary);
+            width: 16px;
+            height: 16px;
+        }
+
+        /* ── BUTTON ── */
+        .btn-login {
             width: 100%;
-            height: 56px;
-            background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy-mid) 100%);
+            height: 54px;
+            background: var(--brand-primary);
             color: white;
             border: none;
-            border-radius: 16px;
+            border-radius: 12px;
             font-size: 1rem;
-            font-weight: 800;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 25px rgba(0, 31, 63, 0.2);
+            transition: all 0.2s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
-            margin-top: 20px;
+            gap: 10px;
         }
 
-        .btn-submit:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 35px rgba(0, 31, 63, 0.3);
-            filter: brightness(1.1);
-        }
-
-        .btn-submit:active {
+        .btn-login:hover {
+            background: var(--brand-secondary);
             transform: translateY(-1px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
         }
 
-        /* ── ERROR ALERT ── */
-        .err-msg {
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        /* ── ALERTS ── */
+        .alert {
             display: none;
-            background: #fff1f2;
-            color: #e11d48;
-            padding: 14px 20px;
-            border-radius: 14px;
+            background: #fee2e2;
+            border-left: 4px solid var(--error);
+            color: #b91c1c;
+            padding: 12px 16px;
+            border-radius: 8px;
             font-size: 0.85rem;
-            font-weight: 700;
-            margin-bottom: 24px;
-            align-items: center;
-            gap: 12px;
-            border: 1px solid #ffe4e6;
+            font-weight: 600;
+            margin-bottom: 20px;
             animation: shake 0.4s ease-in-out;
         }
 
         @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-4px);
+            }
+
+            75% {
+                transform: translateX(4px);
+            }
         }
 
         /* ── FOOTER ── */
         .card-footer {
-            padding: 24px;
-            background: rgba(248, 250, 252, 0.5);
-            border-top: 1px solid var(--border-light);
+            padding: 20px;
             text-align: center;
+            border-top: 1px solid var(--border);
+            background: #fcfcfc;
         }
 
         .footer-text {
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             color: var(--text-muted);
-            font-weight: 600;
-            letter-spacing: 0.3px;
+            font-weight: 500;
         }
 
-        /* ── SPINNER ── */
         .spinner {
             width: 20px;
             height: 20px;
             border: 3px solid rgba(255, 255, 255, 0.3);
-            border-top-color: white;
+            border-top-color: #fff;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        @media (max-width: 480px) {
-            .login-card { border-radius: 24px; }
-            .card-header, .card-body { padding-left: 30px; padding-right: 30px; }
+            to {
+                transform: rotate(360deg);
+            }
         }
     </style>
 </head>
+
 <body>
+    <div class="bg-mesh"></div>
+    <div class="bg-grid"></div>
 
-    <div class="bg-pattern"></div>
-    <div class="glow"></div>
+    <div class="login-wrap">
+        <div class="login-card">
+            <div class="top-accent"></div>
 
-    <div class="login-card">
-        <div class="card-accent"></div>
-        
-        <header class="card-header">
-            <div class="logo-box">
-                <img src="asset/image.png" alt="Danprel Logo" onerror="this.src='https://via.placeholder.com/72?text=D'">
-            </div>
-            <h1 class="company-name">DANPREL</h1>
-            <p class="company-sub">Engineering Automation</p>
-        </header>
+            <header>
+                <div class="logo-box">
+                    <img src="asset/image.png" alt="Danprel Logo"
+                        onerror="this.src='https://via.placeholder.com/80?text=D'">
+                </div>
+                <h1 class="brand-title">DANPREL</h1>
+                <p class="brand-subtitle">Engineering Automation Pvt Ltd</p>
+            </header>
 
-        <main class="card-body">
-            <p class="auth-label">Resource Management Console</p>
-
-            <div id="errAlert" class="err-msg">
-                <i class="bi bi-shield-lock-fill"></i>
-                <span id="errorTxt">Authentication failed. Check credentials.</span>
-            </div>
-
-            <form id="loginForm">
-                <div class="input-group">
-                    <label class="field-label" for="username">Username</label>
-                    <div class="input-container">
-                        <input type="text" id="username" class="input-field" placeholder="danprelresource" required autocomplete="off">
-                        <i class="bi bi-person-fill input-icon"></i>
-                    </div>
+            <main class="card-content">
+                <div id="alert" class="alert">
+                    <i class="bi bi-exclamation-circle-fill"></i>
+                    <span id="alert-text">Invalid credentials. Please try again.</span>
                 </div>
 
-                <div class="input-group">
-                    <label class="field-label" for="password">Security Key</label>
-                    <div class="input-container">
-                        <input type="password" id="password" class="input-field" placeholder="••••••••" required>
-                        <i class="bi bi-key-fill input-icon"></i>
+                <form id="login-form">
+                    <div class="input-group">
+                        <label class="label">Username</label>
+                        <div class="control">
+                            <i class="bi bi-person icon"></i>
+                            <input type="text" id="username" class="input" required placeholder="User ID">
+                        </div>
                     </div>
-                </div>
 
-                <button type="submit" id="submitBtn" class="btn-submit">
-                    <span id="btnTxt">Initialization Session</span>
-                    <i class="bi bi-arrow-right-circle-fill"></i>
-                </button>
-            </form>
-        </main>
+                    <div class="input-group">
+                        <label class="label">Password</label>
+                        <div class="control">
+                            <i class="bi bi-lock icon"></i>
+                            <input type="password" id="password" class="input" required placeholder="••••••••">
+                            <i class="bi bi-eye toggle-pass" id="togglePassword"></i>
+                        </div>
+                    </div>
 
-        <footer class="card-footer">
-            <p class="footer-text">© 2026 Danprel Engineering Automation Pvt Ltd. All rights reserved.</p>
-        </footer>
+                    <div class="form-options">
+                        <label class="remember-me">
+                            <input type="checkbox" id="remember">
+                            Remember Me
+                        </label>
+                    </div>
+
+                    <button type="submit" id="submit-btn" class="btn-login">
+                        <span id="btn-text">Sign In</span>
+                        <i class="bi bi-arrow-right-short" style="font-size: 1.5rem;"></i>
+                    </button>
+                </form>
+            </main>
+
+            <footer class="card-footer">
+                <p class="footer-text">© 2026 Danprel Engineering Automation Pvt Ltd.</p>
+            </footer>
+        </div>
     </div>
 
     <script>
         const VALID_USER = 'danprelresource';
         const VALID_PASS = 'danprel';
 
-        const loginForm = document.getElementById('loginForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const btnTxt = document.getElementById('btnTxt');
-        const errAlert = document.getElementById('errAlert');
+        const loginForm = document.getElementById('login-form');
+        const submitBtn = document.getElementById('submit-btn');
+        const btnText = document.getElementById('btn-text');
+        const alertBox = document.getElementById('alert');
         const passwordInput = document.getElementById('password');
+        const usernameInput = document.getElementById('username');
+        const rememberCheck = document.getElementById('remember');
+        const togglePass = document.getElementById('togglePassword');
+
+        // Check for remembered user
+        if (localStorage.getItem('remembered_user')) {
+            usernameInput.value = localStorage.getItem('remembered_user');
+            rememberCheck.checked = true;
+        }
+
+        // Toggle Password visibility
+        togglePass.addEventListener('click', () => {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            togglePass.classList.toggle('bi-eye');
+            togglePass.classList.toggle('bi-eye-slash');
+        });
 
         loginForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            
-            errAlert.style.display = 'none';
-            const user = document.getElementById('username').value.trim();
+            alertBox.style.display = 'none';
+
+            const user = usernameInput.value.trim();
             const pass = passwordInput.value.trim();
 
-            // Set loading
+            // UI state: loading
             submitBtn.disabled = true;
-            btnTxt.innerHTML = '<span class="spinner"></span>';
-            const btnIcon = submitBtn.querySelector('.bi');
-            if(btnIcon) btnIcon.style.display = 'none';
+            btnText.innerHTML = '<div class="spinner"></div>';
+            const icon = submitBtn.querySelector('i');
+            if (icon) icon.style.display = 'none';
 
             setTimeout(() => {
                 if (user === VALID_USER && pass === VALID_PASS) {
+                    // Handle Remember Me
+                    if (rememberCheck.checked) {
+                        localStorage.setItem('remembered_user', user);
+                    } else {
+                        localStorage.removeItem('remembered_user');
+                    }
+
                     localStorage.setItem('danprel_auth', 'true');
-                    window.location.href = 'resource.html';
+                    window.location.href = 'summary.html';
                 } else {
                     submitBtn.disabled = false;
-                    btnTxt.textContent = 'Intitalization Session';
-                    if(btnIcon) btnIcon.style.display = 'block';
-                    errAlert.style.display = 'flex';
+                    btnText.textContent = 'Sign In';
+                    if (icon) icon.style.display = 'block';
+                    alertBox.style.display = 'block';
                     passwordInput.value = '';
                     passwordInput.focus();
                 }
-            }, 1200);
+            }, 1000);
         });
 
-        // Clear error on input
-        document.querySelectorAll('.input-field').forEach(input => {
-            input.addEventListener('input', () => {
-                errAlert.style.display = 'none';
+        // Hide alert on input
+        [usernameInput, passwordInput].forEach(el => {
+            el.addEventListener('input', () => {
+                alertBox.style.display = 'none';
             });
         });
     </script>
 </body>
+
 </html>
