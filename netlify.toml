@@ -1,0 +1,8 @@
+[build]
+  command = "npm run build"
+  publish = "."
+
+# Netlify will serve these files as a static site.
+# NOTE: server.js will NOT run on Netlify.
+# To make this work with a backend, consider using Netlify Functions 
+# or hosting the backend on a platform like Render or Railway.
