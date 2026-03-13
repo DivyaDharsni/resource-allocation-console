@@ -18,5 +18,9 @@
   "bugs": {
     "url": "https://github.com/DivyaDharsni/resource-allocation-console/issues"
   },
-  "homepage": "https://github.com/DivyaDharsni/resource-allocation-console#readme"
+  "homepage": "https://github.com/DivyaDharsni/resource-allocation-console#readme",
+  "dependencies": {
+    "dotenv": "^17.3.1",
+    "mongoose": "^9.3.0"
+  }
 }

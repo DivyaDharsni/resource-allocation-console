@@ -925,23 +925,36 @@
             setInterval(updateClock, 1000);
             setupYearDropdown();
 
-            const now = new Date();
-            document.getElementById('selMonth').value = now.getMonth();
+            // Change this to YOUR Render URL after deploying
+            const API_BASE = 'https://danprel-backend.onrender.com';
 
             try {
                 const [mRes, aRes, pRes] = await Promise.all([
-                    fetch('/api/members').then(r => r.json()),
-                    fetch('/api/assignments').then(r => r.json()),
-                    fetch('/api/projects').then(r => r.json())
+                    fetch(`${API_BASE}/api/members`).then(r => r.json()),
+                    fetch(`${API_BASE}/api/assignments`).then(r => r.json()),
+                    fetch(`${API_BASE}/api/projects`).then(r => r.json())
                 ]);
                 registryData = mRes;
                 assignmentsData = aRes;
                 projectsData = pRes;
             } catch (e) {
-                console.warn('Server offline. Using empty data.');
-                registryData = [];
-                assignmentsData = [];
-                projectsData = [];
+                console.warn('Server offline. Using local fallback data.');
+                // Fallback to preloaded data in resources.js
+                if (Array.isArray(window.INITIAL_RESOURCES)) {
+                    registryData = window.INITIAL_RESOURCES;
+                } else {
+                    registryData = [];
+                }
+                
+                // On Netlify, we can use localStorage to "remember" assignments and projects
+                // since we can't write to CSV files.
+                try {
+                    assignmentsData = JSON.parse(localStorage.getItem('danprel_assignments') || '[]');
+                    projectsData = JSON.parse(localStorage.getItem('danprel_projects') || '[]');
+                } catch(err) {
+                    assignmentsData = [];
+                    projectsData = [];
+                }
             }
 
             updateFromToDates();
