@@ -1080,18 +1080,7 @@
 
 <body>
 
-    <!-- Server Waking Loader -->
-    <div id="wakingLoader">
-        <div class="loader-spinner"></div>
-        <div class="loader-title">DATABASE WAKING UP</div>
-        <div class="loader-text">
-            Render's free tier is starting the server. This usually takes 30-60 seconds.
-            <br><span id="retryIndicator" style="color:var(--teal-bright); font-weight:700;">Connecting...</span>
-        </div>
-        <button onclick="forceSkipLoader()" style="margin-top:20px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.3); color:white; padding:8px 20px; border-radius:100px; font-size:0.75rem; cursor:pointer; font-weight:700; transition:0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
-            Skip & Use Offline Data
-        </button>
-    </div>
+    <!-- Loader removed for Netlify Functions (Fast/Instant) -->
     <header class="app-header">
         <div class="brand-box">
             <div class="brand-logo-wrap">
@@ -1278,50 +1267,28 @@
             setInterval(updateClock, 1000);
             setupYearDropdown();
 
-            const API_BASE = 'https://danprel-resource-allocation.onrender.com';
-            let isForced = false;
-            window.forceSkipLoader = () => {
-                isForced = true;
-                loader.classList.add('hidden');
-                useFallback();
-            };
+            const API_BASE = '/api';
+            const loader = document.getElementById('wakingLoader');
+            if (loader) loader.classList.add('hidden');
 
             async function fetchData() {
-                if (isForced) return;
                 try {
-                    indicator.textContent = `Attempt ${retryCount + 1}: Contacting server...`;
-                    
                     const [mRes, aRes, pRes] = await Promise.all([
-                        fetch(`${API_BASE}/api/members`).then(r => r.json()),
-                        fetch(`${API_BASE}/api/assignments`).then(r => r.json()),
-                        fetch(`${API_BASE}/api/projects`).then(r => r.json())
+                        fetch(`${API_BASE}/members`).then(r => r.json()),
+                        fetch(`${API_BASE}/assignments`).then(r => r.json()),
+                        fetch(`${API_BASE}/projects`).then(r => r.json())
                     ]);
 
                     registryData = mRes;
                     assignmentsData = aRes;
                     projectsData = pRes;
 
-                    // Success! Hide loader and update UI
                     localStorage.setItem('danprel_last_data', Date.now());
-                    loader.classList.add('hidden');
                     updateFromToDates();
                     updateAnalysis();
-
                 } catch (e) {
-                    console.warn('Server waking up or offline...', e);
-                    retryCount++;
-                    
-                    if (retryCount < 20) { // Try for ~60 seconds (20 * 3s)
-                        indicator.textContent = `Server is still starting... Retrying in 3s (Try ${retryCount})`;
-                        setTimeout(fetchData, 3000);
-                    } else {
-                        // Permanent fail / Long timeout - Fallback
-                        indicator.textContent = "Server taking too long. Using local backup.";
-                        setTimeout(() => {
-                            loader.classList.add('hidden');
-                            useFallback();
-                        }, 2000);
-                    }
+                    console.error('API Error:', e);
+                    useFallback();
                 }
             }
 

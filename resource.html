@@ -2051,18 +2051,7 @@
 
 <body>
 
-    <!-- Server Waking Loader -->
-    <div id="wakingLoader">
-        <div class="loader-spinner"></div>
-        <div class="loader-title">DATABASE WAKING UP</div>
-        <div class="loader-text">
-            Render's free tier is starting the server. This usually takes 30-60 seconds.
-            <br><span id="retryIndicator" style="color:var(--teal-bright); font-weight:700;">Connecting...</span>
-        </div>
-        <button onclick="forceSkipLoader()" style="margin-top:20px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.3); color:white; padding:8px 20px; border-radius:100px; font-size:0.75rem; cursor:pointer; font-weight:700; transition:0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
-            Skip & Use Offline Data
-        </button>
-    </div>
+    <!-- Loader removed for Netlify Functions (Fast/Instant) -->
 
     <!-- ===== HEADER ===== -->
     <header class="app-header">
@@ -3722,7 +3711,7 @@
         /* =========================================================
            LIVE CLOCK & API CONFIG
         ========================================================= */
-        const API_BASE = 'https://danprel-resource-allocation.onrender.com';
+        const API_BASE = '/api';
 
         function updateClock() {
             const now = new Date();
@@ -3783,39 +3772,22 @@
         ========================================================= */
         document.addEventListener('DOMContentLoaded', async () => {
             const loader = document.getElementById('wakingLoader');
-            const indicator = document.getElementById('retryIndicator');
-            let retryCount = 0;
-            let isForced = false;
-
-            window.forceSkipLoader = () => {
-                isForced = true;
-                loader.classList.add('hidden');
-                useFallback();
-            };
+            if (loader) loader.classList.add('hidden');
 
             async function initApp() {
-                if (isForced) return;
                 try {
-                    indicator.textContent = `Attempt ${retryCount + 1}: Contacting server...`;
-
-                    // Load EVERYTHING at once
                     const [mRes, pRes, aRes] = await Promise.all([
-                        fetch(`${API_BASE}/api/members`).then(r => r.json()),
-                        fetch(`${API_BASE}/api/projects`).then(r => r.json()),
-                        fetch(`${API_BASE}/api/assignments`).then(r => r.json())
+                        fetch(`${API_BASE}/members`).then(r => r.json()),
+                        fetch(`${API_BASE}/projects`).then(r => r.json()),
+                        fetch(`${API_BASE}/assignments`).then(r => r.json())
                     ]);
 
-                    // Success! 
-                    loader.classList.add('hidden');
-
-                    // Process members
                     mRes.forEach(r => {
                         if (!registryData.some(x => x.id === r.id)) {
                             registryData.push({ ...r, projects: [] });
                         }
                     });
 
-                    // Process projects
                     pRes.forEach((p, idx) => {
                         if (!projectRegistry.some(x => x.code.toUpperCase() === p.code.toUpperCase())) {
                             projectRegistry.push({
@@ -3829,7 +3801,6 @@
                         }
                     });
 
-                    // Process assignments
                     aRes.forEach(a => {
                         const res = registryData.find(x => x.id === a.empId);
                         const proj = projectRegistry.find(p => p.code === a.projCode);
@@ -3849,20 +3820,9 @@
                     });
 
                     finishInit();
-
                 } catch (e) {
-                    console.warn('Server waking or down...', e);
-                    retryCount++;
-                    if (retryCount < 20) {
-                        indicator.textContent = `Server is still starting... Retrying in 3s (Try ${retryCount})`;
-                        setTimeout(initApp, 3000);
-                    } else {
-                        indicator.textContent = "Server taking too long. Using local backup.";
-                        setTimeout(() => {
-                            loader.classList.add('hidden');
-                            useFallback();
-                        }, 2000);
-                    }
+                    console.error('API Error:', e);
+                    useFallback();
                 }
             }
 
