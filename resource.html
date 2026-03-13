@@ -2902,8 +2902,8 @@
             const newProject = { id: Date.now(), name, code, start, end, days };
 
             try {
-                // POST to server → permanently appends to projects.csv
-                const res = await fetch('/api/add-project', {
+                // POST to server
+                const res = await fetch(`${API_BASE}/api/add-project`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name, code, start, end, days })
@@ -2959,7 +2959,7 @@
             if (!name) return alert('Name is required.');
 
             try {
-                const res = await fetch('/api/update-member', {
+                const res = await fetch(`${API_BASE}/api/update-member`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ id, name, role, exp, dept })
@@ -3080,7 +3080,7 @@
             const target = registryData[empIdx];
 
             try {
-                const res = await fetch('/api/add-assignment', {
+                const res = await fetch(`${API_BASE}/api/add-assignment`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -3143,7 +3143,7 @@
             const days = Math.ceil((new Date(newE) - new Date(newS)) / 86400000);
 
             try {
-                const res = await fetch('/api/update-assignment', {
+                const res = await fetch(`${API_BASE}/api/update-assignment`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -3478,8 +3478,10 @@
         }
 
         /* =========================================================
-           LIVE CLOCK
+           LIVE CLOCK & API CONFIG
         ========================================================= */
+        const API_BASE = 'https://danprel-resource-allocation.onrender.com';
+
         function updateClock() {
             const now = new Date();
             const d = now.toLocaleDateString('en-GB', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' });
@@ -3511,8 +3513,8 @@
             }
 
             try {
-                // POST to server → permanently appends to resources.csv
-                const res = await fetch('/api/add-member', {
+                // POST to server → permanently updates MongoDB
+                const res = await fetch(`${API_BASE}/api/add-member`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name, id, dept, role, exp })
@@ -3530,7 +3532,7 @@
                 showToast(`<i class="bi bi-person-check-fill me-2" style="color:var(--teal-bright)"></i><strong>${name}</strong> saved permanently to resources.csv!`);
 
             } catch (e) {
-                alert('❌ Server not reachable.\n\nPlease start the server first:\n   Double-click  start.bat\n   Then open:  http://localhost:3000');
+                alert(`❌ Server not reachable.\n\nPlease check if your Render backend is live at:\n${API_BASE}`);
             }
         }
 
@@ -3539,8 +3541,8 @@
         ========================================================= */
         document.addEventListener('DOMContentLoaded', async () => {
             try {
-                // Load members from server (reads resources.csv)
-                const res = await fetch('/api/members');
+                // Load members from server (MongoDB)
+                const res = await fetch(`${API_BASE}/api/members`);
                 const members = await res.json();
                 members.forEach(r => {
                     if (!registryData.some(x => x.id === r.id)) {
@@ -3557,7 +3559,7 @@
             }
 
             try {
-                const pRes = await fetch('/api/projects');
+                const pRes = await fetch(`${API_BASE}/api/projects`);
                 const savedProjects = await pRes.json();
                 savedProjects.forEach((p, idx) => {
                     // Avoid duplicates (code-based check)
@@ -3574,9 +3576,9 @@
                 });
             } catch (e) { }
 
-            // Load saved assignments from assignments.csv via server
+            // Load saved assignments from server
             try {
-                const aRes = await fetch('/api/assignments');
+                const aRes = await fetch(`${API_BASE}/api/assignments`);
                 const savedAssignments = await aRes.json();
                 savedAssignments.forEach(a => {
                     const res = registryData.find(x => x.id === a.empId);
