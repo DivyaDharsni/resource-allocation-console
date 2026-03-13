@@ -99,9 +99,13 @@ async function migrate() {
                 const p = line.split(',').map(s => s.trim());
                 if (!p[0] || !p[1]) continue;
                 try {
-                    await Assignment.create({ empId: p[0], projCode: p[1], start: p[2], end: p[3], days: parseInt(p[4]) || 0 });
+                    await Assignment.findOneAndUpdate(
+                        { empId: p[0], projCode: p[1], start: p[2], end: p[3] },
+                        { days: parseInt(p[4]) || 0 },
+                        { upsert: true }
+                    );
                     console.log(`Migrated Assignment: ${p[0]} -> ${p[1]}`);
-                } catch (err) { }
+                } catch (err) { console.error(`Failed Assignment: ${err.message}`); }
             }
         }
 

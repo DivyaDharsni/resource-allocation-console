@@ -36,6 +36,12 @@
             /* Adjustable via JS */
         }
 
+        @media (max-width: 1400px) {
+            :root {
+                --left-panel-width: 400px;
+            }
+        }
+
         *,
         *::before,
         *::after {
@@ -139,42 +145,53 @@
             white-space: nowrap;
         }
 
-        @media(max-width: 992px) {
-            .app-header {
-                flex-direction: column;
-                gap: 20px;
-                padding: 24px;
-                text-align: center;
+        @media(max-width: 768px) {
+            body { padding: 12px; }
+            .app-header { 
+                flex-direction: row; 
+                justify-content: space-between; 
+                padding: 10px 14px; 
+                margin-bottom: 20px; 
+                border-radius: 18px; 
+                gap: 10px; 
             }
-
-            .brand-box {
-                flex-direction: column;
-                text-align: center;
+            .brand-box { flex-direction: row; gap: 10px; }
+            .brand-logo-wrap { width: 38px; height: 38px; border-radius: 10px; }
+            .brand-name { font-size: 0.85rem; }
+            .brand-sub { font-size: 0.52rem; }
+            .header-center-title { display: none; }
+            
+            .header-right { 
+                display: flex;
+                flex-direction: row;
+                width: auto;
+                gap: 8px;
             }
-
-            .header-center-title {
-                position: static;
-                transform: none;
-                order: 3;
-                width: 100%;
-                font-size: 0.75rem;
+            .btn-add-project, .btn-summary-nav { 
+                width: auto; 
+                padding: 0 12px; 
+                font-size: 0.72rem; 
+                height: 36px; 
+                border-radius: 100px;
             }
-
-            .header-right {
-                width: 100%;
-                justify-content: center;
-                flex-wrap: wrap;
+            .header-timestamp { 
+                display: none; /* Hide timestamp on tiny rows to save space */
+            }
+            .btn-logout, .btn-intel {
+                width: 36px;
+                height: 36px;
+                font-size: 0.9rem;
             }
         }
 
-        @media(max-width: 600px) {
-            .brand-name {
-                font-size: 0.95rem;
-            }
-
-            .header-center-title {
-                display: none;
-            }
+        @media(max-width: 480px) {
+            body { padding: 8px; }
+            .app-header { padding: 8px 10px; border-radius: 16px; margin-bottom: 16px; gap: 6px; }
+            .brand-logo-wrap { width: 32px; height: 32px; }
+            .brand-name { font-size: 0.75rem; }
+            .btn-add-project, .btn-summary-nav { font-size: 0.65rem; height: 32px; padding: 0 10px; }
+            .btn-logout, .btn-intel { width: 32px; height: 32px; font-size: 0.8rem; }
+            .brand-sub { display: none; } /* Hide sub-brand on tiny phones to keep single line */
         }
 
         .header-right {
@@ -366,6 +383,42 @@
             background: white;
         }
 
+        @media (max-width: 1200px) {
+            .main-content {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .left-panel,
+            .right-panel {
+                width: 100% !important;
+                height: auto;
+                flex: none;
+            }
+
+            .main-resizer {
+                display: none;
+            }
+
+            .left-panel {
+                margin-bottom: 24px;
+                max-height: 500px;
+                /* Limit height on desktop-ish tablets to avoid endless scrolling */
+            }
+        }
+
+        @media (max-width: 768px) {
+            .left-panel {
+                max-height: none;
+                border-radius: 18px;
+            }
+            .right-panel {
+                border-radius: 18px;
+            }
+            .content-header-row {
+                padding: 16px 20px;
+            }
+        }
         @media(max-width: 600px) {
 
             .clean-select,
@@ -459,6 +512,18 @@
             font-weight: 900;
             color: var(--navy-dark);
             line-height: 1;
+        }
+
+        @media (max-width: 480px) {
+            .stat-chip {
+                flex: 1 1 calc(50% - 14px);
+                gap: 8px;
+                padding: 10px;
+                border-radius: 12px;
+            }
+            .stat-chip-icon { width: 34px; height: 34px; font-size: 1rem; }
+            .stat-chip-value { font-size: 1.1rem; }
+            .stat-chip-label { font-size: 0.55rem; }
         }
 
         /* ── LAYOUT ────────────────────────────────────────────── */
@@ -642,6 +707,17 @@
             color: #64748b;
         }
 
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        @media (max-width: 600px) {
+            .table-responsive .registry-table {
+                min-width: 500px;
+            }
+        }
+
         .action-btn {
             background: #f1f5f9;
             border: none;
@@ -727,6 +803,30 @@
             text-transform: uppercase;
             letter-spacing: 0.8px;
             overflow: hidden;
+        }
+
+        @media (max-width: 1024px) {
+            :root {
+                --gantt-sidebar-width: 150px;
+            }
+            .m-cell { font-size: 0.6rem; }
+            .w-num { font-size: 0.52rem; }
+        }
+
+        @media (max-width: 768px) {
+            :root {
+                --gantt-sidebar-width: 120px;
+            }
+            .m-cell { font-size: 0.55rem; padding: 6px 0; }
+            .w-num { font-size: 0.5rem; }
+            .w-date, .w-day { font-size: 0.45rem; }
+        }
+
+        @media (max-width: 480px) {
+            :root {
+                --gantt-sidebar-width: 90px;
+            }
+            .m-cell { font-size: 0.5rem; letter-spacing: 0; }
         }
 
         .w-row {
@@ -820,6 +920,9 @@
             font-size: 0.83rem;
             font-weight: 900;
             color: var(--navy-dark);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .g-res-role {
@@ -827,9 +930,23 @@
             font-weight: 700;
             color: #94a3b8;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
+
+        @media (max-width: 768px) {
+            .g-res-name { font-size: 0.72rem; }
+            .g-res-role { font-size: 0.52rem; }
+            .g-res-info { padding: 8px 10px; }
+        }
+
+        @media (max-width: 480px) {
+            .g-res-name { font-size: 0.65rem; }
+            .g-res-role { font-size: 0.48rem; }
+            .g-res-info { padding: 6px 8px; }
+        }
+
 
         .g-track {
             position: relative;
@@ -842,21 +959,48 @@
             height: 38px;
             border-radius: 10px;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 0.65rem;
-            font-weight: 900;
-            padding: 0 5px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
             cursor: pointer;
             transition: 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 5;
+            line-height: 1;
+            padding: 2px 4px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .b-proj-code {
+            font-size: 0.65rem;
+            font-weight: 900;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            z-index: 5;
-            flex-direction: column;
-            line-height: 1.1;
+            width: 100%;
+            text-align: center;
+        }
+
+        .b-date {
+            font-size: 0.5rem;
+            font-weight: 800;
+            opacity: 0.9;
+            white-space: nowrap;
+        }
+
+        .b-date-start { position: absolute; bottom: 2px; left: 6px; }
+        .b-date-end { position: absolute; bottom: 2px; right: 6px; }
+
+        @media (max-width: 768px) {
+            .g-bar { height: 32px; border-radius: 8px; }
+            .b-proj-code { font-size: 0.58rem; }
+            .b-date { font-size: 0.45rem; bottom: 1px; }
+        }
+
+        @media (max-width: 480px) {
+            .g-bar { height: 28px; border-radius: 6px; }
+            .b-proj-code { font-size: 0.52rem; }
+            .b-date { display: none; } /* Hide dates on tiny mobile bars */
         }
 
         .g-bar:hover {
@@ -1732,10 +1876,22 @@
             .stat-chip-value { font-size: 1.05rem; }
             .stat-chip-label { font-size: 0.55rem; }
 
-            /* filter bar: stacked */
-            .global-filter-bar { border-radius: 18px; padding: 12px 14px; gap: 8px; }
-            .filter-label { font-size: 0.65rem; }
-            .clean-select, .clean-input { font-size: 0.72rem; width: 100% !important; }
+            /* filter bar: single line row */
+            .global-filter-bar { 
+                flex-direction: row; 
+                flex-wrap: nowrap; 
+                overflow-x: auto; 
+                padding: 10px 12px; 
+                gap: 10px; 
+                align-items: center;
+                justify-content: flex-start;
+                border-radius: 100px;
+                -webkit-overflow-scrolling: touch;
+            }
+            .filter-item { flex-shrink: 0; display: flex; align-items: center; gap: 6px; }
+            .filter-label { font-size: 0.6rem; margin: 0; white-space: nowrap; }
+            .clean-select, .clean-input { font-size: 0.7rem; width: auto !important; min-width: 80px; padding: 4px 10px; border-radius: 8px; }
+            .filter-divider { display: block; width: 1px; height: 16px; background: rgba(0,0,0,0.1); margin: 0 4px; }
 
             /* Table: hide less critical columns */
             .registry-table th:nth-child(6),
@@ -1788,8 +1944,11 @@
             .stat-chip { flex: 1 1 calc(50% - 6px); padding: 8px 10px; border-radius: 12px; }
             .stat-chip-value { font-size: 0.95rem; }
 
-            /* filter bar: fully vertical */
-            .global-filter-bar { padding: 10px 12px; gap: 6px; border-radius: 16px; }
+            /* filter bar: single line compact */
+            .global-filter-bar { padding: 8px 10px; gap: 6px; border-radius: 16px; justify-content: flex-start; }
+            .filter-label { font-size: 0.55rem; }
+            .clean-select, .clean-input { font-size: 0.68rem; min-width: 70px; padding: 3px 8px; }
+            .filter-divider { height: 14px; margin: 0 2px; }
 
             /* table: further hide columns */
             .registry-table th:nth-child(5),
@@ -1821,6 +1980,11 @@
             .brand-name { font-size: 0.78rem; }
             .stat-chip { flex: 1 1 100%; }  /* single column */
             .stat-bar { gap: 6px; }
+
+            .global-filter-bar { padding: 6px 8px; gap: 4px; }
+            .filter-label { font-size: 0.52rem; }
+            .clean-select, .clean-input { font-size: 0.62rem; min-width: 60px; padding: 2px 6px; }
+            .filter-divider { height: 12px; margin: 0 2px; }
 
             .ui-card-header { padding: 10px 12px; }
             .registry-table th, .registry-table td { padding: 7px 4px; font-size: 0.62rem; }
@@ -2740,9 +2904,22 @@
             /* ── GANTT (per-project colours, vertically-stacked lanes) ── */
             const weeks = window._ganttWeeks || [];
             const trackW = weeks.length * WEEK_W;
-            const LANE_H = 48;   // height of each bar including gap
-            const BAR_H = 38;   // actual visible bar height
-            const LANE_PAD = 10;   // top padding before first lane
+            
+            // Responsive lane heights
+            let LANE_H = 48;   // height of each bar including gap
+            let BAR_H = 38;    // actual visible bar height
+            let LANE_PAD = 10; // top padding before first lane
+            
+            if (window.innerWidth <= 768) {
+                LANE_H = 40;
+                BAR_H = 32;
+                LANE_PAD = 8;
+            }
+            if (window.innerWidth <= 480) {
+                LANE_H = 34;
+                BAR_H = 28;
+                LANE_PAD = 6;
+            }
 
             document.getElementById('ganttBody').innerHTML = filtered.map(r => {
                 // 1. Filter by project filter
@@ -3095,11 +3272,14 @@
                     return alert('Could not save assignment: ' + (data.error || 'Server error'));
                 }
 
-                // Update in-memory
-                target.projects.push({
-                    name: proj.name, code: proj.code, projectId: proj.id,
-                    start, end, days
-                });
+                // Update in-memory if not already exists
+                const exists = target.projects.some(p => p.code === proj.code && p.start === start && p.end === end);
+                if (!exists) {
+                    target.projects.push({
+                        name: proj.name, code: proj.code, projectId: proj.id,
+                        start, end, days
+                    });
+                }
                 renderUI();
                 bootstrap.Modal.getInstance(document.getElementById('assignModal')).hide();
                 showToast(`<i class="bi bi-check-circle-fill me-2" style="color:var(--teal-bright)"></i>Assigned <strong>${proj.code}</strong> to <strong>${target.name}</strong>`);
@@ -3584,14 +3764,18 @@
                     const res = registryData.find(x => x.id === a.empId);
                     const proj = projectRegistry.find(p => p.code === a.projCode);
                     if (res) {
-                        res.projects.push({
-                            name: proj ? proj.name : a.projCode,
-                            code: a.projCode,
-                            projectId: proj ? proj.id : null,
-                            start: a.start,
-                            end: a.end,
-                            days: a.days
-                        });
+                        // Avoid duplicates if already in memory
+                        const exists = res.projects.some(p => p.code === a.projCode && p.start === a.start && p.end === a.end);
+                        if (!exists) {
+                            res.projects.push({
+                                name: proj ? proj.name : a.projCode,
+                                code: a.projCode,
+                                projectId: proj ? proj.id : null,
+                                start: a.start,
+                                end: a.end,
+                                days: a.days
+                            });
+                        }
                     }
                 });
             } catch (e) { }
@@ -3603,6 +3787,13 @@
             renderUI();
             updateClock();
             setInterval(updateClock, 1000);
+
+            // Re-render on resize to handle responsive heights
+            window.addEventListener('resize', () => {
+                const year = parseInt(document.getElementById('fYear').value);
+                buildGanttHeaders(year);
+                renderUI();
+            });
         });
 
         function syncProjectFilter() {

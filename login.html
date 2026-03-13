@@ -322,6 +322,58 @@
                 transform: rotate(360deg);
             }
         }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 480px) {
+            body { 
+                padding: 1rem;
+                align-items: center;
+                overflow-y: auto;
+            }
+            .login-wrap { 
+                padding: 0; 
+                max-width: 100%;
+            }
+            .login-card { 
+                border-radius: 20px; 
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            }
+            header { padding: 2rem 1.5rem 1rem; }
+            .logo-box { 
+                width: 70px; 
+                height: 70px; 
+                border-radius: 16px; 
+                margin-bottom: 1rem; 
+            }
+            .brand-title { font-size: 1.5rem; }
+            .brand-subtitle { font-size: 0.7rem; }
+            .card-content { padding: 1rem 1.5rem 2.5rem; }
+            
+            .input { 
+                height: 50px; 
+                font-size: 0.95rem; 
+                padding-left: 46px; 
+                border-radius: 10px;
+            }
+            .icon { left: 16px; font-size: 1.1rem; }
+            .btn-login { 
+                height: 52px; 
+                font-size: 1rem; 
+                border-radius: 10px;
+                margin-top: 0.5rem;
+            }
+            .form-options { margin-bottom: 1.5rem; }
+            .card-footer { padding: 1.25rem; }
+            .footer-text { font-size: 0.7rem; }
+        }
+
+        /* ── Extra Small Devices ── */
+        @media (max-width: 360px) {
+            .brand-title { font-size: 1.3rem; }
+            .logo-box { width: 60px; height: 60px; }
+            header { padding: 1.5rem 1rem 0.5rem; }
+            .card-content { padding: 0.5rem 1rem 2rem; }
+        }
     </style>
 </head>
 

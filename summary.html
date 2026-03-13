@@ -529,15 +529,22 @@
 
         /* ── 992px: tablets ── */
         @media (max-width: 992px) {
-            body { padding: 14px; }
+            body {
+                padding: 14px;
+            }
 
             .app-header {
-                flex-direction: column;
-                gap: 14px;
-                padding: 22px 20px;
-                text-align: center;
+                flex-direction: row;
+                justify-content: space-between;
+                padding: 12px 16px;
+                gap: 10px;
             }
-            .brand-box { flex-direction: column; }
+
+            .brand-box {
+                flex-direction: row;
+                gap: 10px;
+            }
+
             .header-center-title {
                 position: static;
                 transform: none;
@@ -545,117 +552,398 @@
                 font-size: 0.85rem;
                 padding: 10px 20px;
             }
+
             .header-right {
-                width: 100%;
-                justify-content: center;
-                flex-wrap: wrap;
-                gap: 8px;
+                width: auto;
+                justify-content: flex-end;
+                gap: 10px;
             }
 
             /* totals bar wraps nicely */
-            .totals-bar { gap: 16px; padding: 18px 20px; }
-            .total-val { font-size: 2rem; }
-            .total-lbl { font-size: 0.75rem; }
+            .totals-bar {
+                gap: 16px;
+                padding: 18px 20px;
+            }
+
+            .total-val {
+                font-size: 2rem;
+            }
+
+            .total-lbl {
+                font-size: 0.75rem;
+            }
 
             /* chart adjusts height */
-            .chart-wrapper { height: 380px; }
+            .chart-wrapper {
+                height: 380px;
+            }
 
             /* filter */
-            .filter-pill { border-radius: 20px; padding: 14px 18px; }
-            .fp-select, .fp-input { font-size: 0.8rem; padding: 6px 14px; min-width: 90px; }
-            .fp-label { font-size: 0.72rem; }
+            .filter-pill {
+                border-radius: 20px;
+                padding: 14px 18px;
+            }
+
+            .fp-select,
+            .fp-input {
+                font-size: 0.8rem;
+                padding: 6px 14px;
+                min-width: 90px;
+            }
+
+            .fp-label {
+                font-size: 0.72rem;
+            }
         }
 
         /* ── 768px: large phones ── */
         @media (max-width: 768px) {
-            body { padding: 12px; }
+            body {
+                padding: 12px;
+            }
 
-            .app-header { padding: 16px 14px; border-radius: 18px; gap: 12px; }
-            .brand-logo-wrap { width: 44px; height: 44px; border-radius: 12px; }
-            .brand-name { font-size: 0.95rem; }
-            .brand-sub { font-size: 0.58rem; }
-            .header-center-title { display: none; }
-            .btn-nav { padding: 8px 18px; font-size: 0.8rem; }
+            .app-header {
+                flex-direction: row;
+                justify-content: space-between;
+                padding: 10px 14px;
+                border-radius: 18px;
+                gap: 8px;
+            }
 
-            /* totals bar: 2-per-row */
-            .totals-bar { padding: 16px 14px; gap: 12px; border-radius: 18px; }
-            .total-item { flex: 1 1 calc(50% - 12px); }
-            .total-val { font-size: 1.8rem; }
-            .total-lbl { font-size: 0.7rem; }
+            .brand-logo-wrap {
+                width: 38px;
+                height: 38px;
+                border-radius: 10px;
+            }
+
+            .brand-name {
+                font-size: 0.85rem;
+            }
+
+            .brand-sub {
+                font-size: 0.52rem;
+            }
+
+            .header-center-title {
+                display: none;
+            }
+
+            .header-right {
+                width: auto;
+                gap: 8px;
+            }
+
+            .btn-nav {
+                padding: 6px 14px;
+                font-size: 0.75rem;
+                flex: none;
+            }
+
+            /* totals bar: 2x2 grid */
+            .totals-bar {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                padding: 20px 14px;
+                gap: 20px;
+                border-radius: 18px;
+            }
+
+            .total-item {
+                width: 100%;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                padding-bottom: 10px;
+            }
+
+            .total-item:nth-last-child(-n+2) {
+                border-bottom: none;
+                padding-bottom: 0;
+            }
+
+            .total-val {
+                font-size: 1.8rem;
+            }
+
+            .total-lbl {
+                font-size: 0.65rem;
+            }
 
             /* chart */
-            .chart-wrapper { height: 320px; }
-            .chart-card-top { padding: 18px 18px 16px; }
-            .chart-card-bottom { padding: 16px 18px 20px; }
-            .chart-title { font-size: 1.05rem; }
-            .chart-subtitle { font-size: 0.72rem; }
-            .chart-card-header { gap: 8px; margin-bottom: 14px; }
-            .legend-item { font-size: 0.72rem; padding: 5px 10px; }
+            .chart-wrapper {
+                height: 320px;
+                border-radius: 12px;
+            }
 
-            /* filter pill: stacked */
-            .filter-pill { border-radius: 18px; padding: 12px 14px; gap: 8px; }
-            .fp-divider { display: none; }
-            .fp-select, .fp-input { font-size: 0.75rem; padding: 6px 10px; min-width: 80px; }
+            .chart-card-top {
+                padding: 20px 20px 16px;
+            }
+
+            .chart-card-bottom {
+                padding: 16px 20px 20px;
+            }
+
+            .chart-title {
+                font-size: 1rem;
+            }
+
+            .chart-subtitle {
+                font-size: 0.7rem;
+            }
+
+            .chart-card-header {
+                gap: 10px;
+                margin-bottom: 16px;
+            }
+
+            .legend-item {
+                font-size: 0.7rem;
+                padding: 5px 12px;
+            }
+
+            /* filter pill: single line row */
+            .filter-pill {
+                border-radius: 100px;
+                padding: 10px 14px;
+                gap: 8px;
+                width: auto;
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .fp-divider {
+                display: block;
+                width: 1px;
+                height: 20px;
+                background: #e2e8f0;
+            }
+
+            .fp-item {
+                width: auto;
+                justify-content: flex-start;
+                gap: 6px;
+                flex-shrink: 0;
+            }
+
+            .fp-select,
+            .fp-input {
+                font-size: 0.75rem;
+                padding: 5px 12px;
+                flex: none;
+                text-align: left;
+                min-width: 80px;
+            }
+
+            .fp-label {
+                font-size: 0.65rem;
+                color: #64748b;
+                opacity: 1;
+                text-transform: uppercase;
+                font-weight: 800;
+            }
+
+            /* Hide icons or labels on tiny screens ONLY if needed, but let's try keeping them first */
 
             /* dept table */
-            .dept-tbl thead th, .dept-tbl tbody td { padding: 10px 12px; font-size: 0.8rem; }
-            .tbl-badge { font-size: 0.72rem; padding: 3px 10px; }
-            .dept-table-title { font-size: 0.72rem; }
+            .dept-tbl thead th,
+            .dept-tbl tbody td {
+                padding: 12px 14px;
+                font-size: 0.8rem;
+            }
 
-            .y-axis-label { display: none; }
+            .tbl-badge {
+                font-size: 0.7rem;
+                padding: 4px 10px;
+            }
+
+            .dept-table-title {
+                font-size: 0.7rem;
+            }
+
+            .y-axis-label {
+                display: none;
+            }
         }
 
         /* ── 576px: standard phones ── */
         @media (max-width: 576px) {
-            body { padding: 8px; }
+            body {
+                padding: 8px;
+            }
 
-            .app-header { padding: 12px; border-radius: 16px; gap: 10px; }
-            .brand-logo-wrap { width: 38px; height: 38px; }
-            .brand-name { font-size: 0.82rem; }
-            .btn-nav { padding: 7px 14px; font-size: 0.72rem; }
+            .app-header {
+                padding: 8px 12px;
+                border-radius: 16px;
+                gap: 6px;
+            }
 
-            /* totals: single column if very tight */
-            .totals-bar { padding: 14px 12px; gap: 10px; border-radius: 16px; }
-            .total-item { flex: 1 1 calc(50% - 10px); }
-            .total-val { font-size: 1.55rem; }
-            .total-lbl { font-size: 0.65rem; letter-spacing: 0.5px; }
+            .brand-logo-wrap {
+                width: 32px;
+                height: 32px;
+            }
+
+            .brand-name {
+                font-size: 0.75rem;
+            }
+
+            .brand-sub {
+                font-size: 0.48rem;
+            }
+
+            .header-right {
+                gap: 6px;
+            }
+
+            .btn-nav {
+                padding: 5px 12px;
+                font-size: 0.68rem;
+            }
+
+            .live-clock {
+                font-size: 0.6rem;
+            }
+
+            .totals-bar {
+                gap: 15px;
+                padding: 16px 12px;
+            }
+
+            .total-val {
+                font-size: 1.5rem;
+            }
+
+            .total-lbl {
+                font-size: 0.6rem;
+            }
 
             /* chart */
-            .chart-wrapper { height: 260px; }
-            .chart-card-top { padding: 14px 14px 12px; border-radius: 18px 18px 0 0; }
-            .chart-card-bottom { padding: 14px; }
-            .chart-card { border-radius: 18px; }
-            .chart-title { font-size: 0.9rem; letter-spacing: 0.4px; }
-            .chart-subtitle { font-size: 0.62rem; }
-            .chart-legend { gap: 6px; }
-            .legend-item { font-size: 0.62rem; padding: 4px 8px; gap: 5px; }
-            .legend-dot { width: 8px; height: 8px; }
+            .chart-wrapper {
+                height: 280px;
+            }
+
+            .chart-card {
+                border-radius: 20px;
+            }
+
+            .chart-card-top {
+                border-radius: 20px 20px 0 0;
+                padding: 16px 16px 12px;
+            }
+
+            .chart-card-bottom {
+                padding: 14px 16px;
+            }
+
+            .chart-title {
+                font-size: 0.9rem;
+            }
+
+            .legend-item {
+                font-size: 0.65rem;
+                padding: 4px 10px;
+            }
 
             /* filter */
-            .filter-bar-wrap { margin-bottom: 16px; }
-            .filter-pill { padding: 10px 10px; gap: 6px; border-radius: 16px; }
-            .fp-label { font-size: 0.65rem; }
-            .fp-select, .fp-input { font-size: 0.7rem; padding: 5px 8px; min-width: 70px; }
-            .fp-range-badge { font-size: 0.7rem; padding: 5px 12px; }
+            .filter-bar-wrap { margin-bottom: 16px; width: 100%; overflow: hidden; }
+            .filter-pill { 
+                padding: 8px 10px; 
+                gap: 6px; 
+                width: auto; 
+                flex-direction: row; 
+                justify-content: flex-start;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            .fp-label { font-size: 0.58rem; letter-spacing: 0.2px; }
+            .fp-select, .fp-input { font-size: 0.7rem; padding: 4px 8px; min-width: 65px; border-radius: 8px; }
+            .fp-range-badge { font-size: 0.65rem; padding: 4px 10px; border-radius: 8px; }
+            .fp-divider { height: 16px; margin: 0 4px; }
 
-            /* dept table: horizontal scroll */
-            .dept-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-            .dept-tbl thead th, .dept-tbl tbody td { padding: 8px 10px; font-size: 0.72rem; }
+            /* dept table: clean horizontal scroll */
+            .dept-table-wrap {
+                margin: 0 -16px;
+                padding: 0 16px;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .dept-tbl thead th,
+            .dept-tbl tbody td {
+                padding: 10px 12px;
+                font-size: 0.75rem;
+            }
         }
 
         /* ── 400px: very small phones ── */
         @media (max-width: 400px) {
-            body { padding: 6px; }
+            body {
+                padding: 6px;
+            }
 
-            .app-header { padding: 10px; border-radius: 14px; }
-            .brand-name { font-size: 0.75rem; }
-            .btn-nav { padding: 6px 10px; font-size: 0.65rem; }
+            .app-header {
+                flex-direction: row;
+                justify-content: space-between;
+                padding: 8px 10px;
+                border-radius: 14px;
+                gap: 6px;
+            }
 
-            .total-item { flex: 1 1 100%; }
-            .total-val { font-size: 1.4rem; }
+            .brand-box {
+                gap: 6px;
+            }
 
-            .chart-wrapper { height: 220px; }
-            .chart-title { font-size: 0.82rem; }
+            .brand-logo-wrap {
+                width: 30px;
+                height: 30px;
+            }
+
+            .brand-name {
+                font-size: 0.72rem;
+            }
+
+            .brand-sub {
+                display: none;
+            }
+
+            /* Hide sub-text on tiny screens */
+
+            .btn-nav {
+                padding: 5px 10px;
+                font-size: 0.62rem;
+            }
+
+            .header-right {
+                gap: 5px;
+            }
+
+            .live-clock { font-size: 0.55rem; }
+
+            .filter-pill {
+                padding: 6px 8px;
+                gap: 5px;
+            }
+            .fp-label { font-size: 0.52rem; }
+            .fp-select, .fp-input { font-size: 0.65rem; padding: 3px 6px; min-width: 60px; }
+            .fp-range-badge { font-size: 0.6rem; padding: 3px 8px; }
+
+            .total-item {
+                flex: 1 1 100%;
+            }
+
+            .total-val {
+                font-size: 1.4rem;
+            }
+
+            .chart-wrapper {
+                height: 220px;
+            }
+
+            .chart-title {
+                font-size: 0.82rem;
+            }
         }
 
         .btn-export {
@@ -675,7 +963,8 @@
             backdrop-filter: blur(8px);
         }
 
-        .btn-export:hover, .btn-export.show {
+        .btn-export:hover,
+        .btn-export.show {
             background: white;
             color: var(--navy-dark);
             transform: translateY(-1px);
@@ -737,12 +1026,69 @@
         ::-webkit-scrollbar-thumb:hover {
             background: var(--blue-accent);
         }
+
+        /* ── WAKING SERVER LOADER ── */
+        #wakingLoader {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 31, 63, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: opacity 0.5s ease, visibility 0.5s;
+        }
+
+        .loader-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid var(--teal-bright);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 24px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loader-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .loader-text {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+            max-width: 300px;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        #wakingLoader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
     </style>
 </head>
 
 <body>
 
-    <!-- ═══════ HEADER ═══════ -->
+    <!-- Server Waking Loader -->
+    <div id="wakingLoader">
+        <div class="loader-spinner"></div>
+        <div class="loader-title">DATABASE WAKING UP</div>
+        <div class="loader-text">
+            Render's free tier is starting the server. This usually takes 30-60 seconds after inactivity. 
+            <br><span id="retryIndicator" style="color:var(--teal-bright); font-weight:700;">Connecting...</span>
+        </div>
+    </div>
     <header class="app-header">
         <div class="brand-box">
             <div class="brand-logo-wrap">
@@ -808,7 +1154,7 @@
         </div>
     </div>
 
-        </div>
+    </div>
     </div>
 
     <!-- ═══════ SUMMARY TOTALS BAR ═══════ -->
@@ -847,18 +1193,22 @@
                 <div class="chart-header-actions" style="position:relative;z-index:10;">
                     <div class="chart-legend" id="chartLegend"></div>
                     <div class="dropdown">
-                        <button class="btn-export dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-download"></i> Export Summary
+                        <button class="btn-export dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            <i class="bi bi-download"></i> Export
                         </button>
                         <ul class="dropdown-menu export-dropdown-menu dropdown-menu-end">
                             <li>
-                                <a class="dropdown-item export-dropdown-item" href="#" onclick="exportSummary('pdf'); return false;">
+                                <a class="dropdown-item export-dropdown-item" href="#"
+                                    onclick="exportSummary('pdf'); return false;">
                                     <i class="bi bi-file-earmark-pdf-fill" style="color:#ef4444;"></i> Download PDF
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item export-dropdown-item" href="#" onclick="exportSummary('csv'); return false;">
-                                    <i class="bi bi-file-earmark-spreadsheet-fill" style="color:#10b981;"></i> Download Excel
+                                <a class="dropdown-item export-dropdown-item" href="#"
+                                    onclick="exportSummary('csv'); return false;">
+                                    <i class="bi bi-file-earmark-spreadsheet-fill" style="color:#10b981;"></i> Download
+                                    Excel
                                 </a>
                             </li>
                         </ul>
@@ -925,40 +1275,68 @@
             setInterval(updateClock, 1000);
             setupYearDropdown();
 
-            // Change this to YOUR Render URL after deploying
             const API_BASE = 'https://danprel-resource-allocation.onrender.com';
+            const loader = document.getElementById('wakingLoader');
+            const indicator = document.getElementById('retryIndicator');
+            let retryCount = 0;
 
-            try {
-                const [mRes, aRes, pRes] = await Promise.all([
-                    fetch(`${API_BASE}/api/members`).then(r => r.json()),
-                    fetch(`${API_BASE}/api/assignments`).then(r => r.json()),
-                    fetch(`${API_BASE}/api/projects`).then(r => r.json())
-                ]);
-                registryData = mRes;
-                assignmentsData = aRes;
-                projectsData = pRes;
-            } catch (e) {
-                console.warn('Server offline. Using local fallback data.');
-                // Fallback to preloaded data in resources.js
+            async function fetchData() {
+                try {
+                    indicator.textContent = `Attempt ${retryCount + 1}: Contacting server...`;
+                    
+                    const [mRes, aRes, pRes] = await Promise.all([
+                        fetch(`${API_BASE}/api/members`).then(r => r.json()),
+                        fetch(`${API_BASE}/api/assignments`).then(r => r.json()),
+                        fetch(`${API_BASE}/api/projects`).then(r => r.json())
+                    ]);
+
+                    registryData = mRes;
+                    assignmentsData = aRes;
+                    projectsData = pRes;
+
+                    // Success! Hide loader and update UI
+                    localStorage.setItem('danprel_last_data', Date.now());
+                    loader.classList.add('hidden');
+                    updateFromToDates();
+                    updateAnalysis();
+
+                } catch (e) {
+                    console.warn('Server waking up or offline...', e);
+                    retryCount++;
+                    
+                    if (retryCount < 20) { // Try for ~60 seconds (20 * 3s)
+                        indicator.textContent = `Server is still starting... Retrying in 3s (Try ${retryCount})`;
+                        setTimeout(fetchData, 3000);
+                    } else {
+                        // Permanent fail / Long timeout - Fallback
+                        indicator.textContent = "Server taking too long. Using local backup.";
+                        setTimeout(() => {
+                            loader.classList.add('hidden');
+                            useFallback();
+                        }, 2000);
+                    }
+                }
+            }
+
+            function useFallback() {
                 if (Array.isArray(window.INITIAL_RESOURCES)) {
                     registryData = window.INITIAL_RESOURCES;
                 } else {
                     registryData = [];
                 }
-                
-                // On Netlify, we can use localStorage to "remember" assignments and projects
-                // since we can't write to CSV files.
                 try {
                     assignmentsData = JSON.parse(localStorage.getItem('danprel_assignments') || '[]');
                     projectsData = JSON.parse(localStorage.getItem('danprel_projects') || '[]');
-                } catch(err) {
+                } catch (err) {
                     assignmentsData = [];
                     projectsData = [];
                 }
+                updateFromToDates();
+                updateAnalysis();
             }
 
-            updateFromToDates();
-            updateAnalysis();
+            // Start fetching
+            fetchData();
         });
 
         /* ══════════════════════════════════════════════════════
@@ -1428,7 +1806,7 @@
                     doc.setTextColor(0, 31, 63);
                     doc.setFontSize(12);
                     doc.text('EXECUTIVE SUMMARY TOTALS', 15, 45);
-                    
+
                     const totalsData = [
                         ['Total Members', document.getElementById('tTotalEmp').textContent],
                         ['Total Man-Days', document.getElementById('tManDays').textContent],
@@ -1453,7 +1831,7 @@
                         const allocDays = d.allocated * d.days;
                         const freeDays = d.totalDays - allocDays;
                         const pct = Math.round((allocDays / d.totalDays) * 100) || 0;
-                        return [d.dept, d.total, d.totalDays, allocDays, freeDays, `${pct}%` ];
+                        return [d.dept, d.total, d.totalDays, allocDays, freeDays, `${pct}%`];
                     });
 
                     doc.autoTable({

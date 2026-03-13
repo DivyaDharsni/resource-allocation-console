@@ -185,7 +185,12 @@ const server = http.createServer(async (req, res) => {
     if (urlPath === '/api/add-assignment' && req.method === 'POST') {
         try {
             const a = JSON.parse(await readBody(req));
-            await Assignment.create(a);
+            // Use findOneAndUpdate with upsert to avoid duplicate assignments
+            await Assignment.findOneAndUpdate(
+                { empId: a.empId, projCode: a.projCode, start: a.start, end: a.end },
+                { days: a.days },
+                { upsert: true }
+            );
             return json(res, 200, { success: true });
         } catch (e) { return json(res, 400, { error: e.message }); }
     }
