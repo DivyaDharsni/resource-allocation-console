@@ -41,6 +41,20 @@ const Assignment = mongoose.model('Assignment', {
     days: Number
 });
 
+const Machine = mongoose.model('Machine', {
+    name: String,
+    machineId: { type: String, unique: true },
+    specification: String
+});
+
+const MachineAssignment = mongoose.model('MachineAssignment', {
+    machineId: String,
+    projCode: String,
+    start: String,
+    end: String,
+    days: Number
+});
+
 async function migrate() {
     try {
         await mongoose.connect(MONGODB_URI);

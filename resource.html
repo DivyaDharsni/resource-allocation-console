@@ -66,8 +66,8 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 24px;
-            box-shadow: 0 8px 32px rgba(0, 31, 63, 0.25);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px rgba(0, 31, 63, .25);
+            border: 1px solid rgba(255, 255, 255, .08);
             position: relative;
             overflow: hidden;
         }
@@ -76,7 +76,7 @@
             content: '';
             position: absolute;
             inset: 0;
-            background: radial-gradient(ellipse at 20% 50%, rgba(20, 184, 166, 0.12) 0%, transparent 60%);
+            background: radial-gradient(ellipse at 20% 50%, rgba(20, 184, 166, .12) 0%, transparent 60%);
             pointer-events: none;
         }
 
@@ -84,6 +84,8 @@
             display: flex;
             align-items: center;
             gap: 16px;
+            position: relative;
+            z-index: 2;
         }
 
         .brand-logo-wrap {
@@ -94,7 +96,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, .2);
             overflow: hidden;
             flex-shrink: 0;
         }
@@ -106,43 +108,19 @@
             padding: 4px;
         }
 
-        .brand-text-block {
-            display: flex;
-            flex-direction: column;
-            gap: 3px;
-        }
-
         .brand-name {
-            font-size: 1.05rem;
+            font-size: 1.2rem;
             font-weight: 900;
             color: #fff;
-            letter-spacing: 0.4px;
-            line-height: 1.1;
+            letter-spacing: .4px;
         }
 
         .brand-sub {
-            font-size: 0.62rem;
+            font-size: .7rem;
             font-weight: 600;
             color: var(--teal-bright);
             text-transform: uppercase;
             letter-spacing: 1.5px;
-        }
-
-        .header-center-title {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            backdrop-filter: blur(8px);
-            color: white;
-            padding: 10px 28px;
-            border-radius: 100px;
-            font-weight: 800;
-            font-size: 0.82rem;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            white-space: nowrap;
         }
 
         @media(max-width: 768px) {
@@ -198,14 +176,40 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            position: relative;
+            z-index: 2;
         }
 
-        .header-timestamp {
-            color: rgba(255, 255, 255, 0.55);
-            font-size: 0.68rem;
+        .live-clock {
+            color: rgba(255, 255, 255, .55);
+            font-size: .75rem;
             font-weight: 600;
             text-align: right;
             line-height: 1.4;
+        }
+
+        .btn-add-action {
+            background: var(--teal-bright);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 100px;
+            font-size: .85rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all .25s;
+            box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .btn-add-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(20, 184, 166, 0.4);
+            filter: brightness(1.1);
+            color: white;
         }
 
         .btn-logout {
@@ -597,22 +601,22 @@
         }
 
         .ui-card {
-            background: white;
+            background: #fff;
             border-radius: var(--radius-card);
-            border: 1px solid rgba(0, 0, 0, 0.05);
             box-shadow: var(--card-shadow);
+            border: 1px solid rgba(0, 31, 63, 0.05);
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
         }
 
         .ui-card-header {
-            padding: 18px 24px;
-            background: #fafafa;
-            border-bottom: 1px solid #f1f5f9;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
+            padding: 18px 25px;
+            border-bottom: 2px solid #f1f5f9;
         }
 
         @media(max-width: 500px) {
@@ -623,19 +627,18 @@
         }
 
         .card-title {
-            font-size: 0.68rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #64748b;
+            font-size: 1.15rem;
+            font-weight: 900;
+            color: var(--navy-dark);
+            margin: 0;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
         }
 
-        .card-title .bi {
+        .card-title i {
             color: var(--blue-accent);
-            font-size: 0.9rem;
+            font-size: 1.4rem;
         }
 
         /* ── EXPORT BUTTON ───────────────────────────────────── */
@@ -674,14 +677,14 @@
         }
 
         .registry-table td {
-            padding: 12px 16px;
+            padding: 16px 20px;
+            font-size: 0.82rem;
+            border-bottom: 1px solid #f1f5f9;
             vertical-align: middle;
-            font-size: 0.83rem;
-            border-bottom: 1px solid #f8fafc;
         }
 
         .registry-table tbody tr:hover {
-            background: #f8fafc;
+            background: #fbfcfe;
         }
 
         .role-badge {
@@ -721,7 +724,7 @@
         .action-btn {
             background: #f1f5f9;
             border: none;
-            color: var(--navy-mid);
+            color: #334155;
             padding: 6px 11px;
             border-radius: 9px;
             transition: 0.2s;
@@ -730,8 +733,9 @@
         }
 
         .action-btn:hover {
-            background: var(--navy-mid);
+            background: #334155;
             color: white;
+            transform: translateY(-1px);
         }
 
         .proj-chip {
@@ -754,17 +758,13 @@
             }
 
             .ui-card-header {
-                padding: 15px;
+                padding: 14px 16px;
             }
 
             .registry-table th,
             .registry-table td {
-                padding: 10px 8px;
-                font-size: 0.75rem;
-            }
-
-            .action-btn {
-                padding: 5px 8px;
+                padding: 12px 10px;
+                font-size: 0.78rem;
             }
         }
 
@@ -1228,18 +1228,51 @@
 
         /* ── MODALS ──────────────────────────────────────────── */
         .modal-content {
-            border-radius: 26px;
+            border-radius: 24px;
             border: none;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+
+        .form-label {
+            font-weight: 700;
+            font-size: 0.82rem;
+            color: #475569;
+        }
+
+        .form-control, .form-select {
+            border-radius: 12px;
+            padding: 12px 16px;
+            border: 1.5px solid #e2e8f0;
+            font-size: 0.9rem;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--blue-accent);
+            box-shadow: 0 0 0 4px rgba(0, 90, 156, 0.1);
         }
 
         .modal-hdr-dark {
             background: var(--navy-dark);
             color: white;
-            border-radius: 26px 26px 0 0;
-            padding: 22px 28px;
+            padding: 24px 32px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+        }
+
+        .modal-body {
+            padding: 32px !important;
+            background: #fafafa;
+        }
+
+        .action-center-container {
+            background: #f1f5f9;
+            padding: 4px 8px;
+            border-radius: 12px;
+            display: inline-flex;
+            gap: 4px;
+            border: 1px solid #e2e8f0;
         }
 
         .section-lbl {
@@ -1923,9 +1956,9 @@
             .assign-date-arrow { padding-bottom: 0; text-align: center; }
 
             /* modals */
-            .modal-content { border-radius: 20px; }
-            .modal-hdr-dark { padding: 16px 20px; border-radius: 20px 20px 0 0; }
-            .modal-body { padding: 18px !important; }
+            .modal-content { border-radius: 18px; }
+            .modal-hdr-dark { padding: 18px 22px; }
+            .modal-body { padding: 22px !important; }
         }
 
         /* ── 576px: standard phones ── */
@@ -2046,6 +2079,143 @@
             opacity: 0;
             visibility: hidden;
         }
+
+        /* ── SIDEBAR STYLES ── */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--navy-dark) 0%, var(--navy-mid) 100%);
+            color: white;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1100;
+            padding: 30px 20px;
+            box-shadow: 10px 0 30px rgba(0, 0, 0, 0.3);
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            flex-shrink: 0;
+        }
+
+        .sidebar-btn {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 14px 20px;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.9rem;
+            border-radius: 16px;
+            margin-bottom: 10px;
+            transition: all 0.25s;
+            border: 1px solid transparent;
+        }
+
+        .sidebar-btn i {
+            font-size: 1.2rem;
+            transition: transform 0.25s;
+        }
+
+        .sidebar-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            transform: translateX(5px);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-btn.active {
+            background: var(--teal-bright);
+            color: white;
+            box-shadow: 0 8px 16px rgba(20, 184, 166, 0.3);
+            border-color: transparent;
+        }
+
+        .sidebar-btn.active i {
+            transform: scale(1.1);
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 31, 63, 0.6);
+            backdrop-filter: blur(4px);
+            display: none;
+            z-index: 1090;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .menu-toggle {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.6rem;
+            transition: all 0.25s;
+            backdrop-filter: blur(8px);
+        }
+
+        .menu-toggle:hover {
+            background: white;
+            color: var(--navy-dark);
+            transform: scale(1.05);
+        }
+
+        .sidebar-content {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 10px;
+            margin-right: -10px;
+        }
+
+        .sidebar-content::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .sidebar-content::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        .sidebar-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
     </style>
 </head>
 
@@ -2053,29 +2223,87 @@
 
     <!-- Loader removed for Netlify Functions (Fast/Instant) -->
 
-    <!-- ===== HEADER ===== -->
-    <header class="app-header">
-        <div class="brand-box">
-            <div class="brand-logo-wrap">
-                <img src="asset/image.png" alt="Danprel Logo">
+    <!-- ===== SIDEBAR ===== -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="d-flex align-items-center gap-3">
+                <div style="width: 45px; height: 45px; background: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; padding: 4px;">
+                    <img src="asset/image.png" alt="Logo" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                </div>
+                <div>
+                    <div style="font-weight: 900; font-size: 1.2rem; letter-spacing: 1px; color: white;">DANPREL</div>
+                    <div style="font-size: 0.65rem; color: #94a3b8; font-weight: 600; text-transform: uppercase;">Engineering Automation</div>
+                </div>
             </div>
-            <div class="brand-text-block">
-                <div class="brand-name">DANPREL</div>
-                <div class="brand-sub">Engineering Automation Pvt Ltd</div>
-            </div>
+            <button class="btn-close btn-close-white" onclick="toggleSidebar()"></button>
         </div>
-        <div class="header-center-title">
-            <i class="bi bi-grid-3x2-gap-fill me-2"></i>Resource Allocation Dashboard
-        </div>
-        <div class="header-right">
-            <div class="header-timestamp" id="liveTime"></div>
-            <button class="btn-add-project" onclick="openPinModal()">
+        <div class="sidebar-content">
+            <a href="summary.html" class="sidebar-btn">
+                <i class="bi bi-bar-chart-fill"></i> Resource Summary
+            </a>
+            <a href="machine_summary.html" class="sidebar-btn">
+                <i class="bi bi-cpu-fill"></i> Machine Summary
+            </a>
+            <a href="resource.html" class="sidebar-btn active">
+                <i class="bi bi-people-fill"></i> Resource Allocation
+            </a>
+            <a href="machine.html" class="sidebar-btn">
+                <i class="bi bi-hdd-rack-fill"></i> Machine Allocation
+            </a>
+
+            <!-- Action Button -->
+            <button class="sidebar-btn w-100 border-0 text-start" onclick="toggleSidebar(); openPinModal()" style="background: rgba(255, 255, 255, 0.05); margin-top: 20px;">
                 <i class="bi bi-folder-plus"></i> Add Project
             </button>
 
-            <a href="summary.html" class="btn-summary-nav">
-                <i class="bi bi-graph-up-arrow"></i> Summary
-            </a>
+            <!-- Feedback Section -->
+            <div class="sidebar-feedback pt-3" style="margin-top: 10px;">
+                <div style="font-size: 0.65rem; color: #94a3b8; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Share Feedback</div>
+                <textarea id="sidebarFeedbackText" class="form-control" 
+                    style="font-size: 0.8rem; border-radius: 12px; min-height: 80px; background: white !important; color: black !important; border: 1px solid rgba(0,0,0,0.1) !important; margin-bottom: 10px; resize: none;" 
+                    placeholder="Suggest features or report issues..."></textarea>
+                <button onclick="submitSidebarFeedback()" class="sidebar-btn w-100 justify-content-center" style="background: var(--teal-bright); color: white; border: none; box-shadow: 0 4px 12px rgba(20, 184, 166, 0.2);">
+                    Submit Feedback
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <!-- ===== HEADER ===== -->
+    <header class="app-header">
+        <div class="d-flex align-items-center gap-3">
+            <button class="menu-toggle" onclick="toggleSidebar()" title="Open Menu">
+                <i class="bi bi-list"></i>
+            </button>
+            <div class="brand-box">
+                <div class="brand-logo-wrap">
+                    <img src="asset/image.png" alt="Danprel Logo" onerror="this.src='https://placehold.co/54'">
+                </div>
+                <div>
+                    <div class="brand-name">DANPREL</div>
+                    <div class="brand-sub">Engineering Automation Pvt Ltd</div>
+                </div>
+            </div>
+        </div>
+
+        <div style="flex: 1; display: flex; justify-content: center;">
+            <div
+                style="display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.05); padding: 6px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+                <i class="bi bi-people-fill" style="font-size: 1rem; color: var(--teal-bright);"></i>
+                <div style="text-align: left;">
+                    <div
+                        style="margin: 0; font-weight: 700; font-size: 1rem; color: white; letter-spacing: 0.5px; line-height: 1.2;">
+                        Resource Allocation Dashboard</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <button class="btn-add-action d-none d-md-flex" onclick="openPinModal()">
+                <i class="bi bi-folder-plus"></i> Add Project
+            </button>
+            <div class="live-clock" id="liveTime"></div>
             <button class="btn-logout" onclick="performLogout()" title="Logout">
                 <i class="bi bi-box-arrow-right"></i>
             </button>
@@ -2231,7 +2459,7 @@
                     <h5 class="fw-bold mb-0"><i class="bi bi-person-plus-fill me-2"></i>Add New Member</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body p-4" style="background:#fafafa;">
+                <div class="modal-body">
 
                     <div class="row g-3 mb-3">
                         <div class="col-7">
@@ -2307,17 +2535,12 @@
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
                 </div>
-                <div class="modal-body p-4" style="background:#fafafa;">
-                    <!-- Date Range -->
-                    <div class="section-lbl mb-2">Date Range</div>
-                    <div class="row g-3 mb-4">
-                        <div class="col-6">
-                            <label class="form-label small fw-bold text-muted">From Date</label>
-                            <input type="date" id="exFrom" class="form-control rounded-3 fw-bold">
-                        </div>
-                        <div class="col-6">
-                            <label class="form-label small fw-bold text-muted">To Date</label>
-                            <input type="date" id="exTo" class="form-control rounded-3 fw-bold">
+                <div class="modal-body">
+                    <div class="d-flex align-items-center gap-2 mb-4 p-3 rounded-3" style="background:#f0f7ff; border: 1px solid #bfdbfe;">
+                        <i class="bi bi-calendar-check-fill text-primary"></i>
+                        <div class="small fw-700 text-muted">
+                            Applying current filter range: 
+                            <span id="exportRangeLabel" class="text-primary ms-1"></span>
                         </div>
                     </div>
 
@@ -2364,11 +2587,11 @@
     <div class="modal fade" id="editMemberModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-hdr-dark" style="background:var(--navy-mid);">
+                <div class="modal-hdr-dark">
                     <h5 class="fw-bold mb-0"><i class="bi bi-pencil-square me-2"></i>Edit Member Details</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body p-4" style="background:#fafafa;">
+                <div class="modal-body">
                     <input type="hidden" id="eIdx">
                     <div class="row g-3 mb-3">
                         <div class="col-7">
@@ -2465,7 +2688,7 @@
                     <h5 class="fw-bold mb-0"><i class="bi bi-folder-plus me-2"></i>Create New Project</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body p-4" style="background:#fafafa;">
+                <div class="modal-body">
                     <div class="mb-3">
                         <div class="section-lbl">Project Name</div>
                         <input type="text" id="projName" class="form-control rounded-3 fw-bold">
@@ -2516,10 +2739,9 @@
                     </h6>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body p-4" style="background:#fafafa;">
+                <div class="modal-body">
                     <input type="hidden" id="targetIndex">
 
-                    <!-- Project selector -->
                     <div class="mb-3">
                         <div class="section-lbl">Select Project</div>
                         <select id="aProjectSelect" class="form-select rounded-3 fw-bold"
@@ -2591,13 +2813,13 @@
     <div class="modal fade" id="editAssignModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-hdr-dark" style="background:var(--navy-mid);">
+                <div class="modal-hdr-dark">
                     <h6 class="fw-bold mb-0">
                         <i class="bi bi-calendar-event me-2"></i>Edit Assignment Timeline
                     </h6>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body p-4" style="background:#fafafa;">
+                <div class="modal-body">
                     <input type="hidden" id="editEmpId">
                     <input type="hidden" id="editProjCode">
                     <input type="hidden" id="oldStart">
@@ -2896,6 +3118,11 @@
             const year = parseInt(document.getElementById('fYear').value);
             const fDept = document.getElementById('fDept').value;
             const fProj = document.getElementById('fProject').value;
+            const fFrom = document.getElementById('fFrom').value;
+            const fTo = document.getElementById('fTo').value;
+
+            // Update visualization weeks based on selected date range
+            buildGanttHeaders(year, fFrom, fTo);
 
             // Filter people
             const filtered = registryData.filter(r => {
@@ -2941,12 +3168,16 @@
                 <td><div class="small fw-700 text-muted">${r.dept}</div></td>
                 <td class="fw-700 text-muted">${r.exp}y</td>
                 <td class="text-center">
-                    <div class="d-flex align-items-center justify-content-center gap-1">
+                    <div class="action-center-container">
                         <button class="action-btn" onclick="openAssign(${oi})" title="Assign Project">
                             <i class="bi bi-folder-plus"></i>
                         </button>
-                        <button class="action-btn" onclick="openEditMember(${oi})" title="Edit Member"><i class="bi bi-pencil-square"></i></button>
-                        <button class="action-btn" onclick="openPopup(${oi})" title="View Details"><i class="bi bi-eye"></i></button>
+                        <button class="action-btn" onclick="openEditMember(${oi})" title="Edit Member">
+                            <i class="bi bi-pencil-square"></i>
+                        </button>
+                        <button class="action-btn" onclick="openPopup(${oi})" title="View Details">
+                            <i class="bi bi-eye"></i>
+                        </button>
                     </div>
                 </td>
             </tr>`;
@@ -3057,7 +3288,6 @@
             const yr = parseInt(document.getElementById('fYear').value);
             document.getElementById('fFrom').value = yr + '-01-01';
             document.getElementById('fTo').value = yr + '-12-31';
-            buildGanttHeaders(yr);
             renderUI();
         }
 
@@ -3131,7 +3361,7 @@
 
             try {
                 // POST to server
-                const res = await fetch(`${API_BASE}/api/add-project`, {
+                const res = await fetch(`${API_BASE}/add-project`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name, code, start, end, days })
@@ -3139,7 +3369,7 @@
                 const data = await res.json();
 
                 if (res.status === 409) {
-                    return alert(`Project code "${code}" already exists in projects.csv.`);
+                    return alert(`Project code "${code}" already exists in the database.`);
                 }
                 if (!res.ok) {
                     return alert('Could not save project: ' + (data.error || 'Server error'));
@@ -3150,14 +3380,14 @@
                 syncProjectFilter();
                 renderUI();
                 bootstrap.Modal.getInstance(document.getElementById('addProjectModal')).hide();
-                showToast(`<i class="bi bi-check-circle-fill me-2" style="color:var(--teal-bright)"></i>Project <strong>${code}</strong> saved to projects.csv!`);
+                showToast(`<i class="bi bi-check-circle-fill me-2" style="color:var(--teal-bright)"></i>Project <strong>${code}</strong> saved to Cloud Database!`);
 
             } catch (e) {
                 // Server not running — still add to memory but warn user
                 projectRegistry.push(newProject);
                 renderUI();
                 bootstrap.Modal.getInstance(document.getElementById('addProjectModal')).hide();
-                showToast(`<i class="bi bi-exclamation-triangle-fill me-2" style="color:var(--gold)"></i><strong>${code}</strong> created (server offline — not saved to CSV)`);
+                showToast(`<i class="bi bi-exclamation-triangle-fill me-2" style="color:var(--gold)"></i><strong>${code}</strong> created (offline mode — session only)`);
             }
         }
 
@@ -3308,7 +3538,7 @@
             const target = registryData[empIdx];
 
             try {
-                const res = await fetch(`${API_BASE}/api/add-assignment`, {
+                const res = await fetch(`${API_BASE}/add-assignment`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -3340,7 +3570,7 @@
                 target.projects.push({ name: proj.name, code: proj.code, projectId: proj.id, start, end, days });
                 renderUI();
                 bootstrap.Modal.getInstance(document.getElementById('assignModal')).hide();
-                showToast(`<i class="bi bi-exclamation-triangle-fill me-2" style="color:var(--gold)"></i>Assignment created (server offline — not saved to CSV)`);
+                showToast(`<i class="bi bi-exclamation-triangle-fill me-2" style="color:var(--gold)"></i>Assignment created (offline mode — session only)`);
             }
         }
 
@@ -3374,7 +3604,7 @@
             const days = Math.ceil((new Date(newE) - new Date(newS)) / 86400000);
 
             try {
-                const res = await fetch(`${API_BASE}/api/update-assignment`, {
+                const res = await fetch(`${API_BASE}/update-assignment`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -3501,10 +3731,16 @@
         }
 
         function exportGantt() {
-            // Pre-fill date range from current filter
-            document.getElementById('exFrom').value = document.getElementById('fFrom').value;
-            document.getElementById('exTo').value = document.getElementById('fTo').value;
-            // Default to PDF
+            const fFrom = document.getElementById('fFrom').value;
+            const fTo = document.getElementById('fTo').value;
+            
+            // Show range text in modal
+            const lbl = document.getElementById('exportRangeLabel');
+            if (lbl) {
+                const df = d => new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+                lbl.textContent = `${df(fFrom)} — ${df(fTo)}`;
+            }
+
             selectFormat('pdf');
             new bootstrap.Modal(document.getElementById('exportRangeModal')).show();
         }
@@ -3522,42 +3758,53 @@
                 const projOk = fProj === 'ALL' || r.projects.some(p => p.code === fProj);
                 return deptOk && projOk;
             }).flatMap(r => {
-                // Focus on assignments that overlap the export range 
-                // AND match the current project filter (if one is active)
                 const assignments = r.projects.filter(p => {
                     const dateOk = new Date(p.start + 'T00:00:00') <= e && new Date(p.end + 'T00:00:00') >= s;
                     const codeOk = fProj === 'ALL' || p.code === fProj;
                     return dateOk && codeOk;
                 });
 
+                const fd = d => {
+                    const y = d.getFullYear(), m = (d.getMonth() + 1).toString().padStart(2, '0'), dd = d.getDate().toString().padStart(2, '0');
+                    return `${y}-${m}-${dd}`;
+                };
+
                 if (assignments.length) {
-                    return assignments.map(p => ({
-                        name: r.name,
-                        empId: r.id,
-                        dept: r.dept,
-                        role: r.role,
-                        exp: r.exp,
-                        projCode: p.code,
-                        projName: p.name,
-                        start: p.start,
-                        end: p.end,
-                        days: p.days,
-                        status: 'Assigned'
-                    }));
+                    return assignments.map(p => {
+                        const as = new Date(p.start + 'T00:00:00');
+                        const ae = new Date(p.end + 'T00:00:00');
+                        const interS = as > s ? as : s;
+                        const interE = ae < e ? ae : e;
+                        const dNum = Math.ceil((interE - interS) / 86400000) + 1;
+
+                        return {
+                            name: r.name,
+                            empId: r.id,
+                            dept: r.dept,
+                            role: r.role,
+                            exp: r.exp,
+                            projCode: p.code,
+                            projName: p.name,
+                            start: fd(interS),
+                            end: fd(interE),
+                            days: dNum,
+                            status: 'Assigned'
+                        };
+                    });
                 } else {
                     return [{
                         name: r.name, empId: r.id, dept: r.dept,
                         role: r.role, exp: r.exp,
-                        projCode: '-', projName: '-', start: '-', end: '-',
-                        days: '-', status: 'Free'
+                        projCode: '—', projName: '—', start: '—', end: '—',
+                        days: '—', status: 'Free'
                     }];
                 }
             });
         }
 
         async function executeExport() {
-            const rangeFrom = document.getElementById('exFrom').value;
-            const rangeTo = document.getElementById('exTo').value;
+            const rangeFrom = document.getElementById('fFrom').value;
+            const rangeTo = document.getElementById('fTo').value;
             const fmt = _exportFormat;
 
             if (!rangeFrom || !rangeTo) return alert('Please select both From and To dates.');
@@ -3567,7 +3814,7 @@
 
             const rows = buildExportRows(rangeFrom, rangeTo);
             const genDate = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-            const rangeLabel = `${rangeFrom}  →  ${rangeTo}`;
+            const rangeLabel = `${rangeFrom} to ${rangeTo}`;
 
             /* ── CSV / EXCEL ── */
             if (fmt === 'csv') {
@@ -3642,7 +3889,7 @@
                     doc.setTextColor(255, 255, 255); doc.setFont('helvetica', 'bold'); doc.setFontSize(18);
                     doc.text('DANPREL Engineering Automation', 14, 15);
                     doc.setFontSize(10); doc.setFont('helvetica', 'normal');
-                    doc.text('Timeline Deployment Report  |  Timeframe: ' + rangeLabel, 14, 23);
+                    doc.text('Timeline Deployment Report  |  Timeline: ' + rangeLabel, 14, 23);
                     doc.text('Generated: ' + genDate, 14, 30);
 
                     const drawSectionLabel = (text, y) => {
@@ -3708,6 +3955,32 @@
             _toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
         }
 
+        async function submitSidebarFeedback() {
+            const text = document.getElementById('sidebarFeedbackText').value.trim();
+            if (!text) {
+                showToast('<i class="bi bi-exclamation-circle me-2" style="color:#f59e0b"></i>Please enter some feedback');
+                return;
+            }
+            
+            try {
+                const res = await fetch('/api/add-feedback', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('<i class="bi bi-check-circle-fill me-2" style="color:var(--teal-bright)"></i>Thank you! Feedback submmited.');
+                    document.getElementById('sidebarFeedbackText').value = '';
+                    setTimeout(toggleSidebar, 1000); // Close sidebar after a delay
+                } else {
+                    showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Error saving feedback.');
+                }
+            } catch (e) {
+                showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>System connection error.');
+            }
+        }
+
         /* =========================================================
            LIVE CLOCK & API CONFIG
         ========================================================= */
@@ -3745,7 +4018,7 @@
 
             try {
                 // POST to server → permanently updates MongoDB
-                const res = await fetch(`${API_BASE}/api/add-member`, {
+                const res = await fetch(`${API_BASE}/add-member`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name, id, dept, role, exp })
@@ -3760,7 +4033,7 @@
                 registryData.push({ name, id, dept, role, exp, projects: [] });
                 renderUI();
                 bootstrap.Modal.getInstance(document.getElementById('addMemberModal')).hide();
-                showToast(`<i class="bi bi-person-check-fill me-2" style="color:var(--teal-bright)"></i><strong>${name}</strong> saved permanently to resources.csv!`);
+                showToast(`<i class="bi bi-person-check-fill me-2" style="color:var(--teal-bright)"></i><strong>${name}</strong> saved permanently to Cloud Database!`);
 
             } catch (e) {
                 alert(`❌ Server not reachable.\n\nPlease check if your Render backend is live at:\n${API_BASE}`);
@@ -3773,6 +4046,12 @@
         document.addEventListener('DOMContentLoaded', async () => {
             const loader = document.getElementById('wakingLoader');
             if (loader) loader.classList.add('hidden');
+
+            // Global shortcut for opening project modal via URL
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('add') && urlParams.get('add') === 'project') {
+                setTimeout(() => { if (typeof openPinModal === 'function') openPinModal(); }, 600);
+            }
 
             async function initApp() {
                 try {
@@ -3838,8 +4117,6 @@
             function finishInit() {
                 initPinInputs();
                 syncProjectFilter();
-                const year = parseInt(document.getElementById('fYear').value);
-                buildGanttHeaders(year);
                 renderUI();
                 updateClock();
                 setInterval(updateClock, 1000);
@@ -3867,6 +4144,11 @@
             sel.value = current || 'ALL';
             if (sel.selectedIndex === -1) sel.value = 'ALL';
         }
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
+        }
+
         function performLogout() {
             localStorage.removeItem('danprel_auth');
             window.location.replace('login.html');

@@ -21,7 +21,8 @@ mongoose.connect(MONGODB_URI)
     .catch(err => console.error('❌ MongoDB Connection Error:', err));
 
 // ── Models ───────────────────────────────────────────────────
-const Member = mongoose.model('Member', {
+// ── Models ───────────────────────────────────────────────────
+const Member = mongoose.models.Member || mongoose.model('Member', {
     name: String,
     id: { type: String, unique: true },
     dept: String,
@@ -30,7 +31,7 @@ const Member = mongoose.model('Member', {
     refDate: String
 });
 
-const Project = mongoose.model('Project', {
+const Project = mongoose.models.Project || mongoose.model('Project', {
     name: String,
     code: { type: String, unique: true },
     start: String,
@@ -38,12 +39,31 @@ const Project = mongoose.model('Project', {
     days: Number
 });
 
-const Assignment = mongoose.model('Assignment', {
+const Assignment = mongoose.models.Assignment || mongoose.model('Assignment', {
     empId: String,
     projCode: String,
     start: String,
     end: String,
     days: Number
+});
+
+const Machine = mongoose.models.Machine || mongoose.model('Machine', {
+    name: String,
+    machineId: { type: String, unique: true },
+    specification: String
+});
+
+const MachineAssignment = mongoose.models.MachineAssignment || mongoose.model('MachineAssignment', {
+    machineId: String,
+    projCode: String,
+    start: String,
+    end: String,
+    days: Number
+});
+
+const Feedback = mongoose.models.Feedback || mongoose.model('Feedback', {
+    text: String,
+    timestamp: { type: Date, default: Date.now }
 });
 
 // ── MIME types ────────────────────────────────────────────────
@@ -106,106 +126,171 @@ function readBody(req) {
 
 // ── HTTP Server ───────────────────────────────────────────────
 const server = http.createServer(async (req, res) => {
-    const urlPath = req.url.split('?')[0];
+    let urlPath = req.url.split('?')[0];
 
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     if (req.method === 'OPTIONS') { res.writeHead(204); res.end(); return; }
 
-    // API: Members
-    if (urlPath === '/api/members' && req.method === 'GET') {
-        try {
-            const members = await Member.find({});
-            const processed = members.map(m => ({
-                name: m.name,
-                id: m.id,
-                dept: m.dept,
-                role: m.role,
-                exp: getLiveExp(m.baseExp, m.refDate),
-                _baseExp: m.baseExp,
-                _refDate: m.refDate
-            }));
-            return json(res, 200, processed);
-        } catch (e) { return json(res, 500, { error: e.message }); }
-    }
+    // Normalize path for local server (remove /api if present)
+    const apiPath = urlPath.startsWith('/api') ? urlPath.slice(4) : null;
 
-    // API: Projects
-    if (urlPath === '/api/projects' && req.method === 'GET') {
-        try {
-            const projects = await Project.find({});
-            return json(res, 200, projects);
-        } catch (e) { return json(res, 500, { error: e.message }); }
-    }
+    if (apiPath) {
+        // API: Members
+        if (apiPath === '/members' && req.method === 'GET') {
+            try {
+                const members = await Member.find({});
+                const processed = members.map(m => ({
+                    name: m.name,
+                    id: m.id,
+                    dept: m.dept,
+                    role: m.role,
+                    exp: getLiveExp(m.baseExp, m.refDate),
+                    _baseExp: m.baseExp,
+                    _refDate: m.refDate
+                }));
+                return json(res, 200, processed);
+            } catch (e) { return json(res, 500, { error: e.message }); }
+        }
 
-    // API: Assignments
-    if (urlPath === '/api/assignments' && req.method === 'GET') {
-        try {
-            const assignments = await Assignment.find({});
-            return json(res, 200, assignments);
-        } catch (e) { return json(res, 500, { error: e.message }); }
-    }
+        // API: Projects
+        if (apiPath === '/projects' && req.method === 'GET') {
+            try {
+                const projects = await Project.find({});
+                return json(res, 200, projects);
+            } catch (e) { return json(res, 500, { error: e.message }); }
+        }
 
-    // API: Add Project
-    if (urlPath === '/api/add-project' && req.method === 'POST') {
-        try {
-            const project = JSON.parse(await readBody(req));
-            if (!project.days) {
-                project.days = Math.ceil((new Date(project.end) - new Date(project.start)) / 86400000);
-            }
-            await Project.create(project);
-            return json(res, 200, { success: true });
-        } catch (e) { return json(res, 400, { error: e.message }); }
-    }
+        // API: Assignments
+        if (apiPath === '/assignments' && req.method === 'GET') {
+            try {
+                const assignments = await Assignment.find({});
+                return json(res, 200, assignments);
+            } catch (e) { return json(res, 500, { error: e.message }); }
+        }
 
-    // API: Add Member
-    if (urlPath === '/api/add-member' && req.method === 'POST') {
-        try {
-            const member = JSON.parse(await readBody(req));
-            const today = new Date().toISOString().split('T')[0];
-            await Member.create({
-                ...member,
-                baseExp: member.exp,
-                refDate: today
-            });
-            return json(res, 200, { success: true });
-        } catch (e) { return json(res, 400, { error: e.message }); }
-    }
+        // API: Machines
+        if (apiPath === '/machines' && req.method === 'GET') {
+            try {
+                const machines = await Machine.find({});
+                return json(res, 200, machines);
+            } catch (e) { return json(res, 500, { error: e.message }); }
+        }
 
-    // API: Update Member
-    if (urlPath === '/api/update-member' && req.method === 'POST') {
-        try {
-            const member = JSON.parse(await readBody(req));
-            await Member.updateOne({ id: member.id }, member);
-            return json(res, 200, { success: true });
-        } catch (e) { return json(res, 400, { error: e.message }); }
-    }
+        // API: Machine Assignments
+        if (apiPath === '/machine-assignments' && req.method === 'GET') {
+            try {
+                const machineAssignments = await MachineAssignment.find({});
+                return json(res, 200, machineAssignments);
+            } catch (e) { return json(res, 500, { error: e.message }); }
+        }
 
-    // API: Add Assignment
-    if (urlPath === '/api/add-assignment' && req.method === 'POST') {
-        try {
-            const a = JSON.parse(await readBody(req));
-            // Use findOneAndUpdate with upsert to avoid duplicate assignments
-            await Assignment.findOneAndUpdate(
-                { empId: a.empId, projCode: a.projCode, start: a.start, end: a.end },
-                { days: a.days },
-                { upsert: true }
-            );
-            return json(res, 200, { success: true });
-        } catch (e) { return json(res, 400, { error: e.message }); }
-    }
+        // API: Add Project
+        if (apiPath === '/add-project' && req.method === 'POST') {
+            try {
+                const project = JSON.parse(await readBody(req));
+                if (!project.days) {
+                    project.days = Math.ceil((new Date(project.end) - new Date(project.start)) / 86400000);
+                }
+                await Project.create(project);
+                return json(res, 200, { success: true });
+            } catch (e) { return json(res, 400, { error: e.message }); }
+        }
 
-    // API: Update Assignment
-    if (urlPath === '/api/update-assignment' && req.method === 'POST') {
-        try {
-            const data = JSON.parse(await readBody(req));
-            const days = data.days || Math.ceil((new Date(data.newEnd) - new Date(data.newStart)) / 86400000);
-            await Assignment.updateOne(
-                { empId: data.empId, projCode: data.projCode, start: data.oldStart, end: data.oldEnd },
-                { start: data.newStart, end: data.newEnd, days: days }
-            );
-            return json(res, 200, { success: true });
-        } catch (e) { return json(res, 400, { error: e.message }); }
+        // API: Add Member
+        if (apiPath === '/add-member' && req.method === 'POST') {
+            try {
+                const member = JSON.parse(await readBody(req));
+                const today = new Date().toISOString().split('T')[0];
+                await Member.create({
+                    ...member,
+                    baseExp: member.exp,
+                    refDate: today
+                });
+                return json(res, 200, { success: true });
+            } catch (e) { return json(res, 400, { error: e.message }); }
+        }
+
+        // API: Update Member
+        if (apiPath === '/update-member' && req.method === 'POST') {
+            try {
+                const member = JSON.parse(await readBody(req));
+                await Member.updateOne({ id: member.id }, member);
+                return json(res, 200, { success: true });
+            } catch (e) { return json(res, 400, { error: e.message }); }
+        }
+
+        // API: Add Assignment
+        if (apiPath === '/add-assignment' && req.method === 'POST') {
+            try {
+                const a = JSON.parse(await readBody(req));
+                await Assignment.findOneAndUpdate(
+                    { empId: a.empId, projCode: a.projCode, start: a.start, end: a.end },
+                    { days: a.days },
+                    { upsert: true }
+                );
+                return json(res, 200, { success: true });
+            } catch (e) { return json(res, 400, { error: e.message }); }
+        }
+
+        // API: Update Assignment
+        if (apiPath === '/update-assignment' && req.method === 'POST') {
+            try {
+                const data = JSON.parse(await readBody(req));
+                const days = data.days || Math.ceil((new Date(data.newEnd) - new Date(data.newStart)) / 86400000);
+                await Assignment.updateOne(
+                    { empId: data.empId, projCode: data.projCode, start: data.oldStart, end: data.oldEnd },
+                    { start: data.newStart, end: data.newEnd, days: days }
+                );
+                return json(res, 200, { success: true });
+            } catch (e) { return json(res, 400, { error: e.message }); }
+        }
+
+        // API: Add Machine
+        if (apiPath === '/add-machine' && req.method === 'POST') {
+            try {
+                const machine = JSON.parse(await readBody(req));
+                await Machine.create(machine);
+                return json(res, 200, { success: true });
+            } catch (e) { return json(res, 400, { error: e.message }); }
+        }
+
+        // API: Add Machine Assignment
+        if (apiPath === '/add-machine-assignment' && req.method === 'POST') {
+            try {
+                const a = JSON.parse(await readBody(req));
+                const days = a.days || Math.ceil((new Date(a.end) - new Date(a.start)) / 86400000);
+                await MachineAssignment.findOneAndUpdate(
+                    { machineId: a.machineId, projCode: a.projCode, start: a.start, end: a.end },
+                    { days: days },
+                    { upsert: true }
+                );
+                return json(res, 200, { success: true });
+            } catch (e) { return json(res, 400, { error: e.message }); }
+        }
+
+        // API: Update Machine Assignment
+        if (apiPath === '/update-machine-assignment' && req.method === 'POST') {
+            try {
+                const data = JSON.parse(await readBody(req));
+                const days = data.days || Math.ceil((new Date(data.newEnd) - new Date(data.newStart)) / 86400000);
+                await MachineAssignment.updateOne(
+                    { machineId: data.machineId, projCode: data.projCode, start: data.oldStart, end: data.oldEnd },
+                    { start: data.newStart, end: data.newEnd, days: days }
+                );
+                return json(res, 200, { success: true });
+            } catch (e) { return json(res, 400, { error: e.message }); }
+        }
+
+        // API: Add Feedback
+        if (apiPath === '/add-feedback' && req.method === 'POST') {
+            try {
+                const data = JSON.parse(await readBody(req));
+                await Feedback.create({ text: data.text });
+                return json(res, 200, { success: true });
+            } catch (e) { return json(res, 400, { error: e.message }); }
+        }
     }
 
     // Static files

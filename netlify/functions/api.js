@@ -28,6 +28,20 @@ const Assignment = mongoose.models.Assignment || mongoose.model('Assignment', {
     days: Number
 });
 
+const Machine = mongoose.models.Machine || mongoose.model('Machine', {
+    name: String,
+    machineId: { type: String, unique: true },
+    specification: String
+});
+
+const MachineAssignment = mongoose.models.MachineAssignment || mongoose.model('MachineAssignment', {
+    machineId: String,
+    projCode: String,
+    start: String,
+    end: String,
+    days: Number
+});
+
 // Helpers
 function parseExp(val) {
     if (!val) return { y: 0, m: 0 };
@@ -111,6 +125,18 @@ exports.handler = async (event, context) => {
             return { statusCode: 200, headers, body: JSON.stringify(assignments) };
         }
 
+        // GET: Machines
+        if (path === '/machines' && method === 'GET') {
+            const machines = await Machine.find({});
+            return { statusCode: 200, headers, body: JSON.stringify(machines) };
+        }
+
+        // GET: Machine Assignments
+        if (path === '/machine-assignments' && method === 'GET') {
+            const machineAssignments = await MachineAssignment.find({});
+            return { statusCode: 200, headers, body: JSON.stringify(machineAssignments) };
+        }
+
         // POST: Add Project
         if (path === '/add-project' && method === 'POST') {
             const project = JSON.parse(event.body);
@@ -157,6 +183,52 @@ exports.handler = async (event, context) => {
             const days = data.days || Math.ceil((new Date(data.newEnd) - new Date(data.newStart)) / 86400000);
             await Assignment.updateOne(
                 { empId: data.empId, projCode: data.projCode, start: data.oldStart, end: data.oldEnd },
+                { start: data.newStart, end: data.newEnd, days: days }
+            );
+            return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
+        }
+
+        // POST: Add Machine
+        if (path === '/add-machine' && method === 'POST') {
+            const machine = JSON.parse(event.body);
+            await Machine.create(machine);
+            return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
+        }
+
+        // POST: Update Machine
+        if (path === '/update-machine' && method === 'POST') {
+            const data = JSON.parse(event.body);
+            const { oldId, machineId, name, specification } = data;
+            
+            // 1. Update the machine document
+            await Machine.updateOne({ machineId: oldId }, { machineId, name, specification });
+            
+            // 2. If ID changed, update all related assignments
+            if (oldId !== machineId) {
+                await MachineAssignment.updateMany({ machineId: oldId }, { machineId: machineId });
+            }
+            
+            return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
+        }
+
+        // POST: Add Machine Assignment
+        if (path === '/add-machine-assignment' && method === 'POST') {
+            const a = JSON.parse(event.body);
+            const days = a.days || Math.ceil((new Date(a.end) - new Date(a.start)) / 86400000);
+            await MachineAssignment.findOneAndUpdate(
+                { machineId: a.machineId, projCode: a.projCode, start: a.start, end: a.end },
+                { days: days },
+                { upsert: true }
+            );
+            return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
+        }
+
+        // POST: Update Machine Assignment
+        if (path === '/update-machine-assignment' && method === 'POST') {
+            const data = JSON.parse(event.body);
+            const days = data.days || Math.ceil((new Date(data.newEnd) - new Date(data.newStart)) / 86400000);
+            await MachineAssignment.updateOne(
+                { machineId: data.machineId, projCode: data.projCode, start: data.oldStart, end: data.oldEnd },
                 { start: data.newStart, end: data.newEnd, days: days }
             );
             return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };

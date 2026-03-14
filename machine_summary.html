@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danprel Engineering Automation | Machine Allocation Summary</title>
+    <link rel="icon" type="image/png" href="asset/image.png">
+    <meta name="description"
+        content="Machine allocation monitoring and utilization summary for Danprel Engineering Automation.">
+
+    <!-- Auth Guard -->
+    <script>
+        if (localStorage.getItem('danprel_auth') !== 'true') {
+            window.location.replace('login.html');
+        }
+    </script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+    <style>
+        /* ── DESIGN TOKENS ── */
+        :root {
+            --navy-dark: #001f3f;
+            --navy-mid: #003366;
+            --blue-accent: #005a9c;
+            --teal-bright: #14b8a6;
+            --gold: #f59e0b;
+            --rose: #e11d48;
+            --bg-neutral: #f1f5f9;
+            --card-shadow: 0 10px 40px rgba(0, 31, 63, .08);
+            --radius-card: 24px;
+            --free-color: #c7d2fe;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-neutral);
+            color: #1e293b;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* ── HEADER ── */
+        .app-header {
+            background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy-mid) 100%);
+            border-radius: var(--radius-card);
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 32px rgba(0, 31, 63, .25);
+            border: 1px solid rgba(255, 255, 255, .08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .app-header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 20% 50%, rgba(20, 184, 166, .12) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .header-center-title {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, .1);
+            border: 1px solid rgba(255, 255, 255, .18);
+            backdrop-filter: blur(8px);
+            color: white;
+            padding: 12px 32px;
+            border-radius: 100px;
+            font-weight: 800;
+            font-size: .95rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .brand-box {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .brand-logo-wrap {
+            width: 54px;
+            height: 54px;
+            background: white;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, .2);
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .brand-logo-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 4px;
+        }
+
+        .brand-name {
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: #fff;
+            letter-spacing: .4px;
+        }
+
+        .brand-sub {
+            font-size: .7rem;
+            font-weight: 600;
+            color: var(--teal-bright);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .live-clock {
+            color: rgba(255, 255, 255, .55);
+            font-size: .75rem;
+            font-weight: 600;
+            text-align: right;
+            line-height: 1.4;
+        }
+
+        /* ── MODE SWITCHER ── */
+        .mode-switcher {
+            background: var(--navy-dark);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 100px;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .mode-btn {
+            padding: 8px 18px;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: 0.3s;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+        }
+
+        .mode-btn.active {
+            background: var(--teal-bright);
+            color: white;
+            box-shadow: 0 4px 14px rgba(20, 184, 166, 0.3);
+        }
+
+        .mode-btn:not(.active) {
+            color: rgba(255, 255, 255, 0.5);
+            background: transparent;
+        }
+
+        .mode-btn:not(.active):hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* ── FILTER BAR ── */
+        .filter-bar-wrap {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 24px;
+            gap: 16px;
+        }
+
+        .filter-pill {
+            background: white;
+            border-radius: 100px;
+            box-shadow: 0 4px 24px rgba(0, 31, 63, .1);
+            border: 1px solid #e2e8f0;
+            padding: 8px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .fp-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .fp-label {
+            font-size: .75rem;
+            font-weight: 800;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .fp-select {
+            border: 1.5px solid #e2e8f0;
+            border-radius: 100px;
+            padding: 6px 14px;
+            font-size: .85rem;
+            font-weight: 700;
+            color: var(--navy-dark);
+            background: #f8fafc;
+            outline: none;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+
+        .fp-select:focus {
+            border-color: var(--teal-bright);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(20, 184, 166, .1);
+        }
+
+        .fp-divider {
+            width: 1px;
+            height: 24px;
+            background: #e2e8f0;
+        }
+
+        .fp-range-badge {
+            background: linear-gradient(135deg, var(--navy-dark), var(--navy-mid));
+            color: white;
+            padding: 4px 14px;
+            border-radius: 100px;
+            font-size: .8rem;
+            font-weight: 800;
+        }
+
+        /* ── TOTALS BAR ── */
+        .totals-bar {
+            background: linear-gradient(135deg, var(--navy-dark), var(--navy-mid));
+            border-radius: var(--radius-card);
+            padding: 24px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 32px rgba(0, 31, 63, .25);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .totals-bar::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 80% 50%, rgba(20, 184, 166, .15) 0%, transparent 50%);
+        }
+
+        .total-item {
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .total-val {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: #fff;
+            line-height: 1;
+        }
+
+        .total-lbl {
+            font-size: .75rem;
+            font-weight: 700;
+            color: var(--teal-bright);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 4px;
+        }
+
+        /* ── CHART CARD ── */
+        .chart-card {
+            background: white;
+            border-radius: var(--radius-card);
+            box-shadow: 0 20px 60px rgba(0, 31, 63, .13);
+            border: 1px solid rgba(0, 0, 0, .06);
+            margin-bottom: 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .chart-card-top {
+            background: linear-gradient(135deg, var(--navy-dark) 0%, #004080 60%, var(--navy-mid) 100%);
+            padding: 24px 32px 20px;
+            position: relative;
+            border-radius: var(--radius-card) var(--radius-card) 0 0;
+            z-index: 10;
+        }
+
+        .chart-card-top::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 70% 50%, rgba(20, 184, 166, .15) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .chart-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+            position: relative;
+            z-index: 20;
+        }
+
+        .chart-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chart-title {
+            font-size: 1.3rem;
+            font-weight: 900;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: .8px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .chart-subtitle {
+            font-size: .85rem;
+            font-weight: 700;
+            color: var(--teal-bright);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-top: 4px;
+            opacity: .9;
+            position: relative;
+            z-index: 2;
+        }
+
+        .chart-legend {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: .85rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, .85);
+            background: rgba(255, 255, 255, .1);
+            border: 1px solid rgba(255, 255, 255, .15);
+            padding: 6px 14px;
+            border-radius: 100px;
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+
+        .chart-card-bottom {
+            padding: 24px 32px 28px;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 480px;
+            background: linear-gradient(180deg, #fafbff 0%, #ffffff 100%);
+            border-radius: 16px;
+            padding: 12px 4px 4px;
+        }
+
+        .y-axis-label {
+            position: absolute;
+            left: -28px;
+            top: 50%;
+            transform: translateY(-50%) rotate(-90deg);
+            font-size: .75rem;
+            font-weight: 800;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+
+        .btn-export {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 100px;
+            padding: 8px 18px;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 800;
+            transition: 0.2s;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-export:hover {
+            background: white;
+            color: var(--navy-dark);
+            transform: translateY(-2px);
+        }
+
+
+        /* ── DATA TABLE ── */
+        .dept-table-wrap {
+            margin-top: 24px;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 20px;
+            overflow-x: auto;
+        }
+
+        .dept-table-title {
+            font-size: .8rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .dept-table-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #f1f5f9;
+        }
+
+        .dept-tbl {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .95rem;
+        }
+
+        .dept-tbl thead tr {
+            background: linear-gradient(135deg, var(--navy-dark), var(--navy-mid));
+            color: white;
+        }
+
+        .dept-tbl thead th {
+            padding: 14px 18px;
+            text-align: left;
+            font-size: .8rem;
+            font-weight: 800;
+            letter-spacing: .8px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .dept-tbl thead th:first-child { border-radius: 10px 0 0 10px; }
+        .dept-tbl thead th:last-child  { border-radius: 0 10px 10px 0; }
+
+        .dept-tbl tbody tr {
+            border-bottom: 1px solid #f1f5f9;
+            transition: background .2s;
+        }
+
+        .dept-tbl tbody tr:hover { background: #f8fafc; }
+
+        .dept-tbl tbody td {
+            padding: 14px 18px;
+            font-weight: 600;
+            color: #334155;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .dept-tbl tbody td:first-child {
+            font-weight: 800;
+            color: var(--navy-dark);
+        }
+
+        .tbl-badge {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 100px;
+            font-size: .82rem;
+            font-weight: 800;
+        }
+
+        .tbl-badge.alloc { background: #eef2ff; color: #4f46e5; }
+        .tbl-badge.free  { background: #f0fdf4; color: #059669; }
+        .tbl-badge.days  { background: #fef9c3; color: #854d0e; }
+        .tbl-badge.util-high { background: #fef2f2; color: #ef4444; }
+        .tbl-badge.util-ok   { background: #f0fdf4; color: #14b8a6; }
+
+        @media (max-width: 992px) {
+            .totals-bar {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                padding: 24px;
+                gap: 16px;
+            }
+
+            .totals-bar .total-item:last-child {
+                grid-column: span 2;
+            }
+
+            .filter-bar-wrap {
+                flex-direction: column;
+            }
+        }
+
+        /* ── SIDEBAR STYLES ── */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--navy-dark) 0%, var(--navy-mid) 100%);
+            color: white;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1100;
+            padding: 30px 20px;
+            box-shadow: 10px 0 30px rgba(0, 0, 0, 0.3);
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            flex-shrink: 0;
+        }
+
+        .sidebar-btn {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 14px 20px;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.9rem;
+            border-radius: 16px;
+            margin-bottom: 10px;
+            transition: all 0.25s;
+            border: 1px solid transparent;
+        }
+
+        .sidebar-btn i {
+            font-size: 1.2rem;
+            transition: transform 0.25s;
+        }
+
+        .sidebar-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            transform: translateX(5px);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-btn.active {
+            background: var(--teal-bright);
+            color: white;
+            box-shadow: 0 8px 16px rgba(20, 184, 166, 0.3);
+            border-color: transparent;
+        }
+
+        .sidebar-btn.active i {
+            transform: scale(1.1);
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 31, 63, 0.6);
+            backdrop-filter: blur(4px);
+            display: none;
+            z-index: 1090;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .menu-toggle {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.6rem;
+            transition: all 0.25s;
+            backdrop-filter: blur(8px);
+        }
+
+        .menu-toggle:hover {
+            background: white;
+            color: var(--navy-dark);
+            transform: scale(1.05);
+        }
+
+        .btn-logout {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: all 0.25s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+        }
+
+        .btn-logout:hover {
+            background: #e11d48;
+            border-color: #f43f5e;
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(225, 29, 72, 0.3);
+        }
+
+        .sidebar-content {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 10px;
+            margin-right: -10px;
+        }
+
+        .sidebar-content::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .sidebar-content::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        .sidebar-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* ── TOAST ────────────────────────────────────────────── */
+        .gantt-toast {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            background: var(--navy-dark);
+            color: white;
+            padding: 14px 22px;
+            border-radius: 14px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 8px 24px rgba(0, 31, 63, 0.4);
+            transform: translateY(80px);
+            opacity: 0;
+            transition: 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .gantt-toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ===== SIDEBAR ===== -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="d-flex align-items-center gap-3">
+                <div
+                    style="width: 45px; height: 45px; background: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; padding: 4px;">
+                    <img src="asset/image.png" alt="Logo"
+                        style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                </div>
+                <div>
+                    <div style="font-weight: 900; font-size: 1.2rem; letter-spacing: 1px; color: white;">DANPREL</div>
+                    <div style="font-size: 0.65rem; color: #94a3b8; font-weight: 600; text-transform: uppercase;">
+                        Engineering Automation</div>
+                </div>
+            </div>
+            <button class="btn-close btn-close-white" onclick="toggleSidebar()"></button>
+        </div>
+        <div class="sidebar-content">
+            <a href="summary.html" class="sidebar-btn">
+                <i class="bi bi-bar-chart-fill"></i> Resource Summary
+            </a>
+            <a href="machine_summary.html" class="sidebar-btn active">
+                <i class="bi bi-cpu-fill"></i> Machine Summary
+            </a>
+            <a href="resource.html" class="sidebar-btn">
+                <i class="bi bi-people-fill"></i> Resource Allocation
+            </a>
+            <a href="machine.html" class="sidebar-btn">
+                <i class="bi bi-hdd-rack-fill"></i> Machine Allocation
+            </a>
+
+            <!-- Action Button -->
+            <a href="resource.html?add=project" class="sidebar-btn"
+                style="background: rgba(255, 255, 255, 0.05); margin-top: 20px;">
+                <i class="bi bi-folder-plus"></i> Add Project
+            </a>
+
+            <!-- Feedback Section -->
+            <div class="sidebar-feedback pt-3" style="margin-top: 10px;">
+                <div style="font-size: 0.65rem; color: #94a3b8; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Share Feedback</div>
+                <textarea id="sidebarFeedbackText" class="form-control" 
+                    style="font-size: 0.8rem; border-radius: 12px; min-height: 80px; background: white !important; color: black !important; border: 1px solid rgba(0,0,0,0.1) !important; margin-bottom: 10px; resize: none;" 
+                    placeholder="Suggest features or report issues..."></textarea>
+                <button onclick="submitSidebarFeedback()" class="sidebar-btn w-100 justify-content-center" style="background: var(--teal-bright); color: white; border: none; box-shadow: 0 4px 12px rgba(20, 184, 166, 0.2); margin-top: 0;">
+                    Submit Feedback
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <header class="app-header">
+        <div class="d-flex align-items-center gap-3">
+            <button class="menu-toggle" onclick="toggleSidebar()" title="Open Menu">
+                <i class="bi bi-list"></i>
+            </button>
+            <div class="brand-box">
+                <div class="brand-logo-wrap">
+                    <img src="asset/image.png" alt="Danprel Logo" onerror="this.src='https://placehold.co/54'">
+                </div>
+                <div>
+                    <div class="brand-name">DANPREL</div>
+                    <div class="brand-sub">Engineering Automation Pvt Ltd</div>
+                </div>
+            </div>
+        </div>
+
+        <div style="flex: 1; display: flex; justify-content: center;">
+            <div
+                style="display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.05); padding: 6px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+                <i class="bi bi-cpu-fill" style="font-size: 1rem; color: var(--teal-bright);"></i>
+                <div style="text-align: left;">
+                    <div
+                        style="margin: 0; font-weight: 800; font-size: 1rem; color: white; letter-spacing: 0.5px; line-height: 1.2;">
+                        Machine Allocation Summary</div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <div class="live-clock" id="liveTime"></div>
+            <button class="btn-logout" onclick="performLogout()" title="Logout">
+                <i class="bi bi-box-arrow-right"></i>
+            </button>
+        </div>
+    </header>
+
+    <div class="filter-bar-wrap">
+        <!-- MODE SWITCHER PILL -->
+
+
+        <!-- FILTER PILL -->
+        <div class="filter-pill">
+            <div class="fp-item">
+                <i class="bi bi-calendar3 text-primary"></i>
+                <span class="fp-label">Month</span>
+                <select id="selMonth" class="fp-select" onchange="updateAnalysis()">
+                    <option value="0">January</option>
+                    <option value="1">February</option>
+                    <option value="2">March</option>
+                    <option value="3">April</option>
+                    <option value="4">May</option>
+                    <option value="5">June</option>
+                    <option value="6">July</option>
+                    <option value="7">August</option>
+                    <option value="8">September</option>
+                    <option value="9">October</option>
+                    <option value="10">November</option>
+                    <option value="11">December</option>
+                </select>
+            </div>
+            <div class="fp-divider"></div>
+            <div class="fp-item">
+                <span class="fp-label">Year</span>
+                <select id="selYear" class="fp-select" onchange="updateAnalysis()">
+                    <option value="2025">2025</option>
+                    <option value="2026">2026</option>
+                    <option value="2027">2027</option>
+                </select>
+            </div>
+            <div class="fp-divider"></div>
+            <div class="fp-item">
+                <i class="bi bi-calendar-week text-warning"></i>
+                <span class="fp-label">Week</span>
+                <select id="selWeek" class="fp-select" onchange="updateAnalysis()">
+                    <option value="ALL">All Weeks</option>
+                </select>
+            </div>
+            <div class="fp-divider"></div>
+            <span class="fp-range-badge" id="rangeBadge">─ Days</span>
+        </div>
+    </div>
+
+    <!-- TOTALS BAR -->
+    <div class="totals-bar">
+        <div class="total-item">
+            <div class="total-val" id="tTotalMch">0</div>
+            <div class="total-lbl">Machines</div>
+        </div>
+        <div class="total-item">
+            <div class="total-val" id="tTotalDays" style="color:var(--gold)">0</div>
+            <div class="total-lbl">Total Machine Days</div>
+        </div>
+        <div class="total-item">
+            <div class="total-val" id="tAllocated" style="color:var(--teal-bright)">0</div>
+            <div class="total-lbl">Allocated Machine Days</div>
+        </div>
+        <div class="total-item">
+            <div class="total-val" id="tFree" style="color:#93c5fd">0</div>
+            <div class="total-lbl">Open for Allocation </div>
+        </div>
+        <div class="total-item">
+            <div class="total-val" id="tUtil" style="color:#c4b5fd">0%</div>
+            <div class="total-lbl">Utilization</div>
+        </div>
+    </div>
+
+    <!-- MAIN CHART CARD -->
+    <div class="chart-card">
+        <div class="chart-card-top">
+            <div class="chart-card-header">
+                <div style="position:relative;z-index:2;">
+                    <div class="chart-title">Machine Loading Overview</div>
+                    <div class="chart-subtitle" id="chartSubtitle">...</div>
+                </div>
+                <div class="chart-header-actions" style="position:relative;z-index:10;">
+                    <div class="chart-legend" id="chartLegend"></div>
+                    <button class="btn-export" onclick="exportPDF()">
+                        <i class="bi bi-file-earmark-pdf-fill"></i> DOWNLOAD PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="chart-card-bottom">
+            <div class="chart-wrapper">
+                <div class="y-axis-label">Total Days Range (Machine-wise)</div>
+                <canvas id="mchChart"></canvas>
+            </div>
+
+            <!-- TABLE BREAKDOWN -->
+            <div class="dept-table-wrap">
+                <div class="dept-table-title">
+                    <i class="bi bi-table" style="color:var(--teal-bright);"></i>
+                    Machine Breakdown
+                </div>
+                <table class="dept-tbl">
+                    <thead>
+                        <tr>
+                            <th>Machine Name</th>
+                            <th>Number</th>
+                            <th>Total Capacity</th>
+                            <th>Allocated Days</th>
+                            <th>Idle Days</th>
+                            <th>Utilization</th>
+                        </tr>
+                    </thead>
+                    <tbody id="mchTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+        let machines = [];
+        let assignments = [];
+        let myChart = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            updateClock(); setInterval(updateClock, 1000);
+            setupYearDropdown();
+            await fetchData();
+        });
+
+        function setupYearDropdown() {
+            const sel = document.getElementById('selYear');
+            const year = new Date().getFullYear();
+            sel.innerHTML = '';
+            [year - 1, year, year + 1, year + 2].forEach(y => {
+                const opt = document.createElement('option');
+                opt.value = y; opt.textContent = y;
+                if (y === year) opt.selected = true;
+                sel.appendChild(opt);
+            });
+            document.getElementById('selMonth').value = new Date().getMonth();
+        }
+
+        async function fetchData() {
+            try {
+                const [mRes, aRes] = await Promise.all([
+                    fetch(`${API_BASE}/machines`).then(r => r.json()),
+                    fetch(`${API_BASE}/machine-assignments`).then(r => r.json())
+                ]);
+                machines = mRes;
+                assignments = aRes;
+                populateWeeks();
+                updateAnalysis();
+            } catch (e) {
+                console.error('API Error:', e);
+            }
+        }
+
+        function populateWeeks() {
+            const y = parseInt(document.getElementById('selYear').value);
+            const m = parseInt(document.getElementById('selMonth').value);
+            const sel = document.getElementById('selWeek');
+            while (sel.options.length > 1) sel.remove(1);
+
+            let d = new Date(y, m, 1);
+            while (d.getMonth() === m) {
+                if (d.getDay() === 1 || d.getDate() === 1) {
+                    const opt = document.createElement('option');
+                    const weekEnd = new Date(d); weekEnd.setDate(d.getDate() + 6);
+                    if (weekEnd.getMonth() !== m) weekEnd.setDate(new Date(y, m + 1, 0).getDate());
+
+                    const startStr = d.toISOString().split('T')[0];
+                    const endStr = weekEnd.toISOString().split('T')[0];
+                    opt.value = `${startStr}|${endStr}`;
+                    opt.textContent = `Week of ${d.getDate()} ${new Date(y, m, 1).toLocaleString('en-GB', { month: 'short' })}`;
+                    sel.appendChild(opt);
+                }
+                d.setDate(d.getDate() + 1);
+            }
+        }
+
+        function updateAnalysis() {
+            const y = parseInt(document.getElementById('selYear').value);
+            const m = parseInt(document.getElementById('selMonth').value);
+            const selW = document.getElementById('selWeek').value;
+
+            let start, end;
+            if (selW === 'ALL') {
+                start = new Date(y, m, 1);
+                end = new Date(y, m + 1, 0);
+                populateWeeks(); // re-pop if month changed
+            } else {
+                const parts = selW.split('|');
+                start = new Date(parts[0]);
+                end = new Date(parts[1]);
+            }
+
+            const totalDays = Math.ceil((end - start) / 86400000) + 1;
+            document.getElementById('rangeBadge').textContent = `${totalDays} Days`;
+            document.getElementById('chartSubtitle').textContent = `${new Date(y, m, 1).toLocaleString('en-GB', { month: 'long' }).toUpperCase()} ${y}`;
+
+            let periodAllocTotal = 0;
+            const stats = machines.map(mch => {
+                let mchAlloc = 0;
+                const mchAsgn = assignments.filter(a => a.machineId === mch.machineId);
+                mchAsgn.forEach(a => {
+                    const aStart = new Date(a.start);
+                    const aEnd = new Date(a.end);
+                    const overlapStart = new Date(Math.max(start, aStart));
+                    const overlapEnd = new Date(Math.min(end, aEnd));
+                    if (overlapStart <= overlapEnd) {
+                        mchAlloc += Math.ceil((overlapEnd - overlapStart) / 86400000) + 1;
+                    }
+                });
+                periodAllocTotal += mchAlloc;
+                return {
+                    name: mch.name, id: mch.machineId,
+                    allocated: mchAlloc, free: totalDays - mchAlloc,
+                    util: totalDays > 0 ? Math.round((mchAlloc / totalDays) * 100) : 0
+                };
+            });
+
+            // Update Totals
+            const cap = machines.length * totalDays;
+            document.getElementById('tTotalMch').textContent = machines.length;
+            document.getElementById('tTotalDays').textContent = cap;
+            document.getElementById('tAllocated').textContent = periodAllocTotal;
+            document.getElementById('tFree').textContent = cap - periodAllocTotal;
+            document.getElementById('tUtil').textContent = cap > 0 ? Math.round((periodAllocTotal / cap) * 100) + '%' : '0%';
+
+            renderChart(stats, totalDays);
+            renderTable(stats, totalDays);
+        }
+
+        function renderChart(stats, maxDays) {
+            const ctx = document.getElementById('mchChart').getContext('2d');
+            if (myChart) myChart.destroy();
+
+            const labels = stats.map(s => s.name);
+
+            /* ── Allocated Dataset (Green Gradient) ── */
+            const allocatedDataset = {
+                label: 'Allocated Days',
+                _code: '__allocated__',
+                _color: '#10b981',
+                data: stats.map(s => s.allocated),
+                backgroundColor: (() => {
+                    const g = ctx.createLinearGradient(0, 0, 0, 400);
+                    g.addColorStop(0, '#10b981');
+                    g.addColorStop(1, '#059669');
+                    return g;
+                })(),
+                borderWidth: 0,
+                borderRadius: 0,
+                borderSkipped: 'bottom',
+                barPercentage: 0.65,
+                categoryPercentage: 0.75,
+            };
+
+            /* ── Idle Days Dataset (Blue Gradient) ── */
+            const freeDataset = {
+                label: 'Idle Days',
+                _code: '__free__',
+                _color: '#3b82f6',
+                data: stats.map(s => s.free),
+                backgroundColor: (() => {
+                    const g = ctx.createLinearGradient(0, 0, 0, 400);
+                    g.addColorStop(0, '#60a5fa');
+                    g.addColorStop(1, 'rgba(59,130,246,0.4)');
+                    return g;
+                })(),
+                borderWidth: 0,
+                borderRadius: { topLeft: 10, topRight: 10, bottomLeft: 0, bottomRight: 0 },
+                borderSkipped: false,
+                barPercentage: 0.65,
+                categoryPercentage: 0.75,
+            };
+
+            const datasets = [allocatedDataset, freeDataset];
+
+            /* ── Dynamic legend ── */
+            const legendEl = document.getElementById('chartLegend');
+            if (legendEl) {
+                legendEl.innerHTML = datasets.map(ds => `
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background:${ds._color};"></div>
+                        ${ds.label}
+                    </div>
+                `).join('');
+            }
+
+            /* ── Inner percentage label plugin ── */
+            const innerLabelPlugin = {
+                id: 'innerLabels',
+                afterDraw(chart) {
+                    const c2 = chart.ctx;
+                    chart.data.datasets.forEach((dataset, dsIdx) => {
+                        const meta = chart.getDatasetMeta(dsIdx);
+                        if (meta.hidden) return;
+                        meta.data.forEach((bar, barIdx) => {
+                            const val = dataset.data[barIdx];
+                            if (!val || val < 1) return;
+                            const barH = Math.abs(bar.base - bar.y);
+                            if (barH < 20) return;
+
+                            const total = maxDays;
+                            if (!total) return;
+                            const pct = Math.round((val / total) * 100);
+
+                            c2.save();
+                            c2.textAlign = 'center';
+                            c2.textBaseline = 'middle';
+                            const midY = bar.y + barH / 2;
+                            c2.fillStyle = 'rgba(255,255,255,.9)';
+                            c2.font = '800 12px Inter';
+                            if (barH > 18) c2.fillText(`${pct}%`, bar.x, midY);
+                            c2.restore();
+                        });
+                    });
+                }
+            };
+
+            myChart = new Chart(ctx, {
+                type: 'bar',
+                data: { labels, datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,31,63,.93)',
+                            titleColor: '#fff',
+                            bodyColor: 'rgba(255,255,255,.85)',
+                            padding: 14,
+                            cornerRadius: 12,
+                            callbacks: {
+                                title(items) { return `Machine: ${items[0]?.label}`; },
+                                label(item) {
+                                    const ds = datasets[item.datasetIndex];
+                                    const val = item.raw;
+                                    if (!val) return null;
+                                    return `  ${ds.label}: ${val} days`;
+                                },
+                                afterBody(items) {
+                                    const s = stats[items[0]?.dataIndex];
+                                    if (!s) return [];
+                                    return ['', `Total Capacity : ${maxDays} days`,
+                                        `Utilization    : ${s.util}%`];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: true,
+                            grid: { display: false },
+                            ticks: {
+                                font: { family: 'Inter', weight: '700', size: 12 },
+                                color: '#334155',
+                                maxRotation: 20,
+                                padding: 8
+                            },
+                            border: { display: false }
+                        },
+                        y: {
+                            stacked: true,
+                            beginAtZero: true,
+                            max: maxDays,
+                            grid: {
+                                color: 'rgba(226,232,240,0.7)',
+                                lineWidth: 1,
+                                drawTicks: false
+                            },
+                            ticks: {
+                                font: { family: 'Inter', weight: '600', size: 12 },
+                                color: '#94a3b8',
+                                padding: 12
+                            },
+                            border: { display: false }
+                        }
+                    }
+                },
+                plugins: [innerLabelPlugin]
+            });
+        }
+
+        function renderTable(stats, totalPeriodDays) {
+            const body = document.getElementById('mchTableBody');
+            body.innerHTML = stats.map(s => {
+                const utilClass = s.util > 80 ? 'util-high' : 'util-ok';
+                const utilEmoji = s.util > 80 ? '🔥' : '✅';
+                return `
+                <tr>
+                    <td>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <div style="width:4px;height:32px;border-radius:4px;background:linear-gradient(180deg,var(--teal-bright),var(--navy-mid));flex-shrink:0;"></div>
+                            <span style="font-weight:800;color:var(--navy-dark);">${s.name}</span>
+                        </div>
+                    </td>
+                    <td><span class="tbl-badge days">${s.id}</span></td>
+                    <td><span class="tbl-badge days">⏱ ${totalPeriodDays} days</span></td>
+                    <td><span class="tbl-badge alloc">${s.allocated} days</span></td>
+                    <td><span class="tbl-badge free">${s.free} days</span></td>
+                    <td><span class="tbl-badge ${utilClass}">${s.util}% ${utilEmoji}</span></td>
+                </tr>`;
+            }).join('');
+        }
+
+        function updateClock() {
+            const now = new Date();
+            const d = now.toLocaleDateString('en-GB', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' });
+            const t = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            document.getElementById('liveTime').innerHTML = `${d}<br><span style="font-size:.85rem;font-weight:800;color:#fff;">${t}</span>`;
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
+        }
+
+        async function submitSidebarFeedback() {
+            const text = document.getElementById('sidebarFeedbackText').value.trim();
+            if (!text) {
+                showToast('<i class="bi bi-exclamation-circle me-2" style="color:#f59e0b"></i>Please enter some feedback');
+                return;
+            }
+            
+            try {
+                const res = await fetch('/api/add-feedback', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('<i class="bi bi-check-circle-fill me-2" style="color:var(--teal-bright)"></i>Thank you! Feedback submmited.');
+                    document.getElementById('sidebarFeedbackText').value = '';
+                    setTimeout(toggleSidebar, 1000); 
+                } else {
+                    showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Error saving feedback.');
+                }
+            } catch (e) {
+                showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>System connection error.');
+            }
+        }
+
+        let _toastTimer;
+        function showToast(html) {
+            const t = document.getElementById('ganttToast');
+            t.innerHTML = html; t.classList.add('show');
+            clearTimeout(_toastTimer);
+            _toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        function performLogout() {
+            localStorage.removeItem('danprel_auth');
+            window.location.replace('login.html');
+        }
+
+        async function exportPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('l', 'mm', 'a4');
+            doc.setFontSize(20); doc.setTextColor(0, 31, 63);
+            doc.text("Machine Utilization Report", 14, 20);
+
+            const head = [['Machine Name', 'ID', 'Period Usage (Days)', 'Utilization %']];
+            const body = machines.map(m => {
+                const stat = assignments.filter(a => a.machineId === m.machineId).length; // naive
+                return [m.name, m.machineId, stat, "N/A"];
+            });
+
+            doc.autoTable({ startY: 30, head: head, body: body, theme: 'grid' });
+            doc.save('Machine_Loading_Report.pdf');
+        }
+    </script>
+    <div id="ganttToast" class="gantt-toast"></div>
+</body>
+
+</html>
