@@ -1097,8 +1097,114 @@
             animation: slideUp 0.3s ease;
         }
 
+        /* ── TOAST ────────────────────────────────────────────── */
+        .gantt-toast {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            background: var(--navy-dark);
+            color: white;
+            padding: 14px 22px;
+            border-radius: 14px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            z-index: 99999;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 8px 24px rgba(0, 31, 63, 0.4);
+            transform: translateY(80px);
+            opacity: 0;
+            transition: 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
         .gantt-toast.show {
+            transform: translateY(0);
+            opacity: 1;
             display: flex;
+        }
+
+        /* ── DELETE CONFIRM MODAL ── */
+        .modal-delete-hdr {
+            background: #fff;
+            padding: 32px 32px 20px;
+            text-align: center;
+            border-bottom: none;
+        }
+
+        .delete-icon-circle {
+            width: 72px;
+            height: 72px;
+            background: #fff1f2;
+            color: #e11d48;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            margin: 0 auto 20px;
+            box-shadow: 0 10px 20px rgba(225, 29, 72, 0.1);
+            border: 1.5px solid #fecdd3;
+        }
+
+        .delete-title {
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: var(--navy-dark);
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .delete-text {
+            color: #64748b;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            padding: 0 10px;
+        }
+
+        .modal-delete-footer {
+            padding: 0 32px 32px;
+            border-top: none;
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-delete-confirm {
+            background: #e11d48;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 14px;
+            font-weight: 800;
+            font-size: 0.85rem;
+            flex: 1;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(225, 29, 72, 0.2);
+        }
+
+        .btn-delete-confirm:hover {
+            background: #be123c;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(225, 29, 72, 0.3);
+            color: white;
+        }
+
+        .btn-delete-cancel {
+            background: #f8fafc;
+            color: #475569;
+            border: 1.5px solid #e2e8f0;
+            padding: 12px 24px;
+            border-radius: 14px;
+            font-weight: 800;
+            font-size: 0.85rem;
+            flex: 1;
+            transition: all 0.2s;
+        }
+
+        .btn-delete-cancel:hover {
+            background: #f1f5f9;
+            color: #1e293b;
+            border-color: #cbd5e1;
         }
 
         @keyframes slideUp {
@@ -1944,6 +2050,33 @@
 
 <body>
 
+    <!-- ===== TOAST ===== -->
+    <div class="gantt-toast" id="ganttToast"></div>
+
+    <!-- ===== DELETE CONFIRM MODAL ===== -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 380px;">
+            <div class="modal-content"
+                style="border-radius: 30px; border: none; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
+                <div class="modal-delete-hdr">
+                    <div class="delete-icon-circle">
+                        <i class="bi bi-hdd-rack-fill"></i>
+                    </div>
+                    <h5 class="delete-title">Delete Machine?</h5>
+                    <p class="delete-text">
+                        Are you sure you want to delete <strong id="deleteMachineName"
+                            style="color:var(--navy-dark);"></strong>?
+                        <span class="d-block mt-2 small fw-600" style="opacity: 0.7;">This action is permanent and
+                            cannot be undone.</span>
+                    </p>
+                </div>
+                <div class="modal-delete-footer">
+                    <button type="button" class="btn-delete-cancel" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn-delete-confirm" id="confirmDeleteBtn">Yes, Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- ===== SIDEBAR ===== -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
@@ -2338,6 +2471,7 @@
         const API_BASE = '/api';
         let machines = [];
         let projects = [];
+        let _pendingDeleteIdx = null;
         const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         const DAY_ABBR = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
         const WEEK_W = 52;
@@ -2498,6 +2632,9 @@
                             </button>
                             <button class="action-btn" onclick="openEditMachine(${machines.indexOf(m)})" title="Edit Machine">
                                 <i class="bi bi-pencil-square"></i>
+                            </button>
+                            <button class="action-btn" onclick="deleteMachine(${machines.indexOf(m)})" title="Delete Machine" style="color: #e11d48;">
+                                <i class="bi bi-trash-fill"></i>
                             </button>
                             <button class="action-btn" onclick="openPopup(${machines.indexOf(m)})" title="View Details">
                                 <i class="bi bi-eye"></i>
@@ -2743,7 +2880,7 @@
             const machineId = document.getElementById('mId').value;
             const specification = document.getElementById('mSpec').value;
 
-            if (!name || !machineId) return alert("Fill required fields.");
+            if (!name || !machineId) return showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Fill required fields.');
 
             try {
                 const res = await fetch(`${API_BASE}/add-machine`, {
@@ -2767,11 +2904,11 @@
                     } catch (e) {
                         errorMessage = "Server returned non-JSON response";
                     }
-                    alert("Error saving machine: " + errorMessage);
+                    showToast(`<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Error saving machine: ${errorMessage}`);
                 }
             } catch (err) {
                 console.error(err);
-                alert("❌ Connection Error: Could not contact the server. Please ensure the local server is running.");
+                showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Connection Error: Could not contact the server.');
             }
         }
 
@@ -2792,7 +2929,7 @@
             const name = document.getElementById('eName').value.trim();
             const specification = document.getElementById('eSpec').value.trim();
 
-            if (!name || !newId) return alert('Name and Machine Number are required.');
+            if (!name || !newId) return showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#f59e0b"></i>Name and Machine Number are required.');
 
             try {
                 const res = await fetch(`${API_BASE}/update-machine`, {
@@ -2817,13 +2954,58 @@
                         const data = await res.json();
                         errorMessage = data.error || errorMessage;
                     } catch (e) { }
-                    alert("Error updating machine: " + errorMessage);
+                    showToast(`<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Error updating machine: ${errorMessage}`);
                 }
             } catch (err) {
                 console.error(err);
-                alert("❌ Connection Error: Could not contact the server.");
+                showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Connection Error: Could not contact the server.');
             }
         }
+
+        async function deleteMachine(idx) {
+            const m = machines[idx];
+            _pendingDeleteIdx = idx;
+            document.getElementById('deleteMachineName').textContent = m.name;
+            new bootstrap.Modal(document.getElementById('deleteConfirmModal')).show();
+        }
+
+        // Initialize Delete Confirmation Handler
+        document.addEventListener('DOMContentLoaded', () => {
+            const confirmBtn = document.getElementById('confirmDeleteBtn');
+            if (confirmBtn) {
+                confirmBtn.onclick = async () => {
+                    if (_pendingDeleteIdx === null) return;
+                    const idx = _pendingDeleteIdx;
+                    const m = machines[idx];
+
+                    // Hide modal
+                    const modalEl = document.getElementById('deleteConfirmModal');
+                    const modal = bootstrap.Modal.getInstance(modalEl);
+                    if (modal) modal.hide();
+
+                    try {
+                        const res = await fetch(`${API_BASE}/delete-machine`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ machineId: m.machineId })
+                        });
+
+                        if (res.ok) {
+                            machines.splice(idx, 1);
+                            renderUI();
+                            showToast(`<i class="bi bi-trash-fill me-2" style="color:#e11d48"></i>Machine <strong>${m.name}</strong> has been deleted.`);
+                        } else {
+                            const data = await res.json();
+                            showToast(`<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Could not delete machine: ${data.error || 'Server error'}`);
+                        }
+                    } catch (e) {
+                        showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Connection error. Could not delete machine.');
+                    } finally {
+                        _pendingDeleteIdx = null;
+                    }
+                };
+            }
+        });
 
         function openAssign(idx) {
             const m = machines[idx];
@@ -2893,7 +3075,7 @@
             const start = document.getElementById('aStart').value;
             const end = document.getElementById('aEnd').value;
 
-            if (!start || !end) return alert("Select dates.");
+            if (!start || !end) return showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#f59e0b"></i>Select dates.');
 
             try {
                 const res = await fetch(`${API_BASE}/add-machine-assignment`, {
@@ -2917,11 +3099,11 @@
                     } catch (e) {
                         errorMessage = "Server returned error status " + res.status;
                     }
-                    alert("Error assigning project: " + errorMessage);
+                    showToast(`<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Error assigning project: ${errorMessage}`);
                 }
             } catch (err) {
                 console.error(err);
-                alert("❌ Connection Error: Could not contact the server.");
+                showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Connection Error: Could not contact the server.');
             }
         }
 
@@ -3055,7 +3237,7 @@
             const rangeTo = document.getElementById('fTo').value;
             const fmt = _exportFormat;
 
-            if (!rangeFrom || !rangeTo) return alert('Select dates');
+            if (!rangeFrom || !rangeTo) return showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#f59e0b"></i>Select dates');
             bootstrap.Modal.getInstance(document.getElementById('exportRangeModal')).hide();
 
             const rows = buildExportRows(rangeFrom, rangeTo);

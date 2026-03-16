@@ -1319,7 +1319,7 @@
             font-size: 0.8rem;
             font-weight: 700;
             z-index: 99999;
-            display: flex;
+            display: none;
             align-items: center;
             gap: 10px;
             box-shadow: 0 8px 24px rgba(0, 31, 63, 0.4);
@@ -1331,6 +1331,7 @@
         .gantt-toast.show {
             transform: translateY(0);
             opacity: 1;
+            display: flex;
         }
 
         .btn-logout {
@@ -1520,7 +1521,7 @@
         </div>
         <div class="total-item">
             <div class="total-val" id="tDays" style="color:#c4b5fd">─</div>
-            <div class="total-lbl" style="color:#c4b5fd;">Period</div>
+            <div class="total-lbl" style="color:#c4b5fd;">Days</div>
         </div>
     </div>
 
@@ -1708,9 +1709,16 @@
         let _toastTimer;
         function showToast(html) {
             const t = document.getElementById('ganttToast');
-            t.innerHTML = html; t.classList.add('show');
+            t.innerHTML = html;
+            t.style.display = 'flex';
+            // Trigger reflow
+            t.offsetHeight;
+            t.classList.add('show');
             clearTimeout(_toastTimer);
-            _toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+            _toastTimer = setTimeout(() => {
+                t.classList.remove('show');
+                setTimeout(() => { if (!t.classList.contains('show')) t.style.display = 'none'; }, 350);
+            }, 3000);
         }
 
         function performLogout() {
@@ -2111,7 +2119,7 @@
            EXPORT LOGIC
         ══════════════════════════════════════════════════════ */
         async function exportSummary(format) {
-            if (!currentDeptStats.length) return alert('No data available to export.');
+            if (!currentDeptStats.length) return showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#f59e0b"></i>No data available to export.');
 
             const from = document.getElementById('fromDate').value;
             const to = document.getElementById('toDate').value;
@@ -2152,7 +2160,7 @@
                     a.click();
                     URL.revokeObjectURL(url);
                 } catch (e) {
-                    alert('Excel export failed.');
+                    showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Excel export failed.');
                 }
             } else if (format === 'pdf') {
                 try {
@@ -2229,7 +2237,7 @@
                     doc.save(`${title}.pdf`);
                 } catch (e) {
                     console.error(e);
-                    alert('PDF export failed.');
+                    showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>PDF export failed.');
                 }
             }
         }

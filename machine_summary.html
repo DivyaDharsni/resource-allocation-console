@@ -766,7 +766,7 @@
             font-size: 0.8rem;
             font-weight: 700;
             z-index: 99999;
-            display: flex;
+            display: none;
             align-items: center;
             gap: 10px;
             box-shadow: 0 8px 24px rgba(0, 31, 63, 0.4);
@@ -778,6 +778,7 @@
         .gantt-toast.show {
             transform: translateY(0);
             opacity: 1;
+            display: flex;
         }
 
         /* ══════════════════════════════════════════════════════
@@ -1692,9 +1693,16 @@
         let _toastTimer;
         function showToast(html) {
             const t = document.getElementById('ganttToast');
-            t.innerHTML = html; t.classList.add('show');
+            t.innerHTML = html;
+            t.style.display = 'flex';
+            // Trigger reflow
+            t.offsetHeight;
+            t.classList.add('show');
             clearTimeout(_toastTimer);
-            _toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+            _toastTimer = setTimeout(() => {
+                t.classList.remove('show');
+                setTimeout(() => { if (!t.classList.contains('show')) t.style.display = 'none'; }, 350);
+            }, 3000);
         }
 
         function performLogout() {
@@ -1703,19 +1711,26 @@
         }
 
         async function exportPDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('l', 'mm', 'a4');
-            doc.setFontSize(20); doc.setTextColor(0, 31, 63);
-            doc.text("Machine Utilization Report", 14, 20);
+            showToast('<i class="bi bi-hourglass-split me-2"></i>Preparing PDF report...');
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF('l', 'mm', 'a4');
+                doc.setFontSize(20); doc.setTextColor(0, 31, 63);
+                doc.text("Machine Utilization Report", 14, 20);
 
-            const head = [['Machine Name', 'ID', 'Period Usage (Days)', 'Utilization %']];
-            const body = machines.map(m => {
-                const stat = assignments.filter(a => a.machineId === m.machineId).length; // naive
-                return [m.name, m.machineId, stat, "N/A"];
-            });
+                const head = [['Machine Name', 'ID', 'Period Usage (Days)', 'Utilization %']];
+                const body = machines.map(m => {
+                    const stat = assignments.filter(a => a.machineId === m.machineId).length;
+                    return [m.name, m.machineId, stat, "N/A"];
+                });
 
-            doc.autoTable({ startY: 30, head: head, body: body, theme: 'grid' });
-            doc.save('Machine_Loading_Report.pdf');
+                doc.autoTable({ startY: 30, head: head, body: body, theme: 'grid' });
+                doc.save('Machine_Loading_Report.pdf');
+                showToast('<i class="bi bi-check-circle-fill me-2" style="color:var(--teal-bright)"></i>PDF Report saved successfully!');
+            } catch (err) {
+                console.error(err);
+                showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>PDF Export failed.');
+            }
         }
     </script>
     <div id="ganttToast" class="gantt-toast"></div>

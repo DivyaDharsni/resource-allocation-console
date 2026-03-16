@@ -221,6 +221,17 @@ const server = http.createServer(async (req, res) => {
             } catch (e) { return json(res, 400, { error: e.message }); }
         }
 
+        // API: Delete Member
+        if (apiPath === '/delete-member' && req.method === 'POST') {
+            try {
+                const { id } = JSON.parse(await readBody(req));
+                await Member.deleteOne({ id });
+                // Also delete their assignments
+                await Assignment.deleteMany({ empId: id });
+                return json(res, 200, { success: true });
+            } catch (e) { return json(res, 400, { error: e.message }); }
+        }
+
         // API: Add Assignment
         if (apiPath === '/add-assignment' && req.method === 'POST') {
             try {
@@ -279,6 +290,30 @@ const server = http.createServer(async (req, res) => {
                     { machineId: data.machineId, projCode: data.projCode, start: data.oldStart, end: data.oldEnd },
                     { start: data.newStart, end: data.newEnd, days: days }
                 );
+                return json(res, 200, { success: true });
+            } catch (e) { return json(res, 400, { error: e.message }); }
+        }
+
+        // API: Update Machine
+        if (apiPath === '/update-machine' && req.method === 'POST') {
+            try {
+                const data = JSON.parse(await readBody(req));
+                await Machine.updateOne({ machineId: data.oldId }, { 
+                    name: data.name, 
+                    machineId: data.machineId, 
+                    specification: data.specification 
+                });
+                return json(res, 200, { success: true });
+            } catch (e) { return json(res, 400, { error: e.message }); }
+        }
+
+        // API: Delete Machine
+        if (apiPath === '/delete-machine' && req.method === 'POST') {
+            try {
+                const { machineId } = JSON.parse(await readBody(req));
+                await Machine.deleteOne({ machineId });
+                // Also delete machine assignments
+                await MachineAssignment.deleteMany({ machineId });
                 return json(res, 200, { success: true });
             } catch (e) { return json(res, 400, { error: e.message }); }
         }

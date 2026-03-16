@@ -1510,6 +1510,89 @@
             opacity: 1;
         }
 
+        /* ── DELETE CONFIRM MODAL ── */
+        .modal-delete-hdr {
+            background: #fff;
+            padding: 32px 32px 20px;
+            text-align: center;
+            border-bottom: none;
+        }
+
+        .delete-icon-circle {
+            width: 72px;
+            height: 72px;
+            background: #fff1f2;
+            color: #e11d48;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            margin: 0 auto 20px;
+            box-shadow: 0 10px 20px rgba(225, 29, 72, 0.1);
+            border: 1.5px solid #fecdd3;
+        }
+
+        .delete-title {
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: var(--navy-dark);
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .delete-text {
+            color: #64748b;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            padding: 0 10px;
+        }
+
+        .modal-delete-footer {
+            padding: 0 32px 32px;
+            border-top: none;
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-delete-confirm {
+            background: #e11d48;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 14px;
+            font-weight: 800;
+            font-size: 0.85rem;
+            flex: 1;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(225, 29, 72, 0.2);
+        }
+
+        .btn-delete-confirm:hover {
+            background: #be123c;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(225, 29, 72, 0.3);
+            color: white;
+        }
+
+        .btn-delete-cancel {
+            background: #f8fafc;
+            color: #475569;
+            border: 1.5px solid #e2e8f0;
+            padding: 12px 24px;
+            border-radius: 14px;
+            font-weight: 800;
+            font-size: 0.85rem;
+            flex: 1;
+            transition: all 0.2s;
+        }
+
+        .btn-delete-cancel:hover {
+            background: #f1f5f9;
+            color: #1e293b;
+            border-color: #cbd5e1;
+        }
+
         /* ── POPUP ANIMATION ─────────────────────────────────── */
         @keyframes popupIn {
             from {
@@ -3039,8 +3122,7 @@
                         style="background:#f0fdf4;border:1px solid #bbf7d0;">
                         <i class="bi bi-shield-fill-check mt-1" style="color:#16a34a;flex-shrink:0;"></i>
                         <div class="small" style="color:#166534;font-weight:600;">
-                            Member will be saved <strong>permanently</strong> to
-                            <strong>resources.csv</strong>
+                            Member will be saved <strong>permanently</strong>
                         </div>
                     </div>
 
@@ -3248,8 +3330,7 @@
                         style="background:#f0fdf4;border:1px solid #bbf7d0;">
                         <i class="bi bi-shield-fill-check mt-1" style="color:#16a34a;flex-shrink:0;"></i>
                         <div class="small" style="color:#166534;font-weight:600;">
-                            Project will be saved <strong>permanently</strong> to
-                            <strong>projects.csv</strong>
+                            Project will be saved <strong>permanently</strong>
                         </div>
                     </div>
 
@@ -3429,6 +3510,31 @@
     <!-- ===== TOAST ===== -->
     <div class="gantt-toast" id="ganttToast"></div>
 
+    <!-- ===== DELETE CONFIRM MODAL ===== -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 380px;">
+            <div class="modal-content"
+                style="border-radius: 30px; border: none; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
+                <div class="modal-delete-hdr">
+                    <div class="delete-icon-circle">
+                        <i class="bi bi-person-x-fill"></i>
+                    </div>
+                    <h5 class="delete-title">Delete Member?</h5>
+                    <p class="delete-text">
+                        Are you sure you want to delete <strong id="deleteMemberName"
+                            style="color:var(--navy-dark);"></strong>?
+                        <span class="d-block mt-2 small fw-600" style="opacity: 0.7;">This action is permanent and
+                            cannot be undone.</span>
+                    </p>
+                </div>
+                <div class="modal-delete-footer">
+                    <button type="button" class="btn-delete-cancel" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn-delete-confirm" id="confirmDeleteBtn">Yes, Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="resources.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -3441,6 +3547,7 @@
         ========================================================= */
         let registryData = [];
         let projectRegistry = [];           // { id, name, code, start, end, days }
+        let _pendingDeleteIdx = null;
         const ADMIN_PIN = '1234';        // ← Change this to your desired PIN
         const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         const DAY_ABBR = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -3709,6 +3816,9 @@
                         <button class="action-btn" onclick="openEditMember(${oi})" title="Edit Member">
                             <i class="bi bi-pencil-square"></i>
                         </button>
+                        <button class="action-btn" onclick="deleteMember(${oi})" title="Delete Member" style="color: #e11d48;">
+                            <i class="bi bi-trash-fill"></i>
+                        </button>
                         <button class="action-btn" onclick="openPopup(${oi})" title="View Details">
                             <i class="bi bi-eye"></i>
                         </button>
@@ -3882,12 +3992,12 @@
             const code = document.getElementById('projCode').value.trim().toUpperCase();
             const start = document.getElementById('projStart').value;
             const end = document.getElementById('projEnd').value;
-            if (!name || !code || !start || !end) return alert('All project fields are required.');
-            if (new Date(end) <= new Date(start)) return alert('End date must be after start date.');
-
+            if (!name || !code || !start || !end) return showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>All project fields are required.');
+            if (new Date(end) <= new Date(start)) return showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>End date must be after start date.');
+            
             // Check for duplicate project code in memory
             if (projectRegistry.some(p => p.code.toUpperCase() === code)) {
-                return alert(`Project code "${code}" already exists.`);
+                return showToast(`<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Project code "<strong>${code}</strong>" already exists.`);
             }
 
             const days = Math.ceil((new Date(end) - new Date(start)) / 86400000);
@@ -3903,10 +4013,10 @@
                 const data = await res.json();
 
                 if (res.status === 409) {
-                    return alert(`Project code "${code}" already exists in the database.`);
+                    return showToast(`<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Project code "<strong>${code}</strong>" already exists in database.`);
                 }
                 if (!res.ok) {
-                    return alert('Could not save project: ' + (data.error || 'Server error'));
+                    return showToast(`<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Could not save project: ${data.error || 'Server error'}`);
                 }
 
                 // Add to in-memory registry and re-render
@@ -3948,10 +4058,10 @@
             const exp = document.getElementById('eExp').value.trim() || '0';
             const dept = document.getElementById('eDept').value;
 
-            if (!name) return alert('Name is required.');
+            if (!name) return showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#f59e0b"></i>Member name is required.');
 
             try {
-                const res = await fetch(`${API_BASE}/api/update-member`, {
+                const res = await fetch(`${API_BASE}/update-member`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ id, name, role, exp, dept })
@@ -3970,12 +4080,57 @@
                     showToast(`<i class="bi bi-check-circle-fill me-2" style="color:var(--teal-bright)"></i>Details for <strong>${name}</strong> updated successfully!`);
                 } else {
                     const errData = await res.json();
-                    alert('❌ Error: ' + (errData.error || 'Server rejected the update.'));
+                    showToast(`<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Error: ${errData.error || 'Server rejected the update.'}`);
                 }
             } catch (e) {
-                alert('Server connection error. Detail not updated on disk.');
+                showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Server connection error. Details not saved.');
             }
         }
+
+        async function deleteMember(idx) {
+            const member = registryData[idx];
+            _pendingDeleteIdx = idx;
+            document.getElementById('deleteMemberName').textContent = member.name;
+            new bootstrap.Modal(document.getElementById('deleteConfirmModal')).show();
+        }
+
+        // Initialize Delete Confirmation Handler
+        document.addEventListener('DOMContentLoaded', () => {
+            const confirmBtn = document.getElementById('confirmDeleteBtn');
+            if (confirmBtn) {
+                confirmBtn.onclick = async () => {
+                    if (_pendingDeleteIdx === null) return;
+                    const idx = _pendingDeleteIdx;
+                    const member = registryData[idx];
+
+                    // Hide modal
+                    const modalEl = document.getElementById('deleteConfirmModal');
+                    const modal = bootstrap.Modal.getInstance(modalEl);
+                    if (modal) modal.hide();
+
+                    try {
+                        const res = await fetch(`${API_BASE}/delete-member`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ id: member.id })
+                        });
+
+                        if (res.ok) {
+                            registryData.splice(idx, 1);
+                            renderUI();
+                            showToast(`<i class="bi bi-trash-fill me-2" style="color:#e11d48"></i><strong>${member.name}</strong> has been deleted.`);
+                        } else {
+                            const data = await res.json();
+                            showToast(`<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Could not delete: ${data.error || 'Server error'}`);
+                        }
+                    } catch (e) {
+                        showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Connection error. Could not delete member.');
+                    } finally {
+                        _pendingDeleteIdx = null;
+                    }
+                };
+            }
+        });
         function openAssign(empIdx) {
             const r = registryData[empIdx];
             document.getElementById('targetName').textContent = r.name;
@@ -4063,10 +4218,10 @@
             const end = document.getElementById('aEnd').value;
             const proj = projectRegistry.find(p => p.id === id);
 
-            if (!proj) return alert('Please select a project.');
-            if (!start) return alert('Please enter a start date.');
-            if (!end) return alert('Please enter an end date.');
-            if (new Date(end) <= new Date(start)) return alert('End date must be after start date.');
+            if (!proj) return showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#f59e0b"></i>Please select a project first.');
+            if (!start) return showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#f59e0b"></i>Please enter a start date.');
+            if (!end) return showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#f59e0b"></i>Please enter an end date.');
+            if (new Date(end) <= new Date(start)) return showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>End date must be after start date.');
 
             const days = Math.ceil((new Date(end) - new Date(start)) / 86400000);
             const target = registryData[empIdx];
@@ -4084,7 +4239,7 @@
 
                 if (!res.ok) {
                     const data = await res.json();
-                    return alert('Could not save assignment: ' + (data.error || 'Server error'));
+                    return showToast(`<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Could not save assignment: ${data.error || 'Server error'}`);
                 }
 
                 // Update in-memory if not already exists
@@ -4132,8 +4287,8 @@
             const newS = document.getElementById('newAStart').value;
             const newE = document.getElementById('newAEnd').value;
 
-            if (!newS || !newE) return alert('Please select both dates.');
-            if (new Date(newE) <= new Date(newS)) return alert('End date must be after start date.');
+            if (!newS || !newE) return showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#f59e0b"></i>Please select both dates.');
+            if (new Date(newE) <= new Date(newS)) return showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>End date must be after start date.');
 
             const days = Math.ceil((new Date(newE) - new Date(newS)) / 86400000);
 
@@ -4149,7 +4304,7 @@
 
                 if (!res.ok) {
                     const data = await res.json();
-                    return alert('Update failed: ' + (data.error || 'Server error'));
+                    return showToast(`<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Update failed: ${data.error || 'Server error'}`);
                 }
 
                 // Update in-memory
@@ -4169,7 +4324,7 @@
 
             } catch (e) {
                 console.error(e);
-                alert('Connection error. Could not update assignment.');
+                showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Connection error. Could not update assignment.');
             }
         }
 
@@ -4341,8 +4496,8 @@
             const rangeTo = document.getElementById('fTo').value;
             const fmt = _exportFormat;
 
-            if (!rangeFrom || !rangeTo) return alert('Please select both From and To dates.');
-            if (new Date(rangeTo) < new Date(rangeFrom)) return alert('"To" date must be after "From" date.');
+            if (!rangeFrom || !rangeTo) return showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#f59e0b"></i>Please select both From and To dates.');
+            if (new Date(rangeTo) < new Date(rangeFrom)) return showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>"To" date must be after "From" date.');
 
             bootstrap.Modal.getInstance(document.getElementById('exportRangeModal')).hide();
 
@@ -4544,10 +4699,10 @@
             const dept = document.getElementById('mDept').value;
             const exp = document.getElementById('mExp').value.trim() || '0';
 
-            if (!name) return alert('Please enter the member name.');
-            if (!id) return alert('Please enter the employee code.');
+            if (!name) return showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#f59e0b"></i>Please enter the member name.');
+            if (!id) return showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#f59e0b"></i>Please enter the employee code.');
             if (registryData.some(r => r.id === id)) {
-                return alert(`Employee code ${id} already exists in the list.`);
+                return showToast(`<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Employee code <strong>${id}</strong> already exists.`);
             }
 
             try {
@@ -4560,7 +4715,7 @@
                 const data = await res.json();
 
                 if (!res.ok) {
-                    return alert('Could not save: ' + (data.error || 'Server error'));
+                    return showToast(`<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Could not save: ${data.error || 'Server error'}`);
                 }
 
                 // Add to in-memory list and re-render immediately
@@ -4570,7 +4725,7 @@
                 showToast(`<i class="bi bi-person-check-fill me-2" style="color:var(--teal-bright)"></i><strong>${name}</strong> saved permanently to Cloud Database!`);
 
             } catch (e) {
-                alert(`❌ Server not reachable.\n\nPlease check if your Render backend is live at:\n${API_BASE}`);
+                showToast(`<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Connection Error: Dashboard server not reachable.`);
             }
         }
 
