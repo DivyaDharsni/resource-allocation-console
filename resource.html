@@ -124,38 +124,65 @@
         }
 
         @media(max-width: 768px) {
-            body { padding: 12px; }
-            .app-header { 
-                flex-direction: row; 
-                justify-content: space-between; 
-                padding: 10px 14px; 
-                margin-bottom: 20px; 
-                border-radius: 18px; 
-                gap: 10px; 
+            body {
+                padding: 12px;
             }
-            .brand-box { flex-direction: row; gap: 10px; }
-            .brand-logo-wrap { width: 38px; height: 38px; border-radius: 10px; }
-            .brand-name { font-size: 0.85rem; }
-            .brand-sub { font-size: 0.52rem; }
-            .header-center-title { display: none; }
-            
-            .header-right { 
+
+            .app-header {
+                flex-direction: row;
+                justify-content: space-between;
+                padding: 10px 14px;
+                margin-bottom: 20px;
+                border-radius: 18px;
+                gap: 10px;
+            }
+
+            .brand-box {
+                flex-direction: row;
+                gap: 10px;
+            }
+
+            .brand-logo-wrap {
+                width: 38px;
+                height: 38px;
+                border-radius: 10px;
+            }
+
+            .brand-name {
+                font-size: 0.85rem;
+            }
+
+            .brand-sub {
+                font-size: 0.52rem;
+            }
+
+            .header-center-title {
+                display: none;
+            }
+
+            .header-right {
                 display: flex;
                 flex-direction: row;
                 width: auto;
                 gap: 8px;
             }
-            .btn-add-project, .btn-summary-nav { 
-                width: auto; 
-                padding: 0 12px; 
-                font-size: 0.72rem; 
-                height: 36px; 
+
+            .btn-add-project,
+            .btn-summary-nav {
+                width: auto;
+                padding: 0 12px;
+                font-size: 0.72rem;
+                height: 36px;
                 border-radius: 100px;
             }
-            .header-timestamp { 
-                display: none; /* Hide timestamp on tiny rows to save space */
+
+            .header-timestamp {
+                display: none;
+                /* Hide timestamp on tiny rows to save space */
             }
-            .btn-logout, .btn-intel {
+
+            .btn-logout,
+            .btn-intel {
                 width: 36px;
                 height: 36px;
                 font-size: 0.9rem;
@@ -163,13 +190,45 @@
         }
 
         @media(max-width: 480px) {
-            body { padding: 8px; }
-            .app-header { padding: 8px 10px; border-radius: 16px; margin-bottom: 16px; gap: 6px; }
-            .brand-logo-wrap { width: 32px; height: 32px; }
-            .brand-name { font-size: 0.75rem; }
-            .btn-add-project, .btn-summary-nav { font-size: 0.65rem; height: 32px; padding: 0 10px; }
-            .btn-logout, .btn-intel { width: 32px; height: 32px; font-size: 0.8rem; }
-            .brand-sub { display: none; } /* Hide sub-brand on tiny phones to keep single line */
+            body {
+                padding: 8px;
+            }
+
+            .app-header {
+                padding: 8px 10px;
+                border-radius: 16px;
+                margin-bottom: 16px;
+                gap: 6px;
+            }
+
+            .brand-logo-wrap {
+                width: 32px;
+                height: 32px;
+            }
+
+            .brand-name {
+                font-size: 0.75rem;
+            }
+
+            .btn-add-project,
+            .btn-summary-nav {
+                font-size: 0.65rem;
+                height: 32px;
+                padding: 0 10px;
+            }
+
+            .btn-logout,
+            .btn-intel {
+                width: 32px;
+                height: 32px;
+                font-size: 0.8rem;
+            }
+
+            .brand-sub {
+                display: none;
+            }
+
+            /* Hide sub-brand on tiny phones to keep single line */
         }
 
         .header-right {
@@ -416,13 +475,16 @@
                 max-height: none;
                 border-radius: 18px;
             }
+
             .right-panel {
                 border-radius: 18px;
             }
+
             .content-header-row {
                 padding: 16px 20px;
             }
         }
+
         @media(max-width: 600px) {
 
             .clean-select,
@@ -525,9 +587,20 @@
                 padding: 10px;
                 border-radius: 12px;
             }
-            .stat-chip-icon { width: 34px; height: 34px; font-size: 1rem; }
-            .stat-chip-value { font-size: 1.1rem; }
-            .stat-chip-label { font-size: 0.55rem; }
+
+            .stat-chip-icon {
+                width: 34px;
+                height: 34px;
+                font-size: 1rem;
+            }
+
+            .stat-chip-value {
+                font-size: 1.1rem;
+            }
+
+            .stat-chip-label {
+                font-size: 0.55rem;
+            }
         }
 
         /* ── LAYOUT ────────────────────────────────────────────── */
@@ -809,24 +882,45 @@
             :root {
                 --gantt-sidebar-width: 150px;
             }
-            .m-cell { font-size: 0.6rem; }
-            .w-num { font-size: 0.52rem; }
+
+            .m-cell {
+                font-size: 0.6rem;
+            }
+
+            .w-num {
+                font-size: 0.52rem;
+            }
         }
 
         @media (max-width: 768px) {
             :root {
                 --gantt-sidebar-width: 120px;
             }
-            .m-cell { font-size: 0.55rem; padding: 6px 0; }
-            .w-num { font-size: 0.5rem; }
-            .w-date, .w-day { font-size: 0.45rem; }
+
+            .m-cell {
+                font-size: 0.55rem;
+                padding: 6px 0;
+            }
+
+            .w-num {
+                font-size: 0.5rem;
+            }
+
+            .w-date,
+            .w-day {
+                font-size: 0.45rem;
+            }
         }
 
         @media (max-width: 480px) {
             :root {
                 --gantt-sidebar-width: 90px;
             }
-            .m-cell { font-size: 0.5rem; letter-spacing: 0; }
+
+            .m-cell {
+                font-size: 0.5rem;
+                letter-spacing: 0;
+            }
         }
 
         .w-row {
@@ -936,15 +1030,31 @@
         }
 
         @media (max-width: 768px) {
-            .g-res-name { font-size: 0.72rem; }
-            .g-res-role { font-size: 0.52rem; }
-            .g-res-info { padding: 8px 10px; }
+            .g-res-name {
+                font-size: 0.72rem;
+            }
+
+            .g-res-role {
+                font-size: 0.52rem;
+            }
+
+            .g-res-info {
+                padding: 8px 10px;
+            }
         }
 
         @media (max-width: 480px) {
-            .g-res-name { font-size: 0.65rem; }
-            .g-res-role { font-size: 0.48rem; }
-            .g-res-info { padding: 6px 8px; }
+            .g-res-name {
+                font-size: 0.65rem;
+            }
+
+            .g-res-role {
+                font-size: 0.48rem;
+            }
+
+            .g-res-info {
+                padding: 6px 8px;
+            }
         }
 
 
@@ -988,19 +1098,49 @@
             white-space: nowrap;
         }
 
-        .b-date-start { position: absolute; bottom: 2px; left: 6px; }
-        .b-date-end { position: absolute; bottom: 2px; right: 6px; }
+        .b-date-start {
+            position: absolute;
+            bottom: 2px;
+            left: 6px;
+        }
+
+        .b-date-end {
+            position: absolute;
+            bottom: 2px;
+            right: 6px;
+        }
 
         @media (max-width: 768px) {
-            .g-bar { height: 32px; border-radius: 8px; }
-            .b-proj-code { font-size: 0.58rem; }
-            .b-date { font-size: 0.45rem; bottom: 1px; }
+            .g-bar {
+                height: 32px;
+                border-radius: 8px;
+            }
+
+            .b-proj-code {
+                font-size: 0.58rem;
+            }
+
+            .b-date {
+                font-size: 0.45rem;
+                bottom: 1px;
+            }
         }
 
         @media (max-width: 480px) {
-            .g-bar { height: 28px; border-radius: 6px; }
-            .b-proj-code { font-size: 0.52rem; }
-            .b-date { display: none; } /* Hide dates on tiny mobile bars */
+            .g-bar {
+                height: 28px;
+                border-radius: 6px;
+            }
+
+            .b-proj-code {
+                font-size: 0.52rem;
+            }
+
+            .b-date {
+                display: none;
+            }
+
+            /* Hide dates on tiny mobile bars */
         }
 
         .g-bar:hover {
@@ -1240,14 +1380,16 @@
             color: #475569;
         }
 
-        .form-control, .form-select {
+        .form-control,
+        .form-select {
             border-radius: 12px;
             padding: 12px 16px;
             border: 1.5px solid #e2e8f0;
             font-size: 0.9rem;
         }
 
-        .form-control:focus, .form-select:focus {
+        .form-control:focus,
+        .form-select:focus {
             border-color: var(--blue-accent);
             box-shadow: 0 0 0 4px rgba(0, 90, 156, 0.1);
         }
@@ -1818,19 +1960,31 @@
 
         /* ── 1200px: start compressing the left panel ── */
         @media (max-width: 1200px) {
-            .console-grid { flex-direction: column; }
-            .left-side, .right-side {
+            .console-grid {
+                flex-direction: column;
+            }
+
+            .left-side,
+            .right-side {
                 width: 100% !important;
                 max-width: none !important;
                 min-width: 0 !important;
             }
-            .resizer-v { display: none; }
-            :root { --left-panel-width: 100% !important; }
+
+            .resizer-v {
+                display: none;
+            }
+
+            :root {
+                --left-panel-width: 100% !important;
+            }
         }
 
         /* ── 992px: tablet portrait ── */
         @media (max-width: 992px) {
-            body { padding: 14px; }
+            body {
+                padding: 14px;
+            }
 
             .app-header {
                 flex-direction: column;
@@ -1838,7 +1992,11 @@
                 padding: 20px 18px;
                 text-align: center;
             }
-            .brand-box { flex-direction: column; }
+
+            .brand-box {
+                flex-direction: column;
+            }
+
             .header-center-title {
                 position: static;
                 transform: none;
@@ -1846,19 +2004,38 @@
                 font-size: 0.75rem;
                 padding: 8px 18px;
             }
+
             .header-right {
                 width: 100%;
                 justify-content: center;
                 flex-wrap: wrap;
                 gap: 8px;
             }
-            .header-timestamp { display: none; }
+
+            .header-timestamp {
+                display: none;
+            }
 
             /* stat chips: 2-per-row */
-            .stat-bar { gap: 10px; }
-            .stat-chip { flex: 1 1 calc(50% - 10px); min-width: 140px; padding: 12px 16px; }
-            .stat-chip-value { font-size: 1.15rem; }
-            .stat-chip-icon { width: 36px; height: 36px; font-size: 1rem; }
+            .stat-bar {
+                gap: 10px;
+            }
+
+            .stat-chip {
+                flex: 1 1 calc(50% - 10px);
+                min-width: 140px;
+                padding: 12px 16px;
+            }
+
+            .stat-chip-value {
+                font-size: 1.15rem;
+            }
+
+            .stat-chip-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 1rem;
+            }
 
             /* filter bar */
             .global-filter-bar {
@@ -1866,169 +2043,508 @@
                 gap: 10px;
                 border-radius: 18px;
             }
-            .filter-divider { display: none; }
-            .clean-select, .clean-input { font-size: 0.75rem; padding: 5px 10px; }
+
+            .filter-divider {
+                display: none;
+            }
+
+            .clean-select,
+            .clean-input {
+                font-size: 0.75rem;
+                padding: 5px 10px;
+            }
 
             /* table */
-            .registry-table th, .registry-table td { padding: 10px 8px; font-size: 0.75rem; }
+            .registry-table th,
+            .registry-table td {
+                padding: 10px 8px;
+                font-size: 0.75rem;
+            }
 
             /* Gantt */
-            .gantt-pane { -webkit-overflow-scrolling: touch; }
-            .ui-card-header { padding: 14px 16px; flex-wrap: wrap; gap: 10px; }
-            .card-title { font-size: 0.62rem; }
+            .gantt-pane {
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .ui-card-header {
+                padding: 14px 16px;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .card-title {
+                font-size: 0.62rem;
+            }
 
             /* popup card */
-            .detail-card { width: 92vw; border-radius: 28px; }
-            .dc-top { padding: 24px 22px; flex-wrap: wrap; gap: 10px; }
-            .dc-main { padding: 22px; }
-            .dc-proj-code { font-size: 0.95rem; }
-            .dc-proj-days-num { font-size: 1.2rem; }
+            .detail-card {
+                width: 92vw;
+                border-radius: 28px;
+            }
+
+            .dc-top {
+                padding: 24px 22px;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .dc-main {
+                padding: 22px;
+            }
+
+            .dc-proj-code {
+                font-size: 0.95rem;
+            }
+
+            .dc-proj-days-num {
+                font-size: 1.2rem;
+            }
         }
 
         /* ── 768px: large phones / small tablets ── */
         @media (max-width: 768px) {
-            body { padding: 10px; }
+            body {
+                padding: 10px;
+            }
 
             /* header */
-            .app-header { padding: 16px 14px; gap: 12px; border-radius: 18px; }
-            .brand-logo-wrap { width: 44px; height: 44px; border-radius: 12px; }
-            .brand-name { font-size: 0.92rem; }
-            .brand-sub { font-size: 0.55rem; letter-spacing: 1px; }
-            .header-center-title { display: none; }
-            .btn-add-project, .btn-summary-nav {
+            .app-header {
+                padding: 16px 14px;
+                gap: 12px;
+                border-radius: 18px;
+            }
+
+            .brand-logo-wrap {
+                width: 44px;
+                height: 44px;
+                border-radius: 12px;
+            }
+
+            .brand-name {
+                font-size: 0.92rem;
+            }
+
+            .brand-sub {
+                font-size: 0.55rem;
+                letter-spacing: 1px;
+            }
+
+            .header-center-title {
+                display: none;
+            }
+
+            .btn-add-project,
+            .btn-summary-nav {
                 height: 36px;
                 padding: 0 14px;
                 font-size: 0.72rem;
             }
-            .btn-logout { width: 36px; height: 36px; font-size: 0.95rem; }
+
+            .btn-logout {
+                width: 36px;
+                height: 36px;
+                font-size: 0.95rem;
+            }
 
             /* stat chips: 2-per-row tighter */
-            .stat-bar { gap: 8px; }
-            .stat-chip { flex: 1 1 calc(50% - 8px); padding: 10px 12px; gap: 10px; border-radius: 14px; }
-            .stat-chip-icon { width: 32px; height: 32px; font-size: 0.9rem; border-radius: 10px; }
-            .stat-chip-value { font-size: 1.05rem; }
-            .stat-chip-label { font-size: 0.55rem; }
+            .stat-bar {
+                gap: 8px;
+            }
+
+            .stat-chip {
+                flex: 1 1 calc(50% - 8px);
+                padding: 10px 12px;
+                gap: 10px;
+                border-radius: 14px;
+            }
+
+            .stat-chip-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 0.9rem;
+                border-radius: 10px;
+            }
+
+            .stat-chip-value {
+                font-size: 1.05rem;
+            }
+
+            .stat-chip-label {
+                font-size: 0.55rem;
+            }
 
             /* filter bar: single line row */
-            .global-filter-bar { 
-                flex-direction: row; 
-                flex-wrap: nowrap; 
-                overflow-x: auto; 
-                padding: 10px 12px; 
-                gap: 10px; 
+            .global-filter-bar {
+                flex-direction: row;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                padding: 10px 12px;
+                gap: 10px;
                 align-items: center;
                 justify-content: flex-start;
                 border-radius: 100px;
                 -webkit-overflow-scrolling: touch;
             }
-            .filter-item { flex-shrink: 0; display: flex; align-items: center; gap: 6px; }
-            .filter-label { font-size: 0.6rem; margin: 0; white-space: nowrap; }
-            .clean-select, .clean-input { font-size: 0.7rem; width: auto !important; min-width: 80px; padding: 4px 10px; border-radius: 8px; }
-            .filter-divider { display: block; width: 1px; height: 16px; background: rgba(0,0,0,0.1); margin: 0 4px; }
+
+            .filter-item {
+                flex-shrink: 0;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+            .filter-label {
+                font-size: 0.6rem;
+                margin: 0;
+                white-space: nowrap;
+            }
+
+            .clean-select,
+            .clean-input {
+                font-size: 0.7rem;
+                width: auto !important;
+                min-width: 80px;
+                padding: 4px 10px;
+                border-radius: 8px;
+            }
+
+            .filter-divider {
+                display: block;
+                width: 1px;
+                height: 16px;
+                background: rgba(0, 0, 0, 0.1);
+                margin: 0 4px;
+            }
 
             /* Table: hide less critical columns */
             .registry-table th:nth-child(6),
-            .registry-table td:nth-child(6) { display: none; }  /* hide Exp column */
-            .registry-table th, .registry-table td { padding: 9px 6px; font-size: 0.72rem; }
-            .role-badge { font-size: 0.58rem; padding: 3px 8px; }
-            .proj-badge { font-size: 0.55rem; padding: 2px 5px; }
-            .action-btn { padding: 5px 8px; font-size: 0.8rem; }
+            .registry-table td:nth-child(6) {
+                display: none;
+            }
+
+            /* hide Exp column */
+            .registry-table th,
+            .registry-table td {
+                padding: 9px 6px;
+                font-size: 0.72rem;
+            }
+
+            .role-badge {
+                font-size: 0.58rem;
+                padding: 3px 8px;
+            }
+
+            .proj-badge {
+                font-size: 0.55rem;
+                padding: 2px 5px;
+            }
+
+            .action-btn {
+                padding: 5px 8px;
+                font-size: 0.8rem;
+            }
 
             /* Gantt card */
-            #ganttCard .ui-card-header { flex-direction: column; align-items: flex-start; }
-            .gantt-legend { gap: 8px; flex-wrap: wrap; }
-            .legend-label { font-size: 0.6rem; }
-            .legend-dot { width: 8px; height: 8px; }
+            #ganttCard .ui-card-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .gantt-legend {
+                gap: 8px;
+                flex-wrap: wrap;
+            }
+
+            .legend-label {
+                font-size: 0.6rem;
+            }
+
+            .legend-dot {
+                width: 8px;
+                height: 8px;
+            }
 
             /* popup card */
-            .detail-card { width: 96vw; max-width: 96vw; border-radius: 22px; }
-            .dc-top { padding: 20px 18px; }
-            .dc-main { padding: 18px; }
-            .dc-avatar { width: 56px; height: 56px; font-size: 1.2rem; }
-            h3#pName { font-size: 1.25rem !important; }
-            .dc-role-badge { font-size: 0.6rem; padding: 5px 12px; }
-            .dc-dept-tag { font-size: 0.58rem; padding: 5px 10px; }
-            .dc-proj-card { padding: 14px 14px; gap: 12px; }
-            .dc-proj-dot { width: 48px; height: 48px; border-radius: 12px; font-size: 0.55rem; }
+            .detail-card {
+                width: 96vw;
+                max-width: 96vw;
+                border-radius: 22px;
+            }
+
+            .dc-top {
+                padding: 20px 18px;
+            }
+
+            .dc-main {
+                padding: 18px;
+            }
+
+            .dc-avatar {
+                width: 56px;
+                height: 56px;
+                font-size: 1.2rem;
+            }
+
+            h3#pName {
+                font-size: 1.25rem !important;
+            }
+
+            .dc-role-badge {
+                font-size: 0.6rem;
+                padding: 5px 12px;
+            }
+
+            .dc-dept-tag {
+                font-size: 0.58rem;
+                padding: 5px 10px;
+            }
+
+            .dc-proj-card {
+                padding: 14px 14px;
+                gap: 12px;
+            }
+
+            .dc-proj-dot {
+                width: 48px;
+                height: 48px;
+                border-radius: 12px;
+                font-size: 0.55rem;
+            }
 
             /* assign modal date grid */
-            .assign-date-grid { flex-direction: column; gap: 8px; }
-            .assign-date-arrow { padding-bottom: 0; text-align: center; }
+            .assign-date-grid {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .assign-date-arrow {
+                padding-bottom: 0;
+                text-align: center;
+            }
 
             /* modals */
-            .modal-content { border-radius: 18px; }
-            .modal-hdr-dark { padding: 18px 22px; }
-            .modal-body { padding: 22px !important; }
+            .modal-content {
+                border-radius: 18px;
+            }
+
+            .modal-hdr-dark {
+                padding: 18px 22px;
+            }
+
+            .modal-body {
+                padding: 22px !important;
+            }
         }
 
         /* ── 576px: standard phones ── */
         @media (max-width: 576px) {
-            body { padding: 8px; }
+            body {
+                padding: 8px;
+            }
 
             /* header: compact single row */
-            .app-header { padding: 12px 12px; border-radius: 16px; }
-            .brand-logo-wrap { width: 38px; height: 38px; }
-            .brand-name { font-size: 0.85rem; }
+            .app-header {
+                padding: 12px 12px;
+                border-radius: 16px;
+            }
+
+            .brand-logo-wrap {
+                width: 38px;
+                height: 38px;
+            }
+
+            .brand-name {
+                font-size: 0.85rem;
+            }
+
             .btn-add-project span,
-            .btn-summary-nav span { display: none; }  /* icon-only on tiny screens */
-            .btn-add-project, .btn-summary-nav { padding: 0 12px; }
+            .btn-summary-nav span {
+                display: none;
+            }
+
+            /* icon-only on tiny screens */
+            .btn-add-project,
+            .btn-summary-nav {
+                padding: 0 12px;
+            }
 
             /* stat chips: full-width on very small */
-            .stat-chip { flex: 1 1 calc(50% - 6px); padding: 8px 10px; border-radius: 12px; }
-            .stat-chip-value { font-size: 0.95rem; }
+            .stat-chip {
+                flex: 1 1 calc(50% - 6px);
+                padding: 8px 10px;
+                border-radius: 12px;
+            }
+
+            .stat-chip-value {
+                font-size: 0.95rem;
+            }
 
             /* filter bar: single line compact */
-            .global-filter-bar { padding: 8px 10px; gap: 6px; border-radius: 16px; justify-content: flex-start; }
-            .filter-label { font-size: 0.55rem; }
-            .clean-select, .clean-input { font-size: 0.68rem; min-width: 70px; padding: 3px 8px; }
-            .filter-divider { height: 14px; margin: 0 2px; }
+            .global-filter-bar {
+                padding: 8px 10px;
+                gap: 6px;
+                border-radius: 16px;
+                justify-content: flex-start;
+            }
+
+            .filter-label {
+                font-size: 0.55rem;
+            }
+
+            .clean-select,
+            .clean-input {
+                font-size: 0.68rem;
+                min-width: 70px;
+                padding: 3px 8px;
+            }
+
+            .filter-divider {
+                height: 14px;
+                margin: 0 2px;
+            }
 
             /* table: further hide columns */
             .registry-table th:nth-child(5),
-            .registry-table td:nth-child(5) { display: none; }  /* hide Dept column */
-            .registry-table th, .registry-table td { padding: 8px 5px; font-size: 0.68rem; }
+            .registry-table td:nth-child(5) {
+                display: none;
+            }
+
+            /* hide Dept column */
+            .registry-table th,
+            .registry-table td {
+                padding: 8px 5px;
+                font-size: 0.68rem;
+            }
 
             /* Gantt: reduce sidebar width */
-            :root { --gantt-sidebar-width: 130px; }
-            .g-res-name { font-size: 0.72rem; }
-            .g-res-role { font-size: 0.52rem; }
+            :root {
+                --gantt-sidebar-width: 130px;
+            }
+
+            .g-res-name {
+                font-size: 0.72rem;
+            }
+
+            .g-res-role {
+                font-size: 0.52rem;
+            }
 
             /* popup */
-            .detail-card { width: 98vw; inset: auto; top: 50%; left: 50%; border-radius: 18px; }
-            .dc-top { flex-direction: column; align-items: flex-start; gap: 12px; }
-            .dc-stat-row { grid-template-columns: repeat(2, 1fr); }
-            .dc-proj-code { font-size: 0.85rem; }
-            .dc-proj-days-num { font-size: 1rem; }
+            .detail-card {
+                width: 98vw;
+                inset: auto;
+                top: 50%;
+                left: 50%;
+                border-radius: 18px;
+            }
+
+            .dc-top {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .dc-stat-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .dc-proj-code {
+                font-size: 0.85rem;
+            }
+
+            .dc-proj-days-num {
+                font-size: 1rem;
+            }
 
             /* modals */
-            .modal-dialog { margin: 8px; }
-            .modal-body { padding: 14px !important; }
+            .modal-dialog {
+                margin: 8px;
+            }
+
+            .modal-body {
+                padding: 14px !important;
+            }
         }
 
         /* ── 400px: very small phones ── */
         @media (max-width: 400px) {
-            body { padding: 6px; }
+            body {
+                padding: 6px;
+            }
 
-            .app-header { padding: 10px; border-radius: 14px; gap: 8px; }
-            .brand-name { font-size: 0.78rem; }
-            .stat-chip { flex: 1 1 100%; }  /* single column */
-            .stat-bar { gap: 6px; }
+            .app-header {
+                padding: 10px;
+                border-radius: 14px;
+                gap: 8px;
+            }
 
-            .global-filter-bar { padding: 6px 8px; gap: 4px; }
-            .filter-label { font-size: 0.52rem; }
-            .clean-select, .clean-input { font-size: 0.62rem; min-width: 60px; padding: 2px 6px; }
-            .filter-divider { height: 12px; margin: 0 2px; }
+            .brand-name {
+                font-size: 0.78rem;
+            }
 
-            .ui-card-header { padding: 10px 12px; }
-            .registry-table th, .registry-table td { padding: 7px 4px; font-size: 0.62rem; }
+            .stat-chip {
+                flex: 1 1 100%;
+            }
 
-            :root { --gantt-sidebar-width: 110px; }
-            .g-res-name { font-size: 0.65rem; }
+            /* single column */
+            .stat-bar {
+                gap: 6px;
+            }
 
-            .detail-card { border-radius: 14px; }
-            .dc-top { padding: 14px; }
-            .dc-main { padding: 14px; }
-            h3#pName { font-size: 1.05rem !important; }
+            .global-filter-bar {
+                padding: 6px 8px;
+                gap: 4px;
+            }
+
+            .filter-label {
+                font-size: 0.52rem;
+            }
+
+            .clean-select,
+            .clean-input {
+                font-size: 0.62rem;
+                min-width: 60px;
+                padding: 2px 6px;
+            }
+
+            .filter-divider {
+                height: 12px;
+                margin: 0 2px;
+            }
+
+            .ui-card-header {
+                padding: 10px 12px;
+            }
+
+            .registry-table th,
+            .registry-table td {
+                padding: 7px 4px;
+                font-size: 0.62rem;
+            }
+
+            :root {
+                --gantt-sidebar-width: 110px;
+            }
+
+            .g-res-name {
+                font-size: 0.65rem;
+            }
+
+            .detail-card {
+                border-radius: 14px;
+            }
+
+            .dc-top {
+                padding: 14px;
+            }
+
+            .dc-main {
+                padding: 14px;
+            }
+
+            h3#pName {
+                font-size: 1.05rem !important;
+            }
         }
 
         /* ── WAKING SERVER LOADER ── */
@@ -2057,7 +2573,9 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         .loader-title {
@@ -2168,8 +2686,13 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         .menu-toggle {
@@ -2206,13 +2729,16 @@
         .sidebar-content::-webkit-scrollbar {
             width: 4px;
         }
+
         .sidebar-content::-webkit-scrollbar-track {
             background: transparent;
         }
+
         .sidebar-content::-webkit-scrollbar-thumb {
             background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
         }
+
         .sidebar-content::-webkit-scrollbar-thumb:hover {
             background: rgba(255, 255, 255, 0.2);
         }
@@ -2227,42 +2753,49 @@
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="d-flex align-items-center gap-3">
-                <div style="width: 45px; height: 45px; background: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; padding: 4px;">
-                    <img src="asset/image.png" alt="Logo" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                <div
+                    style="width: 45px; height: 45px; background: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; padding: 4px;">
+                    <img src="asset/image.png" alt="Logo"
+                        style="max-width: 100%; max-height: 100%; object-fit: contain;">
                 </div>
                 <div>
                     <div style="font-weight: 900; font-size: 1.2rem; letter-spacing: 1px; color: white;">DANPREL</div>
-                    <div style="font-size: 0.65rem; color: #94a3b8; font-weight: 600; text-transform: uppercase;">Engineering Automation</div>
+                    <div style="font-size: 0.65rem; color: #94a3b8; font-weight: 600; text-transform: uppercase;">
+                        Engineering Automation</div>
                 </div>
             </div>
             <button class="btn-close btn-close-white" onclick="toggleSidebar()"></button>
         </div>
         <div class="sidebar-content">
             <a href="summary.html" class="sidebar-btn">
-                <i class="bi bi-bar-chart-fill"></i> Resource Summary
+                <i class="bi bi-bar-chart-fill"></i> Man Power Summary
             </a>
             <a href="machine_summary.html" class="sidebar-btn">
                 <i class="bi bi-cpu-fill"></i> Machine Summary
             </a>
             <a href="resource.html" class="sidebar-btn active">
-                <i class="bi bi-people-fill"></i> Resource Allocation
+                <i class="bi bi-people-fill"></i> Man Power Allocation
             </a>
             <a href="machine.html" class="sidebar-btn">
                 <i class="bi bi-hdd-rack-fill"></i> Machine Allocation
             </a>
 
             <!-- Action Button -->
-            <button class="sidebar-btn w-100 border-0 text-start" onclick="toggleSidebar(); openPinModal()" style="background: rgba(255, 255, 255, 0.05); margin-top: 20px;">
+            <button class="sidebar-btn w-100 border-0 text-start" onclick="toggleSidebar(); openPinModal()"
+                style="background: rgba(255, 255, 255, 0.05); margin-top: 20px;">
                 <i class="bi bi-folder-plus"></i> Add Project
             </button>
 
             <!-- Feedback Section -->
             <div class="sidebar-feedback pt-3" style="margin-top: 10px;">
-                <div style="font-size: 0.65rem; color: #94a3b8; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Share Feedback</div>
-                <textarea id="sidebarFeedbackText" class="form-control" 
-                    style="font-size: 0.8rem; border-radius: 12px; min-height: 80px; background: white !important; color: black !important; border: 1px solid rgba(0,0,0,0.1) !important; margin-bottom: 10px; resize: none;" 
+                <div
+                    style="font-size: 0.65rem; color: #94a3b8; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">
+                    Share Feedback</div>
+                <textarea id="sidebarFeedbackText" class="form-control"
+                    style="font-size: 0.8rem; border-radius: 12px; min-height: 80px; background: white !important; color: black !important; border: 1px solid rgba(0,0,0,0.1) !important; margin-bottom: 10px; resize: none;"
                     placeholder="Suggest features or report issues..."></textarea>
-                <button onclick="submitSidebarFeedback()" class="sidebar-btn w-100 justify-content-center" style="background: var(--teal-bright); color: white; border: none; box-shadow: 0 4px 12px rgba(20, 184, 166, 0.2);">
+                <button onclick="submitSidebarFeedback()" class="sidebar-btn w-100 justify-content-center"
+                    style="background: var(--teal-bright); color: white; border: none; box-shadow: 0 4px 12px rgba(20, 184, 166, 0.2);">
                     Submit Feedback
                 </button>
             </div>
@@ -2294,7 +2827,7 @@
                 <div style="text-align: left;">
                     <div
                         style="margin: 0; font-weight: 700; font-size: 1rem; color: white; letter-spacing: 0.5px; line-height: 1.2;">
-                        Resource Allocation Dashboard</div>
+                        Man Power Allocation Dashboard</div>
                 </div>
             </div>
         </div>
@@ -2536,10 +3069,11 @@
                     </div>
                 </div>
                 <div class="modal-body">
-                    <div class="d-flex align-items-center gap-2 mb-4 p-3 rounded-3" style="background:#f0f7ff; border: 1px solid #bfdbfe;">
+                    <div class="d-flex align-items-center gap-2 mb-4 p-3 rounded-3"
+                        style="background:#f0f7ff; border: 1px solid #bfdbfe;">
                         <i class="bi bi-calendar-check-fill text-primary"></i>
                         <div class="small fw-700 text-muted">
-                            Applying current filter range: 
+                            Applying current filter range:
                             <span id="exportRangeLabel" class="text-primary ms-1"></span>
                         </div>
                     </div>
@@ -3186,12 +3720,12 @@
             /* ── GANTT (per-project colours, vertically-stacked lanes) ── */
             const weeks = window._ganttWeeks || [];
             const trackW = weeks.length * WEEK_W;
-            
+
             // Responsive lane heights
             let LANE_H = 48;   // height of each bar including gap
             let BAR_H = 38;    // actual visible bar height
             let LANE_PAD = 10; // top padding before first lane
-            
+
             if (window.innerWidth <= 768) {
                 LANE_H = 40;
                 BAR_H = 32;
@@ -3733,7 +4267,7 @@
         function exportGantt() {
             const fFrom = document.getElementById('fFrom').value;
             const fTo = document.getElementById('fTo').value;
-            
+
             // Show range text in modal
             const lbl = document.getElementById('exportRangeLabel');
             if (lbl) {
@@ -3961,7 +4495,7 @@
                 showToast('<i class="bi bi-exclamation-circle me-2" style="color:#f59e0b"></i>Please enter some feedback');
                 return;
             }
-            
+
             try {
                 const res = await fetch('/api/add-feedback', {
                     method: 'POST',

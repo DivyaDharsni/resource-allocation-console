@@ -505,15 +505,22 @@
             white-space: nowrap;
         }
 
-        .dept-tbl thead th:first-child { border-radius: 10px 0 0 10px; }
-        .dept-tbl thead th:last-child  { border-radius: 0 10px 10px 0; }
+        .dept-tbl thead th:first-child {
+            border-radius: 10px 0 0 10px;
+        }
+
+        .dept-tbl thead th:last-child {
+            border-radius: 0 10px 10px 0;
+        }
 
         .dept-tbl tbody tr {
             border-bottom: 1px solid #f1f5f9;
             transition: background .2s;
         }
 
-        .dept-tbl tbody tr:hover { background: #f8fafc; }
+        .dept-tbl tbody tr:hover {
+            background: #f8fafc;
+        }
 
         .dept-tbl tbody td {
             padding: 14px 18px;
@@ -536,11 +543,30 @@
             font-weight: 800;
         }
 
-        .tbl-badge.alloc { background: #eef2ff; color: #4f46e5; }
-        .tbl-badge.free  { background: #f0fdf4; color: #059669; }
-        .tbl-badge.days  { background: #fef9c3; color: #854d0e; }
-        .tbl-badge.util-high { background: #fef2f2; color: #ef4444; }
-        .tbl-badge.util-ok   { background: #f0fdf4; color: #14b8a6; }
+        .tbl-badge.alloc {
+            background: #eef2ff;
+            color: #4f46e5;
+        }
+
+        .tbl-badge.free {
+            background: #f0fdf4;
+            color: #059669;
+        }
+
+        .tbl-badge.days {
+            background: #fef9c3;
+            color: #854d0e;
+        }
+
+        .tbl-badge.util-high {
+            background: #fef2f2;
+            color: #ef4444;
+        }
+
+        .tbl-badge.util-ok {
+            background: #f0fdf4;
+            color: #14b8a6;
+        }
 
         @media (max-width: 992px) {
             .totals-bar {
@@ -714,13 +740,16 @@
         .sidebar-content::-webkit-scrollbar {
             width: 4px;
         }
+
         .sidebar-content::-webkit-scrollbar-track {
             background: transparent;
         }
+
         .sidebar-content::-webkit-scrollbar-thumb {
             background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
         }
+
         .sidebar-content::-webkit-scrollbar-thumb:hover {
             background: rgba(255, 255, 255, 0.2);
         }
@@ -750,6 +779,375 @@
             transform: translateY(0);
             opacity: 1;
         }
+
+        /* ══════════════════════════════════════════════════════
+           RESPONSIVE — machine_summary.html
+        ══════════════════════════════════════════════════════ */
+
+        /* ── 992px: tablets ── */
+        @media (max-width: 992px) {
+            body {
+                padding: 14px;
+            }
+
+            .app-header {
+                padding: 12px 16px;
+                border-radius: 18px;
+                gap: 10px;
+            }
+
+            .brand-box {
+                gap: 10px;
+            }
+
+            .totals-bar {
+                gap: 16px;
+                padding: 18px 20px;
+            }
+
+            .total-val {
+                font-size: 2rem;
+            }
+
+            .chart-wrapper {
+                height: 380px;
+            }
+
+            .filter-pill {
+                border-radius: 20px;
+                padding: 14px 18px;
+            }
+
+            .filter-bar-wrap {
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: flex-start;
+            }
+        }
+
+        /* ── 768px: large phones ── */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .app-header {
+                padding: 10px 14px;
+                border-radius: 16px;
+                gap: 8px;
+                flex-wrap: nowrap;
+            }
+
+            .brand-logo-wrap {
+                width: 38px;
+                height: 38px;
+                border-radius: 10px;
+            }
+
+            .brand-name {
+                font-size: 0.85rem;
+            }
+
+            .brand-sub {
+                font-size: 0.52rem;
+            }
+
+            /* hide center dashboard pill on phones */
+            .app-header>div:nth-child(2) {
+                display: none;
+            }
+
+            .live-clock {
+                font-size: 0.6rem;
+            }
+
+            .btn-logout {
+                width: 36px;
+                height: 36px;
+                font-size: 1.1rem;
+                border-radius: 10px;
+            }
+
+            /* totals: 2 x 2 grid */
+            .totals-bar {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                padding: 16px 14px;
+                gap: 16px;
+                border-radius: 18px;
+            }
+
+            .total-item {
+                width: 100%;
+                border-bottom: 1px solid rgba(255, 255, 255, .05);
+                padding-bottom: 10px;
+            }
+
+            .total-item:nth-last-child(-n+2) {
+                border-bottom: none;
+                padding-bottom: 0;
+            }
+
+            .total-val {
+                font-size: 1.8rem;
+            }
+
+            .total-lbl {
+                font-size: 0.65rem;
+            }
+
+            /* chart */
+            .chart-wrapper {
+                height: 320px;
+                border-radius: 12px;
+            }
+
+            .chart-card-top {
+                padding: 18px 18px 14px;
+            }
+
+            .chart-card-bottom {
+                padding: 14px 18px 18px;
+            }
+
+            .chart-title {
+                font-size: 1rem;
+            }
+
+            .chart-subtitle {
+                font-size: 0.7rem;
+            }
+
+            .chart-card-header {
+                margin-bottom: 14px;
+                gap: 10px;
+            }
+
+            .legend-item {
+                font-size: 0.7rem;
+                padding: 5px 10px;
+            }
+
+            .y-axis-label {
+                display: none;
+            }
+
+            /* filter pill: scrollable */
+            .filter-pill {
+                border-radius: 14px;
+                padding: 10px 14px;
+                gap: 8px;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                width: auto;
+            }
+
+            .fp-item {
+                flex-shrink: 0;
+                gap: 6px;
+            }
+
+            .fp-select {
+                font-size: 0.75rem;
+                padding: 5px 10px;
+                min-width: 80px;
+            }
+
+            .fp-label {
+                font-size: 0.65rem;
+            }
+
+            /* table */
+            .dept-tbl thead th,
+            .dept-tbl tbody td {
+                padding: 12px 14px;
+                font-size: 0.8rem;
+            }
+
+            .tbl-badge {
+                font-size: 0.7rem;
+                padding: 4px 10px;
+            }
+
+            .dept-table-title {
+                font-size: 0.7rem;
+            }
+        }
+
+        /* ── 576px: standard phones ── */
+        @media (max-width: 576px) {
+            body {
+                padding: 8px;
+            }
+
+            .app-header {
+                padding: 8px 12px;
+                border-radius: 14px;
+            }
+
+            .brand-logo-wrap {
+                width: 32px;
+                height: 32px;
+            }
+
+            .brand-name {
+                font-size: 0.78rem;
+            }
+
+            .brand-sub {
+                display: none;
+            }
+
+            .live-clock {
+                display: none;
+            }
+
+            /* totals: still 2-col but smaller */
+            .totals-bar {
+                gap: 12px;
+                padding: 14px 12px;
+            }
+
+            .total-val {
+                font-size: 1.5rem;
+            }
+
+            .total-lbl {
+                font-size: 0.6rem;
+            }
+
+            /* chart */
+            .chart-wrapper {
+                height: 260px;
+            }
+
+            .chart-card {
+                border-radius: 18px;
+            }
+
+            .chart-card-top {
+                padding: 14px 14px 10px;
+                border-radius: 18px 18px 0 0;
+            }
+
+            .chart-card-bottom {
+                padding: 12px 14px 16px;
+            }
+
+            .chart-title {
+                font-size: 0.9rem;
+            }
+
+            .legend-item {
+                font-size: 0.65rem;
+                padding: 4px 10px;
+            }
+
+            /* filter */
+            .filter-bar-wrap {
+                margin-bottom: 14px;
+                overflow: hidden;
+            }
+
+            .filter-pill {
+                padding: 8px 10px;
+                gap: 6px;
+            }
+
+            .fp-select {
+                font-size: 0.7rem;
+                padding: 4px 8px;
+                min-width: 65px;
+                border-radius: 8px;
+            }
+
+            .fp-label {
+                font-size: 0.58rem;
+            }
+
+            .fp-range-badge {
+                font-size: 0.65rem;
+                padding: 4px 10px;
+            }
+
+            /* table: horizontal scroll */
+            .dept-table-wrap {
+                margin: 0 -14px;
+                padding: 0 14px;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .dept-tbl thead th,
+            .dept-tbl tbody td {
+                padding: 10px 12px;
+                font-size: 0.75rem;
+            }
+
+            /* modal */
+            .modal-content {
+                border-radius: 18px;
+            }
+
+            .modal-hdr-dark {
+                padding: 16px 18px;
+            }
+        }
+
+        /* ── 400px: very small phones ── */
+        @media (max-width: 400px) {
+            body {
+                padding: 6px;
+            }
+
+            .app-header {
+                padding: 8px 10px;
+                gap: 5px;
+            }
+
+            .brand-logo-wrap {
+                width: 28px;
+                height: 28px;
+            }
+
+            .brand-name {
+                font-size: 0.72rem;
+            }
+
+            .totals-bar {
+                gap: 10px;
+                padding: 12px 10px;
+            }
+
+            .total-val {
+                font-size: 1.3rem;
+            }
+
+            .chart-wrapper {
+                height: 230px;
+            }
+
+            .chart-title {
+                font-size: 0.82rem;
+            }
+
+            .filter-pill {
+                padding: 6px 8px;
+                gap: 5px;
+            }
+
+            .fp-select {
+                font-size: 0.65rem;
+                min-width: 58px;
+            }
+
+            .dept-tbl thead th,
+            .dept-tbl tbody td {
+                padding: 8px 10px;
+                font-size: 0.7rem;
+            }
+        }
     </style>
 </head>
 
@@ -774,13 +1172,13 @@
         </div>
         <div class="sidebar-content">
             <a href="summary.html" class="sidebar-btn">
-                <i class="bi bi-bar-chart-fill"></i> Resource Summary
+                <i class="bi bi-bar-chart-fill"></i> Man Power Summary
             </a>
             <a href="machine_summary.html" class="sidebar-btn active">
                 <i class="bi bi-cpu-fill"></i> Machine Summary
             </a>
             <a href="resource.html" class="sidebar-btn">
-                <i class="bi bi-people-fill"></i> Resource Allocation
+                <i class="bi bi-people-fill"></i> Man Power Allocation
             </a>
             <a href="machine.html" class="sidebar-btn">
                 <i class="bi bi-hdd-rack-fill"></i> Machine Allocation
@@ -794,11 +1192,14 @@
 
             <!-- Feedback Section -->
             <div class="sidebar-feedback pt-3" style="margin-top: 10px;">
-                <div style="font-size: 0.65rem; color: #94a3b8; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Share Feedback</div>
-                <textarea id="sidebarFeedbackText" class="form-control" 
-                    style="font-size: 0.8rem; border-radius: 12px; min-height: 80px; background: white !important; color: black !important; border: 1px solid rgba(0,0,0,0.1) !important; margin-bottom: 10px; resize: none;" 
+                <div
+                    style="font-size: 0.65rem; color: #94a3b8; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">
+                    Share Feedback</div>
+                <textarea id="sidebarFeedbackText" class="form-control"
+                    style="font-size: 0.8rem; border-radius: 12px; min-height: 80px; background: white !important; color: black !important; border: 1px solid rgba(0,0,0,0.1) !important; margin-bottom: 10px; resize: none;"
                     placeholder="Suggest features or report issues..."></textarea>
-                <button onclick="submitSidebarFeedback()" class="sidebar-btn w-100 justify-content-center" style="background: var(--teal-bright); color: white; border: none; box-shadow: 0 4px 12px rgba(20, 184, 166, 0.2); margin-top: 0;">
+                <button onclick="submitSidebarFeedback()" class="sidebar-btn w-100 justify-content-center"
+                    style="background: var(--teal-bright); color: white; border: none; box-shadow: 0 4px 12px rgba(20, 184, 166, 0.2); margin-top: 0;">
                     Submit Feedback
                 </button>
             </div>
@@ -1268,7 +1669,7 @@
                 showToast('<i class="bi bi-exclamation-circle me-2" style="color:#f59e0b"></i>Please enter some feedback');
                 return;
             }
-            
+
             try {
                 const res = await fetch('/api/add-feedback', {
                     method: 'POST',
@@ -1279,7 +1680,7 @@
                 if (data.success) {
                     showToast('<i class="bi bi-check-circle-fill me-2" style="color:var(--teal-bright)"></i>Thank you! Feedback submmited.');
                     document.getElementById('sidebarFeedbackText').value = '';
-                    setTimeout(toggleSidebar, 1000); 
+                    setTimeout(toggleSidebar, 1000);
                 } else {
                     showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Error saving feedback.');
                 }

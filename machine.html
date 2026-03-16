@@ -1565,6 +1565,380 @@
             transform: translateY(0);
             opacity: 1;
         }
+
+        /* ══════════════════════════════════════════════════════
+           RESPONSIVE — machine.html
+        ══════════════════════════════════════════════════════ */
+
+        /* ── 992px: tablets ── */
+        @media (max-width: 992px) {
+            body {
+                padding: 14px;
+            }
+
+            .app-header {
+                padding: 12px 16px;
+                gap: 10px;
+                border-radius: 18px;
+            }
+
+            .brand-box {
+                gap: 10px;
+            }
+
+            .stat-bar {
+                gap: 10px;
+            }
+
+            .stat-chip {
+                padding: 12px 16px;
+                min-width: 120px;
+            }
+
+            .stat-chip-value {
+                font-size: 1.15rem;
+            }
+
+            .global-filter-bar {
+                padding: 12px 16px;
+                gap: 10px;
+            }
+
+            .clean-select,
+            .clean-input {
+                font-size: 0.75rem;
+                padding: 4px 10px;
+            }
+
+            .filter-label {
+                font-size: 0.65rem;
+            }
+
+            .ui-card-header {
+                padding: 16px 18px;
+            }
+
+            .registry-table th,
+            .registry-table td {
+                padding: 12px 14px;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* ── 768px: large phones ── */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .app-header {
+                padding: 10px 14px;
+                border-radius: 16px;
+                gap: 8px;
+                flex-wrap: nowrap;
+            }
+
+            .brand-logo-wrap {
+                width: 38px;
+                height: 38px;
+                border-radius: 10px;
+            }
+
+            .brand-name {
+                font-size: 0.85rem;
+            }
+
+            .brand-sub {
+                font-size: 0.52rem;
+            }
+
+            /* hide center title on mobile – shown in header already */
+            .app-header>div:nth-child(2) {
+                display: none;
+            }
+
+            .live-clock {
+                font-size: 0.6rem;
+            }
+
+            .btn-logout {
+                width: 36px;
+                height: 36px;
+                font-size: 1.1rem;
+                border-radius: 10px;
+            }
+
+            /* stat bar: 2x2 grid */
+            .stat-bar {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+                margin-bottom: 16px;
+            }
+
+            .stat-chip {
+                flex: none;
+                width: 100%;
+                min-width: 0;
+                padding: 12px 14px;
+            }
+
+            .stat-chip-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 1rem;
+            }
+
+            .stat-chip-value {
+                font-size: 1rem;
+            }
+
+            .stat-chip-label {
+                font-size: 0.58rem;
+            }
+
+            /* filter bar: scrollable row */
+            .global-filter-bar {
+                padding: 10px 14px;
+                gap: 8px;
+                border-radius: 16px;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                justify-content: flex-start;
+            }
+
+            .filter-divider {
+                flex-shrink: 0;
+            }
+
+            .filter-label {
+                font-size: 0.6rem;
+                gap: 4px;
+                flex-shrink: 0;
+            }
+
+            .clean-select,
+            .clean-input {
+                font-size: 0.72rem;
+                padding: 4px 8px;
+                min-width: 70px;
+                flex-shrink: 0;
+            }
+
+            /* cards */
+            .ui-card-header {
+                padding: 14px 16px;
+            }
+
+            .card-title {
+                font-size: 0.9rem;
+            }
+
+            /* table */
+            .registry-table th,
+            .registry-table td {
+                padding: 10px 12px;
+                font-size: 0.77rem;
+            }
+
+            .action-btn {
+                padding: 5px 8px;
+                font-size: 0.82rem;
+            }
+
+            .action-center-container {
+                padding: 3px 6px;
+                gap: 3px;
+            }
+
+            /* gantt: let it scroll horizontally */
+            .right-side {
+                overflow-x: auto;
+            }
+
+            /* add / export buttons */
+            .btn-add-machine,
+            .btn-export {
+                padding: 6px 12px;
+                font-size: 0.66rem;
+            }
+        }
+
+        /* ── 576px: standard phones ── */
+        @media (max-width: 576px) {
+            body {
+                padding: 8px;
+            }
+
+            .app-header {
+                padding: 8px 12px;
+                border-radius: 14px;
+            }
+
+            .brand-logo-wrap {
+                width: 32px;
+                height: 32px;
+            }
+
+            .brand-name {
+                font-size: 0.78rem;
+            }
+
+            .brand-sub {
+                display: none;
+            }
+
+            .live-clock {
+                display: none;
+            }
+
+            .stat-bar {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+                margin-bottom: 12px;
+            }
+
+            .stat-chip {
+                padding: 10px 12px;
+                border-radius: 12px;
+            }
+
+            .stat-chip-icon {
+                width: 30px;
+                height: 30px;
+                font-size: 0.85rem;
+                border-radius: 8px;
+            }
+
+            .stat-chip-value {
+                font-size: 0.9rem;
+            }
+
+            .stat-chip-label {
+                font-size: 0.52rem;
+            }
+
+            /* filter: compact */
+            .global-filter-bar {
+                padding: 8px 12px;
+                gap: 6px;
+                border-radius: 14px;
+            }
+
+            .clean-select,
+            .clean-input {
+                font-size: 0.68rem;
+                padding: 3px 7px;
+                min-width: 60px;
+            }
+
+            .filter-label {
+                font-size: 0.55rem;
+            }
+
+            .filter-divider {
+                height: 18px;
+            }
+
+            .ui-card-header {
+                padding: 12px 14px;
+            }
+
+            .card-title {
+                font-size: 0.82rem;
+            }
+
+            .btn-add-machine,
+            .btn-export {
+                padding: 5px 10px;
+                font-size: 0.62rem;
+            }
+
+            .registry-table th,
+            .registry-table td {
+                padding: 9px 10px;
+                font-size: 0.72rem;
+            }
+
+            /* modal */
+            .modal-content {
+                border-radius: 18px;
+            }
+
+            .modal-hdr-dark {
+                padding: 18px 20px;
+            }
+
+            .modal-body {
+                padding: 20px !important;
+            }
+
+            .form-control,
+            .form-select {
+                padding: 10px 12px;
+                font-size: 0.85rem;
+            }
+
+            /* gantt chart: narrow header text */
+            .g-res-name {
+                font-size: 0.68rem;
+            }
+
+            .g-res-sub {
+                font-size: 0.5rem;
+            }
+        }
+
+        /* ── 400px: very small phones ── */
+        @media (max-width: 400px) {
+            body {
+                padding: 6px;
+            }
+
+            .app-header {
+                padding: 8px 10px;
+                gap: 6px;
+            }
+
+            .brand-logo-wrap {
+                width: 28px;
+                height: 28px;
+            }
+
+            .brand-name {
+                font-size: 0.72rem;
+            }
+
+            .stat-bar {
+                gap: 6px;
+            }
+
+            .stat-chip {
+                padding: 8px 10px;
+            }
+
+            .stat-chip-value {
+                font-size: 0.82rem;
+            }
+
+            .global-filter-bar {
+                padding: 6px 10px;
+                gap: 5px;
+            }
+
+            .clean-select,
+            .clean-input {
+                font-size: 0.62rem;
+                min-width: 55px;
+            }
+
+            .registry-table th,
+            .registry-table td {
+                padding: 8px;
+                font-size: 0.68rem;
+            }
+        }
     </style>
 </head>
 
@@ -1589,13 +1963,13 @@
         </div>
         <div class="sidebar-content">
             <a href="summary.html" class="sidebar-btn">
-                <i class="bi bi-bar-chart-fill"></i> Resource Summary
+                <i class="bi bi-bar-chart-fill"></i> Man Power Summary
             </a>
             <a href="machine_summary.html" class="sidebar-btn">
                 <i class="bi bi-cpu-fill"></i> Machine Summary
             </a>
             <a href="resource.html" class="sidebar-btn">
-                <i class="bi bi-people-fill"></i> Resource Allocation
+                <i class="bi bi-people-fill"></i> Man Power Allocation
             </a>
             <a href="machine.html" class="sidebar-btn active">
                 <i class="bi bi-hdd-rack-fill"></i> Machine Allocation
@@ -2690,7 +3064,7 @@
             if (fmt === 'csv') {
                 showToast('Building Excel CSV...');
                 const genDateLong = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-                
+
                 let lines = [
                     `"DANPREL Engineering Automation"`,
                     `"Machine Allocation Master Report"`,
@@ -2738,7 +3112,7 @@
                 try {
                     // Capture Gantt Chart
                     const ganttEl = document.getElementById('ganttPane');
-                    
+
                     // Save scroll and reset to 0 for full capture
                     const oldScroll = ganttEl.scrollLeft;
                     const oldStyle = ganttEl.style.overflow;

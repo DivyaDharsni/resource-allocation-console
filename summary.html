@@ -1293,13 +1293,16 @@
         .sidebar-content::-webkit-scrollbar {
             width: 4px;
         }
+
         .sidebar-content::-webkit-scrollbar-track {
             background: transparent;
         }
+
         .sidebar-content::-webkit-scrollbar-thumb {
             background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
         }
+
         .sidebar-content::-webkit-scrollbar-thumb:hover {
             background: rgba(255, 255, 255, 0.2);
         }
@@ -1377,13 +1380,13 @@
         </div>
         <div class="sidebar-content">
             <a href="summary.html" class="sidebar-btn active">
-                <i class="bi bi-bar-chart-fill"></i> Resource Summary
+                <i class="bi bi-bar-chart-fill"></i> Man Power Summary
             </a>
             <a href="machine_summary.html" class="sidebar-btn">
                 <i class="bi bi-cpu-fill"></i> Machine Summary
             </a>
             <a href="resource.html" class="sidebar-btn">
-                <i class="bi bi-people-fill"></i> Resource Allocation
+                <i class="bi bi-people-fill"></i> Man Power Allocation
             </a>
             <a href="machine.html" class="sidebar-btn">
                 <i class="bi bi-hdd-rack-fill"></i> Machine Allocation
@@ -1397,11 +1400,14 @@
 
             <!-- Feedback Section -->
             <div class="sidebar-feedback pt-3" style="margin-top: 10px;">
-                <div style="font-size: 0.65rem; color: #94a3b8; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Share Feedback</div>
-                <textarea id="sidebarFeedbackText" class="form-control" 
-                    style="font-size: 0.8rem; border-radius: 12px; min-height: 80px; background: white !important; color: black !important; border: 1px solid rgba(0,0,0,0.1) !important; margin-bottom: 10px; resize: none;" 
+                <div
+                    style="font-size: 0.65rem; color: #94a3b8; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">
+                    Share Feedback</div>
+                <textarea id="sidebarFeedbackText" class="form-control"
+                    style="font-size: 0.8rem; border-radius: 12px; min-height: 80px; background: white !important; color: black !important; border: 1px solid rgba(0,0,0,0.1) !important; margin-bottom: 10px; resize: none;"
                     placeholder="Suggest features or report issues..."></textarea>
-                <button onclick="submitSidebarFeedback()" class="sidebar-btn w-100 justify-content-center" style="background: var(--teal-bright); color: white; border: none; box-shadow: 0 4px 12px rgba(20, 184, 166, 0.2); margin-top: 0;">
+                <button onclick="submitSidebarFeedback()" class="sidebar-btn w-100 justify-content-center"
+                    style="background: var(--teal-bright); color: white; border: none; box-shadow: 0 4px 12px rgba(20, 184, 166, 0.2); margin-top: 0;">
                     Submit Feedback
                 </button>
             </div>
@@ -1433,7 +1439,7 @@
                 <div style="text-align: left;">
                     <div
                         style="margin: 0; font-weight: 700; font-size: 1rem; color: white; letter-spacing: 0.5px; line-height: 1.2;">
-                        Resource Allocation Summary</div>
+                        Man Power Allocation Summary</div>
 
                 </div>
             </div>
@@ -1679,7 +1685,7 @@
                 showToast('<i class="bi bi-exclamation-circle me-2" style="color:#f59e0b"></i>Please enter some feedback');
                 return;
             }
-            
+
             try {
                 const res = await fetch('/api/add-feedback', {
                     method: 'POST',
@@ -1690,7 +1696,7 @@
                 if (data.success) {
                     showToast('<i class="bi bi-check-circle-fill me-2" style="color:var(--teal-bright)"></i>Thank you! Feedback submmited.');
                     document.getElementById('sidebarFeedbackText').value = '';
-                    setTimeout(toggleSidebar, 1000); 
+                    setTimeout(toggleSidebar, 1000);
                 } else {
                     showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Error saving feedback.');
                 }
