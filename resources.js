@@ -17,7 +17,7 @@
  *    • Software Development
  *
  *  Allowed values for Role:
- *    • Head      (Department Head)
+ *    • Manager   (Department Manager)
  *    • Lead      (Department Lead)
  *    • Member    (Team Member)
  *

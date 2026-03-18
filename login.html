@@ -325,54 +325,95 @@
 
         /* ── RESPONSIVE ── */
         @media (max-width: 480px) {
-            body { 
+            body {
                 padding: 1rem;
                 align-items: center;
                 overflow-y: auto;
             }
-            .login-wrap { 
-                padding: 0; 
+
+            .login-wrap {
+                padding: 0;
                 max-width: 100%;
             }
-            .login-card { 
-                border-radius: 20px; 
+
+            .login-card {
+                border-radius: 20px;
                 box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
             }
-            header { padding: 2rem 1.5rem 1rem; }
-            .logo-box { 
-                width: 70px; 
-                height: 70px; 
-                border-radius: 16px; 
-                margin-bottom: 1rem; 
+
+            header {
+                padding: 2rem 1.5rem 1rem;
             }
-            .brand-title { font-size: 1.5rem; }
-            .brand-subtitle { font-size: 0.7rem; }
-            .card-content { padding: 1rem 1.5rem 2.5rem; }
-            
-            .input { 
-                height: 50px; 
-                font-size: 0.95rem; 
-                padding-left: 46px; 
+
+            .logo-box {
+                width: 70px;
+                height: 70px;
+                border-radius: 16px;
+                margin-bottom: 1rem;
+            }
+
+            .brand-title {
+                font-size: 1.5rem;
+            }
+
+            .brand-subtitle {
+                font-size: 0.7rem;
+            }
+
+            .card-content {
+                padding: 1rem 1.5rem 2.5rem;
+            }
+
+            .input {
+                height: 50px;
+                font-size: 0.95rem;
+                padding-left: 46px;
                 border-radius: 10px;
             }
-            .icon { left: 16px; font-size: 1.1rem; }
-            .btn-login { 
-                height: 52px; 
-                font-size: 1rem; 
+
+            .icon {
+                left: 16px;
+                font-size: 1.1rem;
+            }
+
+            .btn-login {
+                height: 52px;
+                font-size: 1rem;
                 border-radius: 10px;
                 margin-top: 0.5rem;
             }
-            .form-options { margin-bottom: 1.5rem; }
-            .card-footer { padding: 1.25rem; }
-            .footer-text { font-size: 0.7rem; }
+
+            .form-options {
+                margin-bottom: 1.5rem;
+            }
+
+            .card-footer {
+                padding: 1.25rem;
+            }
+
+            .footer-text {
+                font-size: 0.7rem;
+            }
         }
 
         /* ── Extra Small Devices ── */
         @media (max-width: 360px) {
-            .brand-title { font-size: 1.3rem; }
-            .logo-box { width: 60px; height: 60px; }
-            header { padding: 1.5rem 1rem 0.5rem; }
-            .card-content { padding: 0.5rem 1rem 2rem; }
+            .brand-title {
+                font-size: 1.3rem;
+            }
+
+            .logo-box {
+                width: 60px;
+                height: 60px;
+            }
+
+            header {
+                padding: 1.5rem 1rem 0.5rem;
+            }
+
+            .card-content {
+                padding: 0.5rem 1rem 2rem;
+            }
         }
     </style>
 </head>
@@ -439,8 +480,17 @@
     </div>
 
     <script>
-        const VALID_USER = 'danprelresource';
-        const VALID_PASS = 'danprel';
+        const CREDENTIALS = {
+            'resource@mechdesign': { pass: 'mechdesign', dept: 'Mechanical Design', page: 'summary.html' },
+            'resource@mechassembly': { pass: 'mechassembly', dept: 'Mechanical Assembly', page: 'summary.html' },
+            'resource@elecdesign': { pass: 'elecdesign', dept: 'Electrical Design', page: 'summary.html' },
+            'resource@elecassembly': { pass: 'elecassembly', dept: 'Electrical Assembly', page: 'summary.html' },
+            'resource@robot': { pass: 'robot', dept: 'Robot Programming', page: 'summary.html' },
+            'resource@labview': { pass: 'labview', dept: 'LabVIEW Programming', page: 'summary.html' },
+            'resource@plc': { pass: 'plc', dept: 'PLC Programming', page: 'summary.html' },
+            'resource@machine': { pass: 'machine', dept: 'Machine Allocation', page: 'machine_summary.html' },
+            'resource@danprel': { pass: 'danprel@2026', dept: 'All', page: 'summary.html' }
+        };
 
         const loginForm = document.getElementById('login-form');
         const submitBtn = document.getElementById('submit-btn');
@@ -479,7 +529,8 @@
             if (icon) icon.style.display = 'none';
 
             setTimeout(() => {
-                if (user === VALID_USER && pass === VALID_PASS) {
+                const cred = CREDENTIALS[user];
+                if (cred && cred.pass === pass) {
                     // Handle Remember Me
                     if (rememberCheck.checked) {
                         localStorage.setItem('remembered_user', user);
@@ -488,7 +539,8 @@
                     }
 
                     localStorage.setItem('danprel_auth', 'true');
-                    window.location.href = 'summary.html';
+                    localStorage.setItem('user_dept', cred.dept);
+                    window.location.href = cred.page;
                 } else {
                     submitBtn.disabled = false;
                     btnText.textContent = 'Sign In';

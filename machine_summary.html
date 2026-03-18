@@ -1149,6 +1149,61 @@
                 font-size: 0.7rem;
             }
         }
+        .btn-export {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 18px;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.25s;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(8px);
+        }
+
+        .btn-export:hover,
+        .btn-export.show {
+            background: white;
+            color: var(--navy-dark);
+            transform: translateY(-1px);
+            border-color: white;
+        }
+
+        .export-dropdown-menu {
+            background: var(--navy-dark);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            margin-top: 8px !important;
+            padding: 8px;
+        }
+
+        .export-dropdown-item {
+            color: rgba(255, 255, 255, 0.8) !important;
+            font-weight: 700;
+            font-size: 0.8rem;
+            padding: 10px 16px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.2s;
+        }
+
+        .export-dropdown-item:hover {
+            background: rgba(255, 255, 255, 0.1) !important;
+            color: white !important;
+            transform: translateX(4px);
+        }
+
+        .export-dropdown-item i {
+            font-size: 1.1rem;
+        }
     </style>
 </head>
 
@@ -1188,7 +1243,7 @@
             <!-- Action Button -->
             <a href="resource.html?add=project" class="sidebar-btn"
                 style="background: rgba(255, 255, 255, 0.05); margin-top: 20px;">
-                <i class="bi bi-folder-plus"></i> Add Project
+                <i class="bi bi-kanban"></i> Project Hub
             </a>
 
             <!-- Feedback Section -->
@@ -1325,9 +1380,27 @@
                 </div>
                 <div class="chart-header-actions" style="position:relative;z-index:10;">
                     <div class="chart-legend" id="chartLegend"></div>
-                    <button class="btn-export" onclick="exportPDF()">
-                        <i class="bi bi-file-earmark-pdf-fill"></i> DOWNLOAD PDF
-                    </button>
+                    <div class="dropdown">
+                        <button class="btn-export dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            <i class="bi bi-download"></i> Export
+                        </button>
+                        <ul class="dropdown-menu export-dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item export-dropdown-item" href="#"
+                                    onclick="exportSummary('pdf'); return false;">
+                                    <i class="bi bi-file-earmark-pdf-fill" style="color:#ef4444;"></i> Download PDF
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item export-dropdown-item" href="#"
+                                    onclick="exportSummary('csv'); return false;">
+                                    <i class="bi bi-file-earmark-spreadsheet-fill" style="color:#10b981;"></i> Download
+                                    CSV/Excel
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1374,15 +1447,18 @@
 
         function setupYearDropdown() {
             const sel = document.getElementById('selYear');
-            const year = new Date().getFullYear();
+            const now = new Date();
+            const curY = now.getFullYear();
+            const curM = now.getMonth();
+            
             sel.innerHTML = '';
-            [year - 1, year, year + 1, year + 2].forEach(y => {
+            for (let y = curY - 1; y <= curY + 3; y++) {
                 const opt = document.createElement('option');
                 opt.value = y; opt.textContent = y;
-                if (y === year) opt.selected = true;
+                if (y === curY) opt.selected = true;
                 sel.appendChild(opt);
-            });
-            document.getElementById('selMonth').value = new Date().getMonth();
+            }
+            document.getElementById('selMonth').value = curM;
         }
 
         async function fetchData() {
@@ -1710,30 +1786,145 @@
             window.location.replace('login.html');
         }
 
-        async function exportPDF() {
-            showToast('<i class="bi bi-hourglass-split me-2"></i>Preparing PDF report...');
-            try {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF('l', 'mm', 'a4');
-                doc.setFontSize(20); doc.setTextColor(0, 31, 63);
-                doc.text("Machine Utilization Report", 14, 20);
+        /* ══════════════════════════════════════════════════════
+           EXPORT LOGIC
+        ══════════════════════════════════════════════════════ */
+        async function exportSummary(format) {
+            const mLabel = document.getElementById('selMonth').options[document.getElementById('selMonth').selectedIndex].text;
+            const yLabel = document.getElementById('selYear').value;
+            const wLabel = document.getElementById('selWeek').value === 'ALL' ? 'Full Month' : `Week ${document.getElementById('selWeek').value}`;
+            const rangeText = document.getElementById('rangeBadge').textContent;
+            const genDate = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+            const title = `Machine_Allocation_Summary_${mLabel}_${yLabel}_${wLabel.replace(' ', '_')}`;
 
-                const head = [['Machine Name', 'ID', 'Period Usage (Days)', 'Utilization %']];
-                const body = machines.map(m => {
-                    const stat = assignments.filter(a => a.machineId === m.machineId).length;
-                    return [m.name, m.machineId, stat, "N/A"];
-                });
+            // We need the data from the current view. 
+            // The logic in updateAnalysis already calculates 'stats' and 'maxDays' internally.
+            // Let's re-trigger part of updateAnalysis logic to get a fresh array for export
+            const mIdx = parseInt(document.getElementById('selMonth').value);
+            const yVal = parseInt(document.getElementById('selYear').value);
+            const wVal = document.getElementById('selWeek').value;
 
-                doc.autoTable({ startY: 30, head: head, body: body, theme: 'grid' });
-                doc.save('Machine_Loading_Report.pdf');
-                showToast('<i class="bi bi-check-circle-fill me-2" style="color:var(--teal-bright)"></i>PDF Report saved successfully!');
-            } catch (err) {
-                console.error(err);
-                showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>PDF Export failed.');
+            const start = new Date(yVal, mIdx, 1);
+            const end = new Date(yVal, mIdx + 1, 0);
+            let sDate = start, eDate = end;
+
+            if (wVal !== 'ALL') {
+                const weekParts = wVal.split('|');
+                sDate = new Date(weekParts[0] + 'T00:00:00');
+                eDate = new Date(weekParts[1] + 'T00:00:00');
             }
+            const totalPeriodDays = Math.ceil((eDate - sDate) / 86400000) + 1;
+
+            const exportData = machines.map(m => {
+                let allocCount = 0;
+                assignments.filter(a => a.machineId === m.machineId).forEach(a => {
+                    const as = new Date(a.start + 'T00:00:00');
+                    const ae = new Date(a.end + 'T00:00:00');
+                    const is = (as > sDate) ? as : sDate;
+                    const ie = (ae < eDate) ? ae : eDate;
+                    if (is <= ie) {
+                        allocCount += Math.ceil((ie - is) / 86400000) + 1;
+                    }
+                });
+                const util = Math.round((allocCount / totalPeriodDays) * 100);
+                return {
+                    name: m.name,
+                    id: m.machineId,
+                    capacity: totalPeriodDays,
+                    allocated: allocCount,
+                    idle: totalPeriodDays - allocCount,
+                    util: util
+                };
+            });
+
+            if (format === 'csv') {
+                try {
+                    const lines = [
+                        `"DANPREL Engineering Automation"`,
+                        `"Machine Utilization Summary Report"`,
+                        `"Period: ${mLabel} ${yVal} (${wLabel})"`,
+                        `"Range: ${rangeText}"`,
+                        `"Generated: ${genDate}"`,
+                        '',
+                        `"Machine Name","Machine ID","Total Capacity (Days)","Allocated Days","Idle Days","Utilization %"`,
+                        ...exportData.map(d => `"${d.name}","${d.id}","${d.capacity}","${d.allocated}","${d.idle}","${d.util}%"`),
+                        '',
+                        `"Totals"`,
+                        `"Total Machines","${machines.length}"`,
+                        '',
+                        `"End of Report"`
+                    ];
+                    const blob = new Blob(['\ufeff', lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${title}.csv`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                } catch (e) {
+                    showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>CSV Export failed.');
+                }
+            } else if (format === 'pdf') {
+                try {
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF('l', 'mm', 'a4');
+                    const PW = doc.internal.pageSize.getWidth();
+                    
+                    // Header
+                    doc.setFillColor(0, 31, 63);
+                    doc.rect(0, 0, PW, 35, 'F');
+                    doc.setTextColor(255, 255, 255);
+                    doc.setFontSize(22);
+                    doc.text('DANPREL Engineering Automation', 15, 15);
+                    doc.setFontSize(12);
+                    doc.text('Machine Utilization Summary Report', 15, 24);
+                    doc.text(`Period: ${mLabel} ${yVal} (${wLabel}) | Generated: ${genDate}`, 15, 30);
+
+                    const head = [['Machine Name', 'ID', 'Total Capacity', 'Allocated Days', 'Idle Days', 'Utilization %']];
+                    const body = exportData.map(d => [d.name, d.id, d.capacity, d.allocated, d.idle, d.util + '%']);
+
+                    doc.autoTable({
+                        startY: 40,
+                        head: head,
+                        body: body,
+                        theme: 'grid',
+                        headStyles: { fillColor: [0, 51, 102] }
+                    });
+
+                    // Chart Capture
+                    try {
+                        const chartEl = document.querySelector('.chart-wrapper');
+                        const canvas = await html2canvas(chartEl, { scale: 2 });
+                        const imgData = canvas.toDataURL('image/png');
+                        const imgW = PW - 30;
+                        const imgH = (canvas.body ? (canvas.height * imgW) : 100) / (canvas.width || 1); // safe check
+                        
+                        doc.addPage();
+                        doc.setFillColor(0, 31, 63); doc.rect(0, 0, PW, 15, 'F');
+                        doc.setTextColor(255, 255, 255); doc.setFontSize(12);
+                        doc.text('Visualization Overview', 15, 10);
+                        doc.addImage(imgData, 'PNG', 15, 25, imgW, (canvas.height * imgW) / canvas.width);
+                    } catch (err) {
+                        console.error('Chart capture failed', err);
+                    }
+
+                    doc.save(`${title}.pdf`);
+                    showToast('<i class="bi bi-check-circle-fill me-2" style="color:var(--teal-bright)"></i>PDF Report saved successfully!');
+                } catch (e) {
+                    console.error(e);
+                    showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>PDF Export failed.');
+                }
+            }
+        }
+
+        function performLogout() {
+            localStorage.removeItem('danprel_auth');
+            localStorage.removeItem('user_dept');
+            window.location.href = 'login.html';
         }
     </script>
     <div id="ganttToast" class="gantt-toast"></div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

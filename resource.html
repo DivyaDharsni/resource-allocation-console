@@ -2866,7 +2866,7 @@
             <!-- Action Button -->
             <button class="sidebar-btn w-100 border-0 text-start" onclick="toggleSidebar(); openPinModal()"
                 style="background: rgba(255, 255, 255, 0.05); margin-top: 20px;">
-                <i class="bi bi-folder-plus"></i> Add Project
+                <i class="bi bi-kanban"></i> Project Hub
             </button>
 
             <!-- Feedback Section -->
@@ -2917,7 +2917,7 @@
 
         <div class="header-right">
             <button class="btn-add-action d-none d-md-flex" onclick="openPinModal()">
-                <i class="bi bi-folder-plus"></i> Add Project
+                <i class="bi bi-kanban"></i> Project Hub
             </button>
             <div class="live-clock" id="liveTime"></div>
             <button class="btn-logout" onclick="performLogout()" title="Logout">
@@ -2938,8 +2938,8 @@
         <div class="stat-chip">
             <div class="stat-chip-icon sci-navy"><i class="bi bi-briefcase-fill"></i></div>
             <div>
-                <div class="stat-chip-label">Heads</div>
-                <div class="stat-chip-value" id="sc-head">0</div>
+                <div class="stat-chip-label">Managers</div>
+                <div class="stat-chip-value" id="sc-manager">0</div>
             </div>
         </div>
         <div class="stat-chip">
@@ -2988,15 +2988,16 @@
             <div class="filter-divider"></div>
             <div class="filter-label"><i class="bi bi-calendar-range-fill"></i> Year</div>
             <select id="fYear" class="clean-select" onchange="onYearChange()" style="width:100px;">
-                <option selected>2026</option>
+                <option selected>2025</option>
+                <option>2026</option>
                 <option>2027</option>
                 <option>2028</option>
             </select>
             <div class="filter-divider"></div>
             <div class="filter-label"><i class="bi bi-calendar3"></i> From</div>
-            <input type="date" id="fFrom" class="clean-input" value="2026-01-01" onchange="renderUI()">
+            <input type="date" id="fFrom" class="clean-input" value="2025-01-01" onchange="renderUI()">
             <div class="filter-label"><i class="bi bi-calendar3-range"></i> To</div>
-            <input type="date" id="fTo" class="clean-input" value="2026-12-31" onchange="renderUI()">
+            <input type="date" id="fTo" class="clean-input" value="2025-12-31" onchange="renderUI()">
         </div>
     </div>
 
@@ -3093,7 +3094,7 @@
                         <div class="col-6">
                             <div class="section-lbl">Role</div>
                             <select id="mRole" class="form-select rounded-3 fw-bold">
-                                <option value="Head">Head</option>
+                                <option value="Manager">Manager</option>
                                 <option value="Lead">Department Lead</option>
                                 <option value="Member" selected>Team Member</option>
                             </select>
@@ -3224,7 +3225,7 @@
                         <div class="col-6">
                             <div class="section-lbl">Role</div>
                             <select id="eRole" class="form-select rounded-3 fw-bold">
-                                <option value="Head">Head</option>
+                                <option value="Manager">Manager</option>
                                 <option value="Lead">Department Lead</option>
                                 <option value="Member">Team Member</option>
                             </select>
@@ -3296,15 +3297,124 @@
         </div>
     </div>
 
-    <!-- ===== ADD PROJECT MODAL ===== -->
+    <!-- ===== PROJECT HUB MODAL (3 Options) ===== -->
+    <div class="modal fade" id="projectActionModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 500px;">
+            <div class="modal-content" style="border-radius: 32px; border: none; overflow: hidden;">
+                <div class="modal-hdr-dark" style="background: linear-gradient(135deg, #001f3f, #005a9c); padding: 30px;">
+                    <div>
+                        <h5 class="fw-900 mb-0 text-white"><i class="bi bi-kanban me-2"></i>Project Hub</h5>
+                        <p class="small mb-0 text-white-50" style="font-size: 0.75rem;">Manage your project portfolio</p>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4" style="background: #f8fafc;">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <button class="hub-btn add" onclick="showAddProjectModal()">
+                                <div class="hub-icon"><i class="bi bi-plus-circle-fill"></i></div>
+                                <div class="hub-info">
+                                    <span class="hub-title">Add New Project</span>
+                                    <span class="hub-desc">Create a new project in the system</span>
+                                </div>
+                                <i class="bi bi-chevron-right ms-auto opacity-50"></i>
+                            </button>
+                        </div>
+                        <div class="col-12">
+                            <button class="hub-btn edit" onclick="showProjectSelection('edit')">
+                                <div class="hub-icon"><i class="bi bi-pencil-square"></i></div>
+                                <div class="hub-info">
+                                    <span class="hub-title">Edit Project</span>
+                                    <span class="hub-desc">Update timeline or details of a project</span>
+                                </div>
+                                <i class="bi bi-chevron-right ms-auto opacity-50"></i>
+                            </button>
+                        </div>
+                        <div class="col-12">
+                            <button class="hub-btn remove" onclick="showProjectSelection('remove')">
+                                <div class="hub-icon"><i class="bi bi-trash3-fill"></i></div>
+                                <div class="hub-info">
+                                    <span class="hub-title">Remove Project</span>
+                                    <span class="hub-desc">Permanently delete a project and its records</span>
+                                </div>
+                                <i class="bi bi-chevron-right ms-auto opacity-50"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .hub-btn {
+            width: 100%;
+            padding: 20px 24px;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+        .hub-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            border-color: var(--blue-accent);
+        }
+        .hub-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+            transition: all 0.3s;
+        }
+        .hub-btn.add .hub-icon { background: #ecfdf5; color: #10b981; }
+        .hub-btn.edit .hub-icon { background: #eff6ff; color: #3b82f6; }
+        .hub-btn.remove .hub-icon { background: #fff1f2; color: #e11d48; }
+
+        .hub-btn:hover .hub-icon { transform: scale(1.1) rotate(5deg); }
+
+        .hub-info { display: flex; flex-direction: column; }
+        .hub-title { font-weight: 800; color: var(--navy-dark); font-size: 1rem; }
+        .hub-desc { font-size: 0.72rem; color: #64748b; font-weight: 600; margin-top: 2px; }
+    </style>
+
+    <!-- ===== PROJECT SELECTION MODAL ===== -->
+    <div class="modal fade" id="projectSelectModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius:24px; overflow:hidden;">
+                <div class="modal-hdr-dark">
+                    <h5 class="fw-bold mb-0" id="selModalTitle">Select Project</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div id="selProjectList" style="max-height: 400px; overflow-y: auto; padding: 15px;">
+                        <!-- Projects injected here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== ADD/EDIT PROJECT MODAL ===== -->
     <div class="modal fade" id="addProjectModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-hdr-dark">
-                    <h5 class="fw-bold mb-0"><i class="bi bi-folder-plus me-2"></i>Create New Project</h5>
+                    <h5 class="fw-bold mb-0" id="projModalTitle"><i class="bi bi-folder-plus me-2"></i>Create New Project</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
+                    <input type="hidden" id="editProjOldCode">
                     <div class="mb-3">
                         <div class="section-lbl">Project Name</div>
                         <input type="text" id="projName" class="form-control rounded-3 fw-bold">
@@ -3325,17 +3435,16 @@
                         </div>
                     </div>
 
-                    <!-- Info note about permanent save -->
-                    <div class="d-flex align-items-start gap-2 p-3 rounded-3 mb-4"
-                        style="background:#f0fdf4;border:1px solid #bbf7d0;">
-                        <i class="bi bi-shield-fill-check mt-1" style="color:#16a34a;flex-shrink:0;"></i>
-                        <div class="small" style="color:#166534;font-weight:600;">
-                            Project will be saved <strong>permanently</strong>
+                    <div id="projChangeWarning" class="d-flex align-items-start gap-2 p-3 rounded-3 mb-4"
+                        style="background:#fff7ed; border:1px solid #ffedd5; display:none !important;">
+                        <i class="bi bi-exclamation-triangle-fill mt-1" style="color:#f97316;flex-shrink:0;"></i>
+                        <div class="small" style="color:#9a3412;font-weight:600;">
+                            Changing the <strong>Project Code</strong> will automatically update all existing member assignments for this project.
                         </div>
                     </div>
 
                     <button class="btn fw-900 w-100 py-3 rounded-pill" style="background:var(--navy-dark);color:white;"
-                        onclick="finalizeProject()">
+                        id="projFinalBtn" onclick="finalizeProject()">
                         <i class="bi bi-check-circle me-2"></i>Create Project
                     </button>
                 </div>
@@ -3428,11 +3537,16 @@
     <div class="modal fade" id="editAssignModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-hdr-dark">
+                <div class="modal-hdr-dark d-flex align-items-center justify-content-between">
                     <h6 class="fw-bold mb-0">
                         <i class="bi bi-calendar-event me-2"></i>Edit Assignment Timeline
                     </h6>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    <div class="d-flex align-items-center gap-2">
+                        <button type="button" class="btn btn-sm btn-outline-danger border-0 rounded-circle" onclick="requestDeleteAssignment()" title="Delete Assignment">
+                            <i class="bi bi-trash3-fill"></i>
+                        </button>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" style="margin:0;"></button>
+                    </div>
                 </div>
                 <div class="modal-body">
                     <input type="hidden" id="editEmpId">
@@ -3441,22 +3555,26 @@
                     <input type="hidden" id="oldEnd">
 
                     <div class="mb-3">
-                        <div class="d-flex align-items-center gap-2 p-3 rounded-3"
-                            style="background:#f1f5f9;border:1px solid #e2e8f0;">
-                            <i class="bi bi-folder-fill" style="color:var(--blue-accent);"></i>
-                            <span id="editProjName" class="fw-800" style="color:var(--navy-dark);"></span>
-                        </div>
+                        <div class="section-lbl">Project</div>
+                        <select id="editAProjSelect" class="form-select rounded-3 fw-bold">
+                            <!-- Populated dynamically -->
+                        </select>
                     </div>
 
                     <div class="row g-3 mb-4">
                         <div class="col-6">
                             <label class="small fw-bold text-muted mb-1">NEW START DATE</label>
-                            <input type="date" id="newAStart" class="form-control rounded-3">
+                            <input type="date" id="newAStart" class="form-control rounded-3" onchange="updateEditDurationPreview()">
                         </div>
                         <div class="col-6">
                             <label class="small fw-bold text-muted mb-1">NEW END DATE</label>
-                            <input type="date" id="newAEnd" class="form-control rounded-3">
+                            <input type="date" id="newAEnd" class="form-control rounded-3" onchange="updateEditDurationPreview()">
                         </div>
+                    </div>
+
+                    <div id="editDurationPreview" class="p-3 rounded-3 mb-4 d-flex align-items-center gap-3" style="background:#f0fdfa; border:1px solid #ccfbf1; display:none;">
+                        <i class="bi bi-clock-history" style="color:#0d9488; font-size:1.2rem;"></i>
+                        <span id="editDurationText" class="small fw-bold" style="color:#0f766e;"></span>
                     </div>
 
                     <button class="btn fw-900 w-100 py-3 rounded-pill" style="background:var(--navy-dark);color:white;"
@@ -3535,6 +3653,25 @@
         </div>
     </div>
 
+    <!-- ===== ASSIGNMENT DELETE CONFIRM MODAL ===== -->
+    <div class="modal fade" id="assignDeleteConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 380px;">
+            <div class="modal-content" style="border-radius: 30px; border: none; overflow: hidden;">
+                <div class="modal-delete-hdr">
+                    <div class="delete-icon-circle" style="background:#fff1f2; color:#e11d48;">
+                        <i class="bi bi-calendar-x-fill"></i>
+                    </div>
+                    <h5 class="delete-title">Delete Assignment?</h5>
+                    <p class="delete-text">Are you sure you want to remove this project assignment?</p>
+                </div>
+                <div class="modal-delete-footer">
+                    <button type="button" class="btn-delete-cancel" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn-delete-confirm" onclick="finalizeDeleteAssignment()">Yes, Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="resources.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -3542,6 +3679,26 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     <script>
+        const USER_DEPT = localStorage.getItem('user_dept') || 'All';
+        const IS_ADMIN = USER_DEPT === 'All';
+
+        // Auth Check
+        if (localStorage.getItem('danprel_auth') !== 'true') {
+            window.location.href = 'login.html';
+        }
+
+        function checkPermission(memberDept, action = "perform this action") {
+            if (IS_ADMIN) return true;
+            if (memberDept === USER_DEPT) return true;
+            showToast(`<i class="bi bi-shield-lock-fill me-2" style="color:#ef4444"></i>Access Denied: You can only ${action} for **${USER_DEPT}** members.`);
+            return false;
+        }
+
+        function performLogout() {
+            localStorage.removeItem('danprel_auth');
+            localStorage.removeItem('user_dept');
+            window.location.href = 'login.html';
+        }
         /* =========================================================
            DATA & CONSTANTS
         ========================================================= */
@@ -3569,6 +3726,14 @@
             const idx = projectRegistry.findIndex(p => p.code === code);
             const n = idx >= 0 ? idx : Math.abs([...code].reduce((a, c) => a + c.charCodeAt(0), 0));
             return PROJECT_PALETTE[n % PROJECT_PALETTE.length];
+        }
+
+        /* Formats department name for display */
+        function formatDept(dept) {
+            if (!dept) return '';
+            return dept
+                .replace('Mechanical', 'Mech')
+                .replace(' Programming', '');
         }
 
         /* =========================================================
@@ -3746,7 +3911,7 @@
         ========================================================= */
         function updateStats(data) {
             document.getElementById('sc-total').textContent = data.length;
-            document.getElementById('sc-head').textContent = data.filter(r => r.role === 'Head').length;
+            document.getElementById('sc-manager').textContent = data.filter(r => r.role === 'Manager').length;
             document.getElementById('sc-lead').textContent = data.filter(r => r.role === 'Lead').length;
             document.getElementById('sc-member').textContent = data.filter(r => r.role === 'Member').length;
             document.getElementById('sc-proj').textContent = projectRegistry.length;
@@ -3772,8 +3937,8 @@
                 return deptMatch && projMatch;
             });
 
-            // Role priority: Head (1), Lead (2), Member (3)
-            const rolePriority = { 'Head': 1, 'Lead': 2, 'Member': 3 };
+            // Role priority: Manager (1), Lead (2), Member (3)
+            const rolePriority = { 'Manager': 1, 'Lead': 2, 'Member': 3 };
             filtered.sort((a, b) => {
                 const pA = rolePriority[a.role] || 99;
                 const pB = rolePriority[b.role] || 99;
@@ -3787,7 +3952,7 @@
             /* ── TABLE ── */
             document.getElementById('registryTableBody').innerHTML = filtered.map((r, i) => {
                 const oi = registryData.indexOf(r);
-                const rc = r.role === 'Head' ? 'role-head' : (r.role === 'Lead' ? 'role-lead' : 'role-member');
+                const rc = r.role === 'Manager' ? 'role-head' : (r.role === 'Lead' ? 'role-lead' : 'role-member');
                 const chips = r.projects.length
                     ? r.projects.map(p => `<span class="proj-badge"><i class="bi bi-folder-fill" style="font-size:0.55rem;"></i>${p.code || p.name}</span>`).join('')
                     : `<span class="small text-muted">—</span>`;
@@ -3806,7 +3971,7 @@
                 <td><div class="fw-800" style="color:var(--navy-dark)">${r.name}</div></td>
                 <td><span class="badge bg-light text-dark border fw-bold small">${r.id}</span></td>
                 <td><span class="role-badge ${rc}">${r.role}</span></td>
-                <td><div class="small fw-700 text-muted">${r.dept}</div></td>
+                <td><div class="small fw-700 text-muted">${formatDept(r.dept)}</div></td>
                 <td class="fw-700 text-muted">${r.exp}y</td>
                 <td class="text-center">
                     <div class="action-center-container">
@@ -3858,7 +4023,7 @@
                     return `<div class="g-row" style="min-height:${rowH}px;">
                         <div class="g-res-info">
                             <div class="g-res-name">${r.name}</div>
-                            <div class="g-res-role">${r.role} · ${r.dept.split(' ')[0]}</div>
+                            <div class="g-res-role">${r.role} · ${formatDept(r.dept)}</div>
                         </div>
                         <div class="g-track" style="min-width:${trackW}px;background-size:${WEEK_W}px 100%;height:${rowH}px;">
                             ${greyHtml}
@@ -3916,7 +4081,7 @@
                 return `<div class="g-row" style="min-height:${rowH}px;">
                     <div class="g-res-info">
                         <div class="g-res-name">${r.name}</div>
-                        <div class="g-res-role">${r.role} · ${r.dept.split(' ')[0]}</div>
+                        <div class="g-res-role">${r.role} · ${formatDept(r.dept)}</div>
                     </div>
                     <div class="g-track" style="min-width:${trackW}px;background-size:${WEEK_W}px 100%;height:${rowH}px;">
                         ${greyHtml}${barsHtml}
@@ -3936,9 +4101,165 @@
         }
 
         /* =========================================================
+           PROJECT HUB LOGIC
+        ========================================================= */
+        function showAddProjectModal() {
+            bootstrap.Modal.getInstance(document.getElementById('projectActionModal')).hide();
+            setTimeout(() => {
+                document.getElementById('projModalTitle').innerHTML = '<i class="bi bi-folder-plus me-2"></i>Create New Project';
+                document.getElementById('projFinalBtn').innerHTML = '<i class="bi bi-check-circle me-2"></i>Create Project';
+                document.getElementById('projName').value = '';
+                document.getElementById('projCode').value = '';
+                document.getElementById('projStart').value = '';
+                document.getElementById('projEnd').value = '';
+                document.getElementById('editProjOldCode').value = '';
+                document.getElementById('projChangeWarning').style.setProperty('display', 'none', 'important');
+                new bootstrap.Modal(document.getElementById('addProjectModal')).show();
+            }, 350);
+        }
+
+        function showProjectSelection(mode) {
+            bootstrap.Modal.getInstance(document.getElementById('projectActionModal')).hide();
+            const list = document.getElementById('selProjectList');
+            list.innerHTML = '';
+            
+            document.getElementById('selModalTitle').textContent = mode === 'edit' ? 'Select Project to Edit' : 'Select Project to Remove';
+
+            if (projectRegistry.length === 0) {
+                list.innerHTML = '<div class="text-center py-4 text-muted fw-bold">No projects available.</div>';
+            } else {
+                projectRegistry.forEach(p => {
+                    const item = document.createElement('div');
+                    item.className = 'proj-drop-item mb-2';
+                    const color = getProjectColor(p.code);
+                    item.innerHTML = `
+                        <div class="hub-icon" style="background:${color}15; color:${color}; width:42px; height:42px; font-size:1.1rem;">
+                            <i class="bi bi-folder2-open"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="proj-drop-code">${p.code}</div>
+                            <div class="proj-drop-name">${p.name}</div>
+                        </div>
+                        <div class="proj-drop-dates text-end">
+                            ${p.start}<br>${p.end}
+                        </div>
+                    `;
+                    item.onclick = () => {
+                        bootstrap.Modal.getInstance(document.getElementById('projectSelectModal')).hide();
+                        setTimeout(() => {
+                            if (mode === 'edit') openEditProject(p);
+                            else confirmDeleteProject(p);
+                        }, 350);
+                    };
+                    list.appendChild(item);
+                });
+            }
+
+            setTimeout(() => {
+                new bootstrap.Modal(document.getElementById('projectSelectModal')).show();
+            }, 350);
+        }
+
+        function openEditProject(p) {
+            document.getElementById('projModalTitle').innerHTML = '<i class="bi bi-pencil-square me-2"></i>Edit Project';
+            document.getElementById('projFinalBtn').innerHTML = '<i class="bi bi-save me-2"></i>Update Project';
+            document.getElementById('projName').value = p.name;
+            document.getElementById('projCode').value = p.code;
+            document.getElementById('projStart').value = p.start;
+            document.getElementById('projEnd').value = p.end;
+            document.getElementById('editProjOldCode').value = p.code;
+            document.getElementById('projChangeWarning').style.setProperty('display', 'flex', 'important');
+            new bootstrap.Modal(document.getElementById('addProjectModal')).show();
+        }
+
+        async function confirmDeleteProject(p) {
+            if (!confirm(`Are you sure you want to PERMANENTLY delete project "${p.code} - ${p.name}"?\n\nThis will also remove ALL member assignments associated with this project.`)) return;
+            
+            try {
+                const res = await fetch(`${API_BASE}/delete-project`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code: p.code })
+                });
+                if (res.ok) {
+                    projectRegistry = projectRegistry.filter(pj => pj.code !== p.code);
+                    // Also clean up local assignments
+                    registryData.forEach(member => {
+                        member.projects = member.projects.filter(task => task.code !== p.code);
+                    });
+                    syncProjectFilter();
+                    renderUI();
+                    showToast(`<i class="bi bi-trash-fill me-2" style="color:#e11d48"></i>Project <strong>${p.code}</strong> deleted and assignments removed.`);
+                } else {
+                    const data = await res.json();
+                    showToast(`<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Delete failed: ${data.error}`);
+                }
+            } catch (e) {
+                showToast(`<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Server connection error.`);
+            }
+        }
+
+        async function finalizeProject() {
+            const name = document.getElementById('projName').value.trim();
+            const code = document.getElementById('projCode').value.trim().toUpperCase();
+            const start = document.getElementById('projStart').value;
+            const end = document.getElementById('projEnd').value;
+            const oldCode = document.getElementById('editProjOldCode').value;
+            const isEdit = !!oldCode;
+
+            if (!name || !code || !start || !end) return showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>All fields are required.');
+            if (new Date(end) <= new Date(start)) return showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>End date must be after start date.');
+            
+            // Duplicate check if creating or changing code
+            if ((!isEdit || code !== oldCode) && projectRegistry.some(p => p.code === code)) {
+                return showToast(`<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Project code "<strong>${code}</strong>" already exists.`);
+            }
+
+            const days = Math.ceil((new Date(end) - new Date(start)) / 86400000);
+            const payload = { name, code, start, end, days };
+            if (isEdit) payload.oldCode = oldCode;
+
+            try {
+                const endpoint = isEdit ? '/update-project' : '/add-project';
+                const res = await fetch(`${API_BASE}${endpoint}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+
+                if (!res.ok) {
+                    return showToast(`<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Error: ${data.error || 'Server error'}`);
+                }
+
+                if (isEdit) {
+                    const idx = projectRegistry.findIndex(p => p.code === oldCode);
+                    projectRegistry[idx] = { ...projectRegistry[idx], ...payload, id: projectRegistry[idx].id };
+                    // If code changed, update in-memory member assignments
+                    if (code !== oldCode) {
+                        registryData.forEach(member => {
+                            member.projects.forEach(t => { if (t.code === oldCode) t.code = code; });
+                        });
+                    }
+                } else {
+                    projectRegistry.push({ ...payload, id: Date.now() });
+                }
+
+                syncProjectFilter();
+                renderUI();
+                bootstrap.Modal.getInstance(document.getElementById('addProjectModal')).hide();
+                showToast(`<i class="bi bi-check-circle-fill me-2" style="color:var(--teal-bright)"></i>Project <strong>${code}</strong> ${isEdit ? 'updated' : 'created'} successfully!`);
+
+            } catch (e) {
+                showToast(`<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Connection error.`);
+            }
+        }
+
+        /* =========================================================
            PIN FLOW
         ========================================================= */
         function openPinModal() {
+            if (!IS_ADMIN) return showToast('<i class="bi bi-shield-lock-fill me-2" style="color:#ef4444"></i>Access Denied: Only administrators can access the Project Hub.');
             document.querySelectorAll('.pin-digit').forEach(x => { x.value = ''; x.classList.remove('filled'); });
             document.getElementById('pinError').style.display = 'none';
             new bootstrap.Modal(document.getElementById('pinModal')).show();
@@ -3950,11 +4271,7 @@
             if (pin === ADMIN_PIN) {
                 bootstrap.Modal.getInstance(document.getElementById('pinModal')).hide();
                 setTimeout(() => {
-                    document.getElementById('projName').value = '';
-                    document.getElementById('projCode').value = '';
-                    document.getElementById('projStart').value = '';
-                    document.getElementById('projEnd').value = '';
-                    new bootstrap.Modal(document.getElementById('addProjectModal')).show();
+                    new bootstrap.Modal(document.getElementById('projectActionModal')).show();
                 }, 350);
             } else {
                 document.getElementById('pinError').style.display = 'block';
@@ -3985,67 +4302,21 @@
         }
 
         /* =========================================================
-           PROJECT CREATION
-        ========================================================= */
-        async function finalizeProject() {
-            const name = document.getElementById('projName').value.trim();
-            const code = document.getElementById('projCode').value.trim().toUpperCase();
-            const start = document.getElementById('projStart').value;
-            const end = document.getElementById('projEnd').value;
-            if (!name || !code || !start || !end) return showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>All project fields are required.');
-            if (new Date(end) <= new Date(start)) return showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>End date must be after start date.');
-            
-            // Check for duplicate project code in memory
-            if (projectRegistry.some(p => p.code.toUpperCase() === code)) {
-                return showToast(`<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Project code "<strong>${code}</strong>" already exists.`);
-            }
-
-            const days = Math.ceil((new Date(end) - new Date(start)) / 86400000);
-            const newProject = { id: Date.now(), name, code, start, end, days };
-
-            try {
-                // POST to server
-                const res = await fetch(`${API_BASE}/add-project`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, code, start, end, days })
-                });
-                const data = await res.json();
-
-                if (res.status === 409) {
-                    return showToast(`<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Project code "<strong>${code}</strong>" already exists in database.`);
-                }
-                if (!res.ok) {
-                    return showToast(`<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Could not save project: ${data.error || 'Server error'}`);
-                }
-
-                // Add to in-memory registry and re-render
-                projectRegistry.push(newProject);
-                syncProjectFilter();
-                renderUI();
-                bootstrap.Modal.getInstance(document.getElementById('addProjectModal')).hide();
-                showToast(`<i class="bi bi-check-circle-fill me-2" style="color:var(--teal-bright)"></i>Project <strong>${code}</strong> saved to Cloud Database!`);
-
-            } catch (e) {
-                // Server not running — still add to memory but warn user
-                projectRegistry.push(newProject);
-                renderUI();
-                bootstrap.Modal.getInstance(document.getElementById('addProjectModal')).hide();
-                showToast(`<i class="bi bi-exclamation-triangle-fill me-2" style="color:var(--gold)"></i><strong>${code}</strong> created (offline mode — session only)`);
-            }
-        }
-
-        /* =========================================================
            EDIT MEMBER
         ========================================================= */
         function openEditMember(idx) {
             const r = registryData[idx];
+            if (!checkPermission(r.dept, "edit details")) return;
             document.getElementById('eIdx').value = idx;
             document.getElementById('eName').value = r.name;
             document.getElementById('eEmpId').value = r.id;
             document.getElementById('eRole').value = r.role;
             document.getElementById('eExp').value = r.exp;
             document.getElementById('eDept').value = r.dept || 'Mechanical Assembly';
+
+            const deptSel = document.getElementById('eDept');
+            if (!IS_ADMIN) deptSel.disabled = true;
+            else deptSel.disabled = false;
 
             new bootstrap.Modal(document.getElementById('editMemberModal')).show();
         }
@@ -4089,6 +4360,7 @@
 
         async function deleteMember(idx) {
             const member = registryData[idx];
+            if (!checkPermission(member.dept, "delete members")) return;
             _pendingDeleteIdx = idx;
             document.getElementById('deleteMemberName').textContent = member.name;
             new bootstrap.Modal(document.getElementById('deleteConfirmModal')).show();
@@ -4133,6 +4405,7 @@
         });
         function openAssign(empIdx) {
             const r = registryData[empIdx];
+            if (!checkPermission(r.dept, "assign projects")) return;
             document.getElementById('targetName').textContent = r.name;
             document.getElementById('targetIndex').value = empIdx;
 
@@ -4142,8 +4415,8 @@
             const aEnd = document.getElementById('aEnd');
             aStart.value = '';
             aEnd.value = '';
-            aStart.min = today;
-            aEnd.min = today;
+            aStart.min = '2025-01-01';
+            aEnd.min = '2025-01-01';
             document.getElementById('assignProjInfo').style.display = 'none';
             document.getElementById('durationPreview').style.display = 'none';
 
@@ -4267,21 +4540,43 @@
            EDIT ASSIGNMENT
         ========================================================= */
         function openEditAssignment(empId, projCode, projName, start, end) {
+            const r = registryData.find(x => x.id === empId);
+            if (r && !checkPermission(r.dept, "edit assignments")) return;
             closePopup();
             document.getElementById('editEmpId').value = empId;
             document.getElementById('editProjCode').value = projCode;
-            document.getElementById('editProjName').textContent = projName;
             document.getElementById('oldStart').value = start;
             document.getElementById('oldEnd').value = end;
             document.getElementById('newAStart').value = start;
             document.getElementById('newAEnd').value = end;
 
+            const sel = document.getElementById('editAProjSelect');
+            sel.innerHTML = projectRegistry.map(p => 
+                `<option value="${p.code}" ${p.code === projCode ? 'selected' : ''}>${p.code} — ${p.name}</option>`
+            ).join('');
+
+            updateEditDurationPreview();
             new bootstrap.Modal(document.getElementById('editAssignModal')).show();
+        }
+
+        function updateEditDurationPreview() {
+            const s = document.getElementById('newAStart').value;
+            const e = document.getElementById('newAEnd').value;
+            const preview = document.getElementById('editDurationPreview');
+            const durText = document.getElementById('editDurationText');
+            if (s && e && e >= s) {
+                const days = Math.ceil((new Date(e) - new Date(s)) / 86400000);
+                preview.style.display = 'flex';
+                durText.textContent = `${days} day${days !== 1 ? 's' : ''} selected  (${new Date(s + 'T00:00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}  →  ${new Date(e + 'T00:00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })})`;
+            } else {
+                preview.style.display = 'none';
+            }
         }
 
         async function saveEditedAssignment() {
             const empId = document.getElementById('editEmpId').value;
-            const projCode = document.getElementById('editProjCode').value;
+            const oldProjCode = document.getElementById('editProjCode').value;
+            const newProjCode = document.getElementById('editAProjSelect').value;
             const oldS = document.getElementById('oldStart').value;
             const oldE = document.getElementById('oldEnd').value;
             const newS = document.getElementById('newAStart').value;
@@ -4297,7 +4592,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        empId, projCode, oldStart: oldS, oldEnd: oldE,
+                        empId, oldProjCode, newProjCode, oldStart: oldS, oldEnd: oldE,
                         newStart: newS, newEnd: newE, days
                     })
                 });
@@ -4310,8 +4605,11 @@
                 // Update in-memory
                 const target = registryData.find(r => r.id === empId);
                 if (target) {
-                    const p = target.projects.find(proj => proj.code === projCode && proj.start === oldS && proj.end === oldE);
+                    const p = target.projects.find(proj => proj.code === oldProjCode && proj.start === oldS && proj.end === oldE);
                     if (p) {
+                        p.code = newProjCode;
+                        const projInfo = projectRegistry.find(pr => pr.code === newProjCode);
+                        p.name = projInfo ? projInfo.name : p.name;
                         p.start = newS;
                         p.end = newE;
                         p.days = days;
@@ -4320,11 +4618,47 @@
 
                 renderUI();
                 bootstrap.Modal.getInstance(document.getElementById('editAssignModal')).hide();
-                showToast(`<i class="bi bi-check-circle-fill me-2" style="color:var(--teal-bright)"></i>Timeline updated for <strong>${projCode}</strong>`);
+                showToast(`<i class="bi bi-check-circle-fill me-2" style="color:var(--teal-bright)"></i>Assignment updated successfully.`);
 
             } catch (e) {
                 console.error(e);
                 showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Connection error. Could not update assignment.');
+            }
+        }
+
+        function requestDeleteAssignment() {
+            // Hide edit modal first
+            bootstrap.Modal.getInstance(document.getElementById('editAssignModal')).hide();
+            new bootstrap.Modal(document.getElementById('assignDeleteConfirmModal')).show();
+        }
+
+        async function finalizeDeleteAssignment() {
+            const empId = document.getElementById('editEmpId').value;
+            const projCode = document.getElementById('editProjCode').value;
+            const start = document.getElementById('oldStart').value;
+            const end = document.getElementById('oldEnd').value;
+
+            try {
+                const res = await fetch(`${API_BASE}/delete-assignment`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ empId, projCode, start, end })
+                });
+
+                if (res.ok) {
+                    const target = registryData.find(r => r.id === empId);
+                    if (target) {
+                        target.projects = target.projects.filter(p => !(p.code === projCode && p.start === start && p.end === end));
+                    }
+                    renderUI();
+                    bootstrap.Modal.getInstance(document.getElementById('assignDeleteConfirmModal')).hide();
+                    showToast(`<i class="bi bi-trash-fill me-2" style="color:#e11d48"></i>Assignment deleted.`);
+                } else {
+                    const data = await res.json();
+                    showToast(`<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Delete failed: ${data.error}`);
+                }
+            } catch (e) {
+                showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Connection error.');
             }
         }
 
@@ -4336,7 +4670,7 @@
 
             // ── Avatar initials + color
             const initials = r.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-            const avatarBg = r.role === 'Head' ? '#003d8f' : r.role === 'Lead' ? '#0d9488' : '#475569';
+            const avatarBg = r.role === 'Manager' ? '#003d8f' : r.role === 'Lead' ? '#0d9488' : '#475569';
             const elAvatar = document.getElementById('pAvatar');
             elAvatar.textContent = initials;
             elAvatar.style.background = avatarBg;
@@ -4345,7 +4679,7 @@
             document.getElementById('pName').textContent = r.name;
 
             // ── Role badge with icon
-            const roleIcons = { Head: 'bi-briefcase-fill', Lead: 'bi-person-badge-fill', Member: 'bi-person-fill' };
+            const roleIcons = { Manager: 'bi-briefcase-fill', Lead: 'bi-person-badge-fill', Member: 'bi-person-fill' };
             document.getElementById('pRoleBadge').innerHTML =
                 `<i class="bi ${roleIcons[r.role] || 'bi-person-fill'}"></i> ${r.role}`;
 
@@ -4688,7 +5022,16 @@
         function openAddMember() {
             ['mName', 'mEmpId', 'mExp'].forEach(id => document.getElementById(id).value = '');
             document.getElementById('mRole').value = 'Member';
-            document.getElementById('mDept').selectedIndex = 0;
+            
+            const deptSel = document.getElementById('mDept');
+            if (!IS_ADMIN) {
+                deptSel.value = USER_DEPT;
+                deptSel.disabled = true;
+            } else {
+                deptSel.selectedIndex = 0;
+                deptSel.disabled = false;
+            }
+            
             new bootstrap.Modal(document.getElementById('addMemberModal')).show();
         }
 
@@ -4698,6 +5041,10 @@
             const role = document.getElementById('mRole').value;
             const dept = document.getElementById('mDept').value;
             const exp = document.getElementById('mExp').value.trim() || '0';
+
+            if (!IS_ADMIN && dept !== USER_DEPT) {
+                return showToast(`<i class="bi bi-shield-lock-fill me-2" style="color:#ef4444"></i>Error: You can only add members to the **${USER_DEPT}** department.`);
+            }
 
             if (!name) return showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#f59e0b"></i>Please enter the member name.');
             if (!id) return showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#f59e0b"></i>Please enter the employee code.');
@@ -4743,6 +5090,20 @@
             }
 
             async function initApp() {
+                // Set default filters to CURRENT month and year
+                const now = new Date();
+                const curY = now.getFullYear();
+                const curM = now.getMonth() + 1; // 1-indexed for HTML dates
+                const lastDay = new Date(curY, curM, 0).getDate();
+                
+                const fYear = document.getElementById('fYear');
+                const fFrom = document.getElementById('fFrom');
+                const fTo = document.getElementById('fTo');
+                
+                if (fYear) fYear.value = curY;
+                if (fFrom) fFrom.value = `${curY}-01-01`;
+                if (fTo) fTo.value = `${curY}-12-31`;
+
                 try {
                     const [mRes, pRes, aRes] = await Promise.all([
                         fetch(`${API_BASE}/members`).then(r => r.json()),

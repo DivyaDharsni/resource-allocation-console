@@ -198,6 +198,37 @@ const server = http.createServer(async (req, res) => {
             } catch (e) { return json(res, 400, { error: e.message }); }
         }
 
+        // API: Update Project
+        if (apiPath === '/update-project' && req.method === 'POST') {
+            try {
+                const project = JSON.parse(await readBody(req));
+                if (!project.days) {
+                    project.days = Math.ceil((new Date(project.end) - new Date(project.start)) / 86400000);
+                }
+                const oldProject = await Project.findOne({ code: project.oldCode });
+                await Project.updateOne({ code: project.oldCode }, project);
+                
+                // If code changed, update all assignments
+                if (project.code !== project.oldCode) {
+                    await Assignment.updateMany({ projCode: project.oldCode }, { projCode: project.code });
+                    await MachineAssignment.updateMany({ projCode: project.oldCode }, { projCode: project.code });
+                }
+                return json(res, 200, { success: true });
+            } catch (e) { return json(res, 400, { error: e.message }); }
+        }
+
+        // API: Delete Project
+        if (apiPath === '/delete-project' && req.method === 'POST') {
+            try {
+                const { code } = JSON.parse(await readBody(req));
+                await Project.deleteOne({ code });
+                // Also delete its assignments
+                await Assignment.deleteMany({ projCode: code });
+                await MachineAssignment.deleteMany({ projCode: code });
+                return json(res, 200, { success: true });
+            } catch (e) { return json(res, 400, { error: e.message }); }
+        }
+
         // API: Add Member
         if (apiPath === '/add-member' && req.method === 'POST') {
             try {
@@ -251,9 +282,18 @@ const server = http.createServer(async (req, res) => {
                 const data = JSON.parse(await readBody(req));
                 const days = data.days || Math.ceil((new Date(data.newEnd) - new Date(data.newStart)) / 86400000);
                 await Assignment.updateOne(
-                    { empId: data.empId, projCode: data.projCode, start: data.oldStart, end: data.oldEnd },
-                    { start: data.newStart, end: data.newEnd, days: days }
+                    { empId: data.empId, projCode: data.oldProjCode, start: data.oldStart, end: data.oldEnd },
+                    { projCode: data.newProjCode, start: data.newStart, end: data.newEnd, days: days }
                 );
+                return json(res, 200, { success: true });
+            } catch (e) { return json(res, 400, { error: e.message }); }
+        }
+
+        // API: Delete Assignment
+        if (apiPath === '/delete-assignment' && req.method === 'POST') {
+            try {
+                const { empId, projCode, start, end } = JSON.parse(await readBody(req));
+                await Assignment.deleteOne({ empId, projCode, start, end });
                 return json(res, 200, { success: true });
             } catch (e) { return json(res, 400, { error: e.message }); }
         }
@@ -287,9 +327,18 @@ const server = http.createServer(async (req, res) => {
                 const data = JSON.parse(await readBody(req));
                 const days = data.days || Math.ceil((new Date(data.newEnd) - new Date(data.newStart)) / 86400000);
                 await MachineAssignment.updateOne(
-                    { machineId: data.machineId, projCode: data.projCode, start: data.oldStart, end: data.oldEnd },
-                    { start: data.newStart, end: data.newEnd, days: days }
+                    { machineId: data.machineId, projCode: data.oldProjCode, start: data.oldStart, end: data.oldEnd },
+                    { projCode: data.newProjCode, start: data.newStart, end: data.newEnd, days: days }
                 );
+                return json(res, 200, { success: true });
+            } catch (e) { return json(res, 400, { error: e.message }); }
+        }
+
+        // API: Delete Machine Assignment
+        if (apiPath === '/delete-machine-assignment' && req.method === 'POST') {
+            try {
+                const { machineId, projCode, start, end } = JSON.parse(await readBody(req));
+                await MachineAssignment.deleteOne({ machineId, projCode, start, end });
                 return json(res, 200, { success: true });
             } catch (e) { return json(res, 400, { error: e.message }); }
         }

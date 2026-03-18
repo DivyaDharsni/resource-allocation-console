@@ -2045,6 +2045,22 @@
                 font-size: 0.68rem;
             }
         }
+
+        .btn-edit-assign {
+            background: none;
+            border: none;
+            color: #64748b;
+            padding: 5px 8px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+        .btn-edit-assign:hover {
+            background: #f1f5f9;
+            color: var(--blue-accent);
+            transform: scale(1.1);
+        }
     </style>
 </head>
 
@@ -2073,6 +2089,25 @@
                 <div class="modal-delete-footer">
                     <button type="button" class="btn-delete-cancel" data-bs-dismiss="modal">Cancel</button>
                     <button type="button" class="btn-delete-confirm" id="confirmDeleteBtn">Yes, Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== ASSIGNMENT DELETE CONFIRM MODAL ===== -->
+    <div class="modal fade" id="assignDeleteConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 380px;">
+            <div class="modal-content" style="border-radius: 30px; border: none; overflow: hidden;">
+                <div class="modal-delete-hdr">
+                    <div class="delete-icon-circle" style="background:#fff1f2; color:#e11d48;">
+                        <i class="bi bi-calendar-x-fill"></i>
+                    </div>
+                    <h5 class="delete-title">Delete Assignment?</h5>
+                    <p class="delete-text">Are you sure you want to remove this project assignment?</p>
+                </div>
+                <div class="modal-delete-footer">
+                    <button type="button" class="btn-delete-cancel" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn-delete-confirm" onclick="finalizeDeleteAssignment()">Yes, Delete</button>
                 </div>
             </div>
         </div>
@@ -2108,11 +2143,6 @@
                 <i class="bi bi-hdd-rack-fill"></i> Machine Allocation
             </a>
 
-            <!-- Action Button -->
-            <a href="resource.html?add=project" class="sidebar-btn"
-                style="background: rgba(255, 255, 255, 0.05); margin-top: 20px;">
-                <i class="bi bi-folder-plus"></i> Add Project
-            </a>
 
             <!-- Feedback Section -->
             <div class="sidebar-feedback pt-3" style="margin-top: 10px;">
@@ -2198,7 +2228,8 @@
 
             <div class="filter-label"><i class="bi bi-calendar-range-fill"></i> Year</div>
             <select id="fYear" class="clean-select" onchange="onYearChange()" style="width:100px;">
-                <option selected>2026</option>
+                <option selected>2025</option>
+                <option>2026</option>
                 <option>2027</option>
                 <option>2028</option>
                 <option>2029</option>
@@ -2206,9 +2237,9 @@
             <div class="filter-divider"></div>
 
             <div class="filter-label"><i class="bi bi-calendar3"></i> From</div>
-            <input type="date" id="fFrom" class="clean-input" value="2026-01-01" onchange="renderUI()">
+            <input type="date" id="fFrom" class="clean-input" value="2025-01-01" onchange="renderUI()">
             <div class="filter-label"><i class="bi bi-calendar3-range"></i> To</div>
-            <input type="date" id="fTo" class="clean-input" value="2026-12-31" onchange="renderUI()">
+            <input type="date" id="fTo" class="clean-input" value="2025-12-31" onchange="renderUI()">
         </div>
     </div>
 
@@ -2377,38 +2408,83 @@
                         </div>
                         <div class="assign-date-grid">
                             <div class="assign-date-field">
-                                <label class="assign-date-label">
-                                    <i class="bi bi-calendar-check"></i> START DATE
-                                </label>
-                                <input type="date" id="aStart" class="assign-date-input" onchange="onStartDateChange()">
-                            </div>
-                            <div class="assign-date-arrow">
-                                <i class="bi bi-arrow-right-circle-fill"></i>
+                                <label class="assign-date-label">Start Date</label>
+                                <input type="date" id="aStart" class="form-control rounded-3 fw-bold" onchange="onStartDateChange()">
                             </div>
                             <div class="assign-date-field">
-                                <label class="assign-date-label">
-                                    <i class="bi bi-calendar-x"></i> END DATE
-                                </label>
-                                <input type="date" id="aEnd" class="assign-date-input"
-                                    onchange="updateDurationPreview()">
+                                <label class="assign-date-label">End Date</label>
+                                <input type="date" id="aEnd" class="form-control rounded-3 fw-bold" onchange="updateDurationPreview()">
                             </div>
-                        </div>
-                        <div class="assign-duration-preview" id="durationPreview" style="display:none;">
-                            <i class="bi bi-clock-history"></i>
-                            <span id="durationText">─</span>
                         </div>
                     </div>
 
-                    <button class="btn fw-900 w-100 py-3 rounded-pill" style="background:var(--navy-dark);color:white;"
-                        onclick="finalizeAssignment()">
-                        <i class="bi bi-check-circle me-2"></i>Authorize Assignment
+                    <div id="durationPreview" class="p-3 rounded-3 mb-4 d-flex align-items-center gap-3" style="background:#f0fdfa; border:1px solid #ccfbf1; display:none;">
+                        <i class="bi bi-clock-history" style="color:#0d9488; font-size:1.2rem;"></i>
+                        <span id="durationText" class="small fw-bold" style="color:#0f766e;"></span>
+                    </div>
+
+                    <button class="btn fw-900 w-100 py-3 rounded-pill" style="background:var(--navy-dark); color:white;" onclick="finalizeAssign()">
+                        <i class="bi bi-check-circle me-2"></i>Confirm Assignment
                     </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ===== EXPORT RANGE MODAL ===== -->
+    <!-- ===== EDIT ASSIGNMENT MODAL ===== -->
+    <div class="modal fade" id="editAssignModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-hdr-dark d-flex align-items-center justify-content-between">
+                    <h6 class="fw-bold mb-0">
+                        <i class="bi bi-calendar-event me-2"></i>Edit Assignment Timeline
+                    </h6>
+                    <div class="d-flex align-items-center gap-2">
+                        <button type="button" class="btn btn-sm btn-outline-danger border-0 rounded-circle" onclick="requestDeleteAssignment()" title="Delete Assignment">
+                            <i class="bi bi-trash3-fill"></i>
+                        </button>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" style="margin:0;"></button>
+                    </div>
+                </div>
+                <div class="modal-body p-4" style="background:#fafafa;">
+                    <input type="hidden" id="editMachineId">
+                    <input type="hidden" id="editProjCode">
+                    <input type="hidden" id="oldStart">
+                    <input type="hidden" id="oldEnd">
+
+                    <div class="mb-3">
+                        <div class="section-lbl">Project</div>
+                        <select id="editAProjSelect" class="form-select rounded-3 fw-bold">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-6">
+                            <label class="small fw-bold text-muted mb-1">NEW START DATE</label>
+                            <input type="date" id="newAStart" class="form-control rounded-3" onchange="updateEditDurationPreview()">
+                        </div>
+                        <div class="col-6">
+                            <label class="small fw-bold text-muted mb-1">NEW END DATE</label>
+                            <input type="date" id="newAEnd" class="form-control rounded-3" onchange="updateEditDurationPreview()">
+                        </div>
+                    </div>
+
+                    <div id="editDurationPreview" class="p-3 rounded-3 mb-4 d-flex align-items-center gap-3" style="background:#f0fdfa; border:1px solid #ccfbf1; display:none;">
+                        <i class="bi bi-clock-history" style="color:#0d9488; font-size:1.2rem;"></i>
+                        <span id="editDurationText" class="small fw-bold" style="color:#0f766e;"></span>
+                    </div>
+
+                    <button class="btn fw-900 w-100 py-3 rounded-pill" style="background:var(--navy-dark);color:white;"
+                        onclick="saveEditedAssignment()">
+                        <i class="bi bi-save me-2"></i>Update Timeline
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: EXPORT -->
     <div class="modal fade" id="exportRangeModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered" style="max-width:460px;">
             <div class="modal-content border-0 shadow-lg" style="border-radius:1.5rem; overflow:hidden;">
@@ -2417,13 +2493,12 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h5 class="fw-800 mb-0"><i class="bi bi-download me-2"></i>Export Machine Data</h5>
-                            <div style="font-size:0.7rem;opacity:0.6;margin-top:4px;">Choose range, format and download
-                            </div>
+                            <div style="font-size:0.7rem;opacity:0.6;margin-top:4px;">Choose range, format and download</div>
                         </div>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
                 </div>
-                <div class="modal-body p-4" style="background:#fafafa;">
+                <div class="modal-body p-4">
                     <div class="d-flex align-items-center gap-2 mb-4 p-3 rounded-3"
                         style="background:#f0f7ff; border: 1px solid #bfdbfe;">
                         <i class="bi bi-calendar-check-fill text-primary"></i>
@@ -2434,9 +2509,7 @@
                     </div>
 
                     <!-- Format Selector -->
-                    <div class="section-lbl mb-2"
-                        style="font-size:0.75rem; font-weight:800; color:var(--navy-mid); text-transform:uppercase; letter-spacing:1px;">
-                        Export Format</div>
+                    <div class="section-lbl mb-2">Export Format</div>
                     <div class="d-flex gap-3 mb-4" id="formatBtns">
                         <button class="flex-fill btn border rounded-3 py-4 format-opt active" id="fmtPdf"
                             onclick="selectFormat('pdf')" style="transition:all .2s;">
@@ -2448,7 +2521,7 @@
                             onclick="selectFormat('csv')" style="transition:all .2s;">
                             <i class="bi bi-file-earmark-spreadsheet d-block mb-2"
                                 style="font-size:2rem;color:#10b981;"></i>
-                            <span class="fw-800">CSV/Excel</span>
+                            <span class="fw-800">CSV Spreadsheet</span>
                             <div style="font-size:0.65rem;color:#64748b;margin-top:4px;">Machine + Timeline</div>
                         </button>
                     </div>
@@ -2469,8 +2542,28 @@
 
     <script>
         const API_BASE = '/api';
+        const USER_DEPT = localStorage.getItem('user_dept') || 'All';
+        const IS_ADMIN = USER_DEPT === 'All' || USER_DEPT === 'Machine Allocation';
+
+        // Auth Check
+        if (localStorage.getItem('danprel_auth') !== 'true') {
+            window.location.href = 'login.html';
+        }
+
+        function checkMachinePermission(action = "perform this action") {
+            if (IS_ADMIN) return true;
+            showToast(`<i class="bi bi-shield-lock-fill me-2" style="color:#ef4444"></i>Access Denied: Only **Machine Allocation** users can ${action}.`);
+            return false;
+        }
+
+        function performLogout() {
+            localStorage.removeItem('danprel_auth');
+            localStorage.removeItem('user_dept');
+            window.location.href = 'login.html';
+        }
+        const ADMIN_PIN = '1234';
         let machines = [];
-        let projects = [];
+        let projectRegistry = []; // Rename to projectRegistry for consistency
         let _pendingDeleteIdx = null;
         const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         const DAY_ABBR = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -2484,16 +2577,31 @@
         ];
 
         function getProjectColor(code) {
-            const idx = projects.findIndex(p => p.code === code);
+            const idx = projectRegistry.findIndex(p => p.code === code);
             const n = idx >= 0 ? idx : Math.abs([...code].reduce((a, c) => a + c.charCodeAt(0), 0));
             return PROJECT_PALETTE[n % PROJECT_PALETTE.length];
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
-            updateClock();
-            setInterval(updateClock, 1000);
-            initResizableContainers();
-            await loadData();
+             updateClock();
+             setInterval(updateClock, 1000);
+             initResizableContainers();
+             
+             // Set default filters to CURRENT month and year
+             const now = new Date();
+             const curY = now.getFullYear();
+             const curM = now.getMonth() + 1;
+             const lastDay = new Date(curY, curM, 0).getDate();
+             
+             const fYear = document.getElementById('fYear');
+             const fFrom = document.getElementById('fFrom');
+             const fTo = document.getElementById('fTo');
+             
+             if (fYear) fYear.value = curY;
+             if (fFrom) fFrom.value = `${curY}-01-01`;
+             if (fTo) fTo.value = `${curY}-12-31`;
+
+             await loadData();
         });
 
         function initResizableContainers() {
@@ -2569,7 +2677,7 @@
                 ]);
 
                 machines = mRes.map(m => ({ ...m, assignments: [] }));
-                projects = pRes;
+                projectRegistry = pRes;
 
                 // Map assignments to machines
                 aRes.forEach(a => {
@@ -2579,22 +2687,26 @@
                     }
                 });
 
-                populateProjectDropdown();
+                syncProjectFilter();
                 renderUI();
             } catch (err) {
                 console.error('Loader Error:', err);
             }
         }
 
-        function populateProjectDropdown() {
+        function syncProjectFilter() {
             // Main filter
             const fSel = document.getElementById('fProject');
-            fSel.innerHTML = '<option value="ALL">All Projects</option>' +
-                projects.map(p => `<option value="${p.code}">${p.code} - ${p.name}</option>`).join('');
+            if (fSel) {
+                fSel.innerHTML = '<option value="ALL">All Projects</option>' +
+                    projectRegistry.map(p => `<option value="${p.code}">${p.code} - ${p.name}</option>`).join('');
+            }
 
             // Modal dropdown
             const aSel = document.getElementById('aProjCode');
-            aSel.innerHTML = projects.map(p => `<option value="${p.code}">${p.code} - ${p.name}</option>`).join('');
+            if (aSel) {
+                aSel.innerHTML = projectRegistry.map(p => `<option value="${p.code}">${p.code} - ${p.name}</option>`).join('');
+            }
         }
 
         function renderUI() {
@@ -2614,7 +2726,7 @@
 
         function updateStats(data) {
             document.getElementById('sc-total').textContent = data.length;
-            document.getElementById('sc-proj').textContent = projects ? projects.length : 0;
+            document.getElementById('sc-proj').textContent = projectRegistry ? projectRegistry.length : 0;
         }
 
         function renderTable(data = machines) {
@@ -2767,6 +2879,16 @@
             return weeks;
         }
 
+        /* =========================================================
+           YEAR CHANGE
+        ========================================================= */
+        function onYearChange() {
+            const yr = parseInt(document.getElementById('fYear').value);
+            document.getElementById('fFrom').value = yr + '-01-01';
+            document.getElementById('fTo').value = yr + '-12-31';
+            renderUI();
+        }
+
         function buildGanttHeaders(weeks) {
             const widths = new Array(12).fill(0);
             weeks.forEach(w => {
@@ -2872,10 +2994,12 @@
         }
 
         function openAddMachine() {
+            if (!checkMachinePermission("add machines")) return;
             new bootstrap.Modal(document.getElementById('addMachineModal')).show();
         }
 
         async function finalizeAddMachine() {
+            if (!checkMachinePermission("add machines")) return;
             const name = document.getElementById('mName').value;
             const machineId = document.getElementById('mId').value;
             const specification = document.getElementById('mSpec').value;
@@ -2913,6 +3037,7 @@
         }
 
         function openEditMachine(idx) {
+            if (!checkMachinePermission("edit machines")) return;
             const m = machines[idx];
             document.getElementById('eIdx').value = idx;
             document.getElementById('eName').value = m.name;
@@ -2923,6 +3048,7 @@
         }
 
         async function finalizeEditMachine() {
+            if (!checkMachinePermission("edit machines")) return;
             const idx = document.getElementById('eIdx').value;
             const oldId = machines[idx].machineId;
             const newId = document.getElementById('eId').value.trim();
@@ -2963,6 +3089,7 @@
         }
 
         async function deleteMachine(idx) {
+            if (!checkMachinePermission("delete machines")) return;
             const m = machines[idx];
             _pendingDeleteIdx = idx;
             document.getElementById('deleteMachineName').textContent = m.name;
@@ -3008,6 +3135,7 @@
         });
 
         function openAssign(idx) {
+            if (!checkMachinePermission("assign projects")) return;
             const m = machines[idx];
             document.getElementById('assignMachineIdx').value = idx;
             document.getElementById('assignMachineName').textContent = m.name;
@@ -3024,7 +3152,7 @@
 
         function onAssignProjectChange() {
             const code = document.getElementById('aProjCode').value;
-            const proj = projects.find(p => p.code === code);
+            const proj = projectRegistry.find(p => p.code === code);
             const info = document.getElementById('assignProjInfo');
             if (proj) {
                 document.getElementById('assignProjLabel').textContent = `${proj.code} — ${proj.name}`;
@@ -3069,6 +3197,7 @@
         }
 
         async function finalizeAssignment() {
+            if (!checkMachinePermission("assign projects")) return;
             const idx = document.getElementById('assignMachineIdx').value;
             const machine = machines[idx];
             const projCode = document.getElementById('aProjCode').value;
@@ -3427,6 +3556,9 @@
                             <div class="dc-proj-days-num">${days}</div>
                             <div class="dc-proj-days-lbl">DAYS</div>
                         </div>
+                        <button class="btn-edit-assign" onclick="openEditAssignment('${m.machineId}', '${p.projCode}', '${p.start}', '${p.end}')" title="Edit Timeline">
+                            <i class="bi bi-pencil-square"></i>
+                        </button>
                     </div>`;
                 }).join('')
                 : `<div class="dc-empty-state"><i class="bi bi-folder-x"></i><p>No projects assigned yet.</p></div>`;
@@ -3436,6 +3568,128 @@
             document.getElementById('dimOverlay').style.display = 'block';
             card.style.display = 'block';
             requestAnimationFrame(() => card.classList.add('open'));
+        }
+
+        function openEditAssignment(machineId, projCode, start, end) {
+            if (!checkMachinePermission("edit assignments")) return;
+            closePopup();
+            document.getElementById('editMachineId').value = machineId;
+            document.getElementById('editProjCode').value = projCode;
+            document.getElementById('oldStart').value = start;
+            document.getElementById('oldEnd').value = end;
+            document.getElementById('newAStart').value = start;
+            document.getElementById('newAEnd').value = end;
+
+            const sel = document.getElementById('editAProjSelect');
+            sel.innerHTML = projectRegistry.map(p => 
+                `<option value="${p.code}" ${p.code === projCode ? 'selected' : ''}>${p.code} — ${p.name}</option>`
+            ).join('');
+
+            updateEditDurationPreview();
+            new bootstrap.Modal(document.getElementById('editAssignModal')).show();
+        }
+
+        function updateEditDurationPreview() {
+            const s = document.getElementById('newAStart').value;
+            const e = document.getElementById('newAEnd').value;
+            const preview = document.getElementById('editDurationPreview');
+            const text = document.getElementById('editDurationText');
+            
+            if (s && e) {
+                const diff = Math.ceil((new Date(e) - new Date(s)) / 86400000) + 1;
+                if (diff > 0) {
+                    text.innerHTML = `Total Duration: <strong>${diff} Days</strong>`;
+                    preview.style.display = 'flex';
+                } else {
+                    preview.style.display = 'none';
+                }
+            } else {
+                preview.style.display = 'none';
+            }
+        }
+
+        async function saveEditedAssignment() {
+            if (!checkMachinePermission("edit assignments")) return;
+            const machineId = document.getElementById('editMachineId').value;
+            const oldProjCode = document.getElementById('editProjCode').value;
+            const newProjCode = document.getElementById('editAProjSelect').value;
+            const oldS = document.getElementById('oldStart').value;
+            const oldE = document.getElementById('oldEnd').value;
+            const newS = document.getElementById('newAStart').value;
+            const newE = document.getElementById('newAEnd').value;
+
+            if (!newS || !newE) return showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#f59e0b"></i>Please select both dates.');
+            if (new Date(newE) < new Date(newS)) return showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>End date must be after start date.');
+
+            const days = Math.ceil((new Date(newE) - new Date(newS)) / 86400000) + 1;
+
+            try {
+                const res = await fetch(`${API_BASE}/update-machine-assignment`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        machineId, oldProjCode, newProjCode, oldStart: oldS, oldEnd: oldE,
+                        newStart: newS, newEnd: newE, days
+                    })
+                });
+
+                if (res.ok) {
+                    const m = machines.find(x => x.machineId === machineId);
+                    if (m) {
+                        const a = m.assignments.find(as => as.projCode === oldProjCode && as.start === oldS && as.end === oldE);
+                        if (a) {
+                            a.projCode = newProjCode;
+                            a.start = newS;
+                            a.end = newE;
+                            a.days = days;
+                        }
+                    }
+                    renderUI();
+                    bootstrap.Modal.getInstance(document.getElementById('editAssignModal')).hide();
+                    showToast(`<i class="bi bi-check-circle-fill me-2" style="color:var(--teal-bright)"></i>Assignment updated.`);
+                } else {
+                    const data = await res.json();
+                    showToast(`<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Update failed: ${data.error}`);
+                }
+            } catch (e) {
+                showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Connection error.');
+            }
+        }
+
+        function requestDeleteAssignment() {
+            bootstrap.Modal.getInstance(document.getElementById('editAssignModal')).hide();
+            new bootstrap.Modal(document.getElementById('assignDeleteConfirmModal')).show();
+        }
+
+        async function finalizeDeleteAssignment() {
+            if (!checkMachinePermission("delete assignments")) return;
+            const machineId = document.getElementById('editMachineId').value;
+            const projCode = document.getElementById('editProjCode').value;
+            const start = document.getElementById('oldStart').value;
+            const end = document.getElementById('oldEnd').value;
+
+            try {
+                const res = await fetch(`${API_BASE}/delete-machine-assignment`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ machineId, projCode, start, end })
+                });
+
+                if (res.ok) {
+                    const m = machines.find(x => x.machineId === machineId);
+                    if (m) {
+                        m.assignments = m.assignments.filter(as => !(as.projCode === projCode && as.start === start && as.end === end));
+                    }
+                    renderUI();
+                    bootstrap.Modal.getInstance(document.getElementById('assignDeleteConfirmModal')).hide();
+                    showToast(`<i class="bi bi-trash-fill me-2" style="color:#e11d48"></i>Assignment deleted.`);
+                } else {
+                    const data = await res.json();
+                    showToast(`<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Delete failed: ${data.error}`);
+                }
+            } catch (e) {
+                showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>Connection error.');
+            }
         }
 
         function closePopup() {

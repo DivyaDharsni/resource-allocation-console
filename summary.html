@@ -1396,7 +1396,7 @@
             <!-- Action Button -->
             <a href="resource.html?add=project" class="sidebar-btn"
                 style="background: rgba(255, 255, 255, 0.05); margin-top: 20px;">
-                <i class="bi bi-folder-plus"></i> Add Project
+                <i class="bi bi-kanban"></i> Project Hub
             </a>
 
             <!-- Feedback Section -->
@@ -1636,7 +1636,7 @@
                     projectsData = pRes;
 
                     localStorage.setItem('danprel_last_data', Date.now());
-                    updateFromToDates();
+                    updateFromToDates(true);
                     updateAnalysis();
                 } catch (e) {
                     console.error('API Error:', e);
@@ -1657,7 +1657,7 @@
                     assignmentsData = [];
                     projectsData = [];
                 }
-                updateFromToDates();
+                updateFromToDates(true);
                 updateAnalysis();
             }
 
@@ -1731,17 +1731,24 @@
         ══════════════════════════════════════════════════════ */
         function setupYearDropdown() {
             const sel = document.getElementById('selYear');
-            const cur = new Date().getFullYear();
-            for (let y = cur - 1; y <= cur + 3; y++) {
+            const now = new Date();
+            const curY = now.getFullYear();
+            const curM = now.getMonth();
+
+            for (let y = curY - 1; y <= curY + 3; y++) {
                 const o = document.createElement('option');
                 o.value = y; o.textContent = y;
-                if (y === cur) o.selected = true;
+                if (y === curY) o.selected = true;
                 sel.appendChild(o);
             }
+            
+            const selMonth = document.getElementById('selMonth');
+            if (selMonth) selMonth.value = curM;
         }
 
-        function updateFromToDates() {
-            populateWeeks();
+        function updateFromToDates(shouldPopulateWeeks = false) {
+            if (shouldPopulateWeeks) populateWeeks();
+            
             const y = parseInt(document.getElementById('selYear').value);
             const m = parseInt(document.getElementById('selMonth').value);
             const selW = document.getElementById('selWeek').value;
@@ -1814,8 +1821,8 @@
             return weeks;
         }
 
-        function handleYearMonthChange() { updateFromToDates(); updateAnalysis(); }
-        function handleWeekChange() { updateFromToDates(); updateAnalysis(); }
+        function handleYearMonthChange() { updateFromToDates(true); updateAnalysis(); }
+        function handleWeekChange() { updateFromToDates(false); updateAnalysis(); }
 
         function updateRangeBadge(start, end) {
             const days = daysBetween(start, end);
@@ -1835,8 +1842,11 @@
 
             const y = parseInt(document.getElementById('selYear').value);
             const m = parseInt(document.getElementById('selMonth').value);
+            const selW = document.getElementById('selWeek');
+            const weekText = selW.value === 'ALL' ? '' : ` — ${selW.options[selW.selectedIndex].textContent}`;
+            
             document.getElementById('chartSubtitle').textContent =
-                `${MONTH_NAMES[m].toUpperCase()}-${y}`;
+                `${MONTH_NAMES[m].toUpperCase()} ${y}${weekText}`;
 
             /* ── All unique departments (X-axis) ── */
             const depts = [...new Set(registryData.map(r => r.dept))].sort();
@@ -2240,6 +2250,12 @@
                     showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>PDF export failed.');
                 }
             }
+        }
+
+        function performLogout() {
+            localStorage.removeItem('danprel_auth');
+            localStorage.removeItem('user_dept');
+            window.location.href = 'login.html';
         }
     </script>
     <div id="ganttToast" class="gantt-toast"></div>
