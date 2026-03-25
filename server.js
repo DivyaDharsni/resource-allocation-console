@@ -63,7 +63,8 @@ const MachineAssignment = mongoose.models.MachineAssignment || mongoose.model('M
 
 const Feedback = mongoose.models.Feedback || mongoose.model('Feedback', {
     text: String,
-    timestamp: { type: Date, default: Date.now }
+    timestamp: { type: Date, default: Date.now },
+    dismissed: { type: Boolean, default: false }
 });
 
 // ── MIME types ────────────────────────────────────────────────
@@ -372,6 +373,23 @@ const server = http.createServer(async (req, res) => {
             try {
                 const data = JSON.parse(await readBody(req));
                 await Feedback.create({ text: data.text });
+                return json(res, 200, { success: true });
+            } catch (e) { return json(res, 400, { error: e.message }); }
+        }
+
+        // API: Get All Feedback (Admin) - only non-dismissed
+        if (apiPath === '/get-feedback' && req.method === 'GET') {
+            try {
+                const feedbacks = await Feedback.find({ dismissed: { $ne: true } }).sort({ timestamp: 1 });
+                return json(res, 200, feedbacks);
+            } catch (e) { return json(res, 500, { error: e.message }); }
+        }
+
+        // API: Dismiss Feedback (keeps in DB, hides from panel)
+        if (apiPath === '/dismiss-feedback' && req.method === 'POST') {
+            try {
+                const data = JSON.parse(await readBody(req));
+                await Feedback.findByIdAndUpdate(data.id, { dismissed: true });
                 return json(res, 200, { success: true });
             } catch (e) { return json(res, 400, { error: e.message }); }
         }

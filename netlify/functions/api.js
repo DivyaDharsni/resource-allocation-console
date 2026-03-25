@@ -42,6 +42,12 @@ const MachineAssignment = mongoose.models.MachineAssignment || mongoose.model('M
     days: Number
 });
 
+const Feedback = mongoose.models.Feedback || mongoose.model('Feedback', {
+    text: String,
+    timestamp: { type: Date, default: Date.now },
+    dismissed: { type: Boolean, default: false }
+});
+
 // Helpers
 function parseExp(val) {
     if (!val) return { y: 0, m: 0 };
@@ -231,6 +237,26 @@ exports.handler = async (event, context) => {
                 { machineId: data.machineId, projCode: data.projCode, start: data.oldStart, end: data.oldEnd },
                 { start: data.newStart, end: data.newEnd, days: days }
             );
+            return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
+        }
+
+        // POST: Add Feedback
+        if (path === '/add-feedback' && method === 'POST') {
+            const data = JSON.parse(event.body);
+            await Feedback.create({ text: data.text });
+            return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
+        }
+
+        // GET: Get All Feedback (Admin) - only non-dismissed
+        if (path === '/get-feedback' && method === 'GET') {
+            const feedbacks = await Feedback.find({ dismissed: { $ne: true } }).sort({ timestamp: 1 });
+            return { statusCode: 200, headers, body: JSON.stringify(feedbacks) };
+        }
+
+        // POST: Dismiss Feedback (keeps in DB, hides from panel)
+        if (path === '/dismiss-feedback' && method === 'POST') {
+            const data = JSON.parse(event.body);
+            await Feedback.findByIdAndUpdate(data.id, { dismissed: true });
             return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
         }
 
