@@ -1390,7 +1390,7 @@
             <div class="fp-item">
                 <i class="bi bi-calendar3 text-primary"></i>
                 <span class="fp-label">Month</span>
-                <select id="selMonth" class="fp-select" onchange="updateAnalysis()">
+                <select id="selMonth" class="fp-select" onchange="handleYearMonthChange()">
                     <option value="0">January</option>
                     <option value="1">February</option>
                     <option value="2">March</option>
@@ -1408,21 +1408,19 @@
             <div class="fp-divider"></div>
             <div class="fp-item">
                 <span class="fp-label">Year</span>
-                <select id="selYear" class="fp-select" onchange="updateAnalysis()">
-                    <option value="2025">2025</option>
-                    <option value="2026">2026</option>
-                    <option value="2027">2027</option>
-                </select>
+                <select id="selYear" class="fp-select" onchange="handleYearMonthChange()"></select>
             </div>
             <div class="fp-divider"></div>
             <div class="fp-item">
                 <i class="bi bi-calendar-week text-warning"></i>
                 <span class="fp-label">Week</span>
-                <select id="selWeek" class="fp-select" onchange="updateAnalysis()">
+                <select id="selWeek" class="fp-select" onchange="handleWeekChange()">
                     <option value="ALL">All Weeks</option>
                 </select>
             </div>
             <div class="fp-divider"></div>
+            <input type="hidden" id="fromDate">
+            <input type="hidden" id="toDate">
             <span class="fp-range-badge" id="rangeBadge">─ Days</span>
         </div>
     </div>
@@ -1520,6 +1518,9 @@
         let assignments = [];
         let myChart = null;
 
+        const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'];
+
         document.addEventListener('DOMContentLoaded', async () => {
             updateClock(); setInterval(updateClock, 1000);
             setupYearDropdown();
@@ -1563,61 +1564,125 @@
             const sel = document.getElementById('selWeek');
             while (sel.options.length > 1) sel.remove(1);
 
-            let d = new Date(y, m, 1);
-            while (d.getMonth() === m) {
-                if (d.getDay() === 1 || d.getDate() === 1) {
-                    const opt = document.createElement('option');
-                    const weekEnd = new Date(d); weekEnd.setDate(d.getDate() + 6);
-                    if (weekEnd.getMonth() !== m) weekEnd.setDate(new Date(y, m + 1, 0).getDate());
+            const allWeeks = getWeeksOfYear(y);
+            const monthWeeks = allWeeks.filter(w => {
+                const wEnd = new Date(w.date.getTime() + 6 * 86400000);
+                return (w.date.getMonth() === m || wEnd.getMonth() === m);
+            });
 
-                    const startStr = d.toISOString().split('T')[0];
-                    const endStr = weekEnd.toISOString().split('T')[0];
-                    opt.value = `${startStr}|${endStr}`;
-                    opt.textContent = `Week of ${d.getDate()} ${new Date(y, m, 1).toLocaleString('en-GB', { month: 'short' })}`;
-                    sel.appendChild(opt);
-                }
-                d.setDate(d.getDate() + 1);
-            }
+            monthWeeks.forEach(w => {
+                const opt = document.createElement('option');
+                const end = new Date(w.date.getTime() + 6 * 86400000);
+                const val = `${toISO(w.date)}|${toISO(end)}`;
+                opt.value = val;
+                opt.textContent = `W${w.weekNum} (${w.label})`;
+                sel.appendChild(opt);
+            });
         }
 
-        function updateAnalysis() {
+        function getWeeksOfYear(year) {
+            const weeks = [];
+            function makeWeek(num, startDate) {
+                const sm = startDate.getMonth();
+                const end = new Date(startDate.getTime() + 6 * 86400000);
+                const em = (end.getFullYear() === year) ? end.getMonth() : sm;
+                return {
+                    weekNum: num, date: new Date(startDate),
+                    label: startDate.getDate().toString().padStart(2, '0') + ' ' + MONTH_NAMES[sm],
+                    startMonth: sm, endMonth: em
+                };
+            }
+            const jan1 = new Date(year, 0, 1);
+            weeks.push(makeWeek(1, jan1));
+            let d = new Date(year, 0, 2);
+            while (d.getDay() !== 1) d.setDate(d.getDate() + 1);
+            let wNum = 2;
+            while (d.getFullYear() === year) {
+                weeks.push(makeWeek(wNum, d));
+                d.setDate(d.getDate() + 7);
+                wNum++;
+            }
+            return weeks;
+        }
+
+        function updateFromToDates(shouldPopulateWeeks = false) {
+            if (shouldPopulateWeeks) populateWeeks();
+            
             const y = parseInt(document.getElementById('selYear').value);
             const m = parseInt(document.getElementById('selMonth').value);
             const selW = document.getElementById('selWeek').value;
 
-            let start, end;
             if (selW === 'ALL') {
-                start = new Date(y, m, 1);
-                end = new Date(y, m + 1, 0);
-                populateWeeks(); // re-pop if month changed
+                const first = new Date(y, m, 1);
+                const last = new Date(y, m + 1, 0);
+                document.getElementById('fromDate').value = toISO(first);
+                document.getElementById('toDate').value = toISO(last);
+                updateRangeBadge(first, last);
             } else {
                 const parts = selW.split('|');
-                start = new Date(parts[0]);
-                end = new Date(parts[1]);
+                document.getElementById('fromDate').value = parts[0];
+                document.getElementById('toDate').value = parts[1];
+                updateRangeBadge(new Date(parts[0]), new Date(parts[1]));
+            }
+        }
+
+        function toISO(d) {
+            if (!d) return '';
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function handleYearMonthChange() { updateFromToDates(true); updateAnalysis(); }
+        function handleWeekChange() { updateFromToDates(false); updateAnalysis(); }
+
+        function updateRangeBadge(start, end) {
+            const days = Math.max(1, Math.ceil(Math.abs(end - start) / 86400000) + 1);
+            document.getElementById('rangeBadge').textContent = `${days} Days`;
+            return days;
+        }
+
+        function updateAnalysis() {
+            const fromStr = document.getElementById('fromDate').value;
+            const toStr = document.getElementById('toDate').value;
+            if(!fromStr || !toStr) {
+                updateFromToDates(true);
             }
 
+            const start = new Date(document.getElementById('fromDate').value);
+            const end = new Date(document.getElementById('toDate').value);
+            const y = parseInt(document.getElementById('selYear').value);
+            const m = parseInt(document.getElementById('selMonth').value);
+
             const totalDays = Math.ceil((end - start) / 86400000) + 1;
-            document.getElementById('rangeBadge').textContent = `${totalDays} Days`;
-            document.getElementById('chartSubtitle').textContent = `${new Date(y, m, 1).toLocaleString('en-GB', { month: 'long' }).toUpperCase()} ${y}`;
+            document.getElementById('chartSubtitle').textContent = `${MONTH_NAMES[m].toUpperCase()} ${y}`;
 
             let periodAllocTotal = 0;
             const stats = machines.map(mch => {
-                let mchAlloc = 0;
+                const allocatedDates = new Set();
                 const mchAsgn = assignments.filter(a => a.machineId === mch.machineId);
+                
                 mchAsgn.forEach(a => {
                     const aStart = new Date(a.start);
                     const aEnd = new Date(a.end);
-                    const overlapStart = new Date(Math.max(start, aStart));
-                    const overlapEnd = new Date(Math.min(end, aEnd));
-                    if (overlapStart <= overlapEnd) {
-                        mchAlloc += Math.ceil((overlapEnd - overlapStart) / 86400000) + 1;
+                    const iter = new Date(Math.max(start, aStart));
+                    const oEnd = new Date(Math.min(end, aEnd));
+                    
+                    while (iter <= oEnd) {
+                        allocatedDates.add(toISO(iter));
+                        iter.setDate(iter.getDate() + 1);
                     }
                 });
+
+                const mchAlloc = allocatedDates.size;
                 periodAllocTotal += mchAlloc;
+                
                 return {
                     name: mch.name, id: mch.machineId,
-                    allocated: mchAlloc, free: totalDays - mchAlloc,
-                    util: totalDays > 0 ? Math.round((mchAlloc / totalDays) * 100) : 0
+                    allocated: mchAlloc, 
+                    free: Math.max(0, totalDays - mchAlloc),
+                    util: totalDays > 0 ? Math.min(100, Math.round((mchAlloc / totalDays) * 100)) : 0
                 };
             });
 
@@ -1897,23 +1962,28 @@
             const totalPeriodDays = Math.ceil((eDate - sDate) / 86400000) + 1;
 
             const exportData = machines.map(m => {
-                let allocCount = 0;
+                const allocatedDates = new Set();
                 assignments.filter(a => a.machineId === m.machineId).forEach(a => {
                     const as = new Date(a.start + 'T00:00:00');
                     const ae = new Date(a.end + 'T00:00:00');
-                    const is = (as > sDate) ? as : sDate;
+                    const iter = new Date(as > sDate ? as : sDate);
                     const ie = (ae < eDate) ? ae : eDate;
-                    if (is <= ie) {
-                        allocCount += Math.ceil((ie - is) / 86400000) + 1;
+                    
+                    while (iter <= ie) {
+                        allocatedDates.add(toISO(iter));
+                        iter.setDate(iter.getDate() + 1);
                     }
                 });
-                const util = Math.round((allocCount / totalPeriodDays) * 100);
+                
+                const allocCount = allocatedDates.size;
+                const util = totalPeriodDays > 0 ? Math.min(100, Math.round((allocCount / totalPeriodDays) * 100)) : 0;
+                
                 return {
                     name: m.name,
                     id: m.machineId,
                     capacity: totalPeriodDays,
                     allocated: allocCount,
-                    idle: totalPeriodDays - allocCount,
+                    idle: Math.max(0, totalPeriodDays - allocCount),
                     util: util
                 };
             });

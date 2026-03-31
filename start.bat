@@ -7,7 +7,7 @@ echo   Resource Allocation Console
 echo  ============================================================
 echo.
 echo  Starting server...
-echo  Once ready, open: http://localhost:3000
+echo  Once ready, open: http://localhost:3001
 echo.
 node "%~dp0server.js"
 pause
