@@ -1419,6 +1419,13 @@
                 </select>
             </div>
             <div class="fp-divider"></div>
+            <div class="fp-item">
+                <div class="form-check form-switch m-0 d-flex align-items-center gap-2">
+                    <input class="form-check-input" type="checkbox" id="chkExcludeHolidays" onchange="updateAnalysis()" style="cursor: pointer; width: 36px; height: 18px;">
+                    <label class="fp-label mb-0" for="chkExcludeHolidays" style="cursor: pointer; color: var(--navy-dark);">Exclude Sundays & Holidays</label>
+                </div>
+            </div>
+            <div class="fp-divider"></div>
             <input type="hidden" id="fromDate">
             <input type="hidden" id="toDate">
             <span class="fp-range-badge" id="rangeBadge">─ Days</span>
@@ -1520,6 +1527,20 @@
 
         const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June',
             'July', 'August', 'September', 'October', 'November', 'December'];
+
+        // Tamil Nadu Government Fixed Holidays 2026
+        const TN_HOLIDAYS_2026 = [
+            '2026-01-01', // New Year's Day
+            '2026-01-14', // Pongal
+            '2026-01-15', // Thiruvalluvar Day
+            '2026-01-16', // Uzhavar Thirunal
+            '2026-01-26', // Republic Day
+            '2026-04-14', // Tamil New Year / Dr. B.R. Ambedkar's Birthday
+            '2026-05-01', // May Day
+            '2026-08-15', // Independence Day
+            '2026-10-02', // Gandhi Jayanti
+            '2026-12-25', // Christmas
+        ];
 
         document.addEventListener('DOMContentLoaded', async () => {
             updateClock(); setInterval(updateClock, 1000);
@@ -1638,9 +1659,27 @@
         function handleWeekChange() { updateFromToDates(false); updateAnalysis(); }
 
         function updateRangeBadge(start, end) {
-            const days = Math.max(1, Math.ceil(Math.abs(end - start) / 86400000) + 1);
-            document.getElementById('rangeBadge').textContent = `${days} Days`;
-            return days;
+            const exclude = document.getElementById('chkExcludeHolidays').checked;
+            let count = 0;
+            let iter = new Date(start);
+            while (iter <= end) {
+                if (exclude) {
+                    if (isWorkingDay(iter)) count++;
+                } else {
+                    count++;
+                }
+                iter.setDate(iter.getDate() + 1);
+            }
+            document.getElementById('rangeBadge').textContent = `${count} ${exclude ? 'Working ' : ''}Days`;
+            return count;
+        }
+
+        function isWorkingDay(date) {
+            const day = date.getDay();
+            if (day === 0) return false; // Sunday
+            const iso = toISO(date);
+            if (TN_HOLIDAYS_2026.includes(iso)) return false; // Holiday
+            return true;
         }
 
         function updateAnalysis() {
@@ -1654,9 +1693,20 @@
             const end = new Date(document.getElementById('toDate').value);
             const y = parseInt(document.getElementById('selYear').value);
             const m = parseInt(document.getElementById('selMonth').value);
+            const exclude = document.getElementById('chkExcludeHolidays').checked;
 
-            const totalDays = Math.ceil((end - start) / 86400000) + 1;
-            document.getElementById('chartSubtitle').textContent = `${MONTH_NAMES[m].toUpperCase()} ${y}`;
+            // Calculate Capacity Days (Denominator)
+            let totalPeriodDays = 0;
+            let iterCap = new Date(start);
+            while (iterCap <= end) {
+                if (!exclude || isWorkingDay(iterCap)) {
+                    totalPeriodDays++;
+                }
+                iterCap.setDate(iterCap.getDate() + 1);
+            }
+            
+            updateRangeBadge(start, end);
+            document.getElementById('chartSubtitle').textContent = `${MONTH_NAMES[m].toUpperCase()} ${y}${exclude ? ' (EXCL. SUNDAYS & HOLIDAYS)' : ''}`;
 
             let periodAllocTotal = 0;
             const stats = machines.map(mch => {
@@ -1670,7 +1720,9 @@
                     const oEnd = new Date(Math.min(end, aEnd));
                     
                     while (iter <= oEnd) {
-                        allocatedDates.add(toISO(iter));
+                        if (!exclude || isWorkingDay(iter)) {
+                            allocatedDates.add(toISO(iter));
+                        }
                         iter.setDate(iter.getDate() + 1);
                     }
                 });
@@ -1678,24 +1730,25 @@
                 const mchAlloc = allocatedDates.size;
                 periodAllocTotal += mchAlloc;
                 
+                const freeCount = Math.max(0, totalPeriodDays - mchAlloc);
                 return {
                     name: mch.name, id: mch.machineId,
                     allocated: mchAlloc, 
-                    free: Math.max(0, totalDays - mchAlloc),
-                    util: totalDays > 0 ? Math.min(100, Math.round((mchAlloc / totalDays) * 100)) : 0
+                    free: freeCount,
+                    util: totalPeriodDays > 0 ? Math.min(100, Math.round((mchAlloc / totalPeriodDays) * 100)) : 0
                 };
             });
 
             // Update Totals
-            const cap = machines.length * totalDays;
+            const cap = machines.length * totalPeriodDays;
             document.getElementById('tTotalMch').textContent = machines.length;
             document.getElementById('tTotalDays').textContent = cap;
             document.getElementById('tAllocated').textContent = periodAllocTotal;
             document.getElementById('tFree').textContent = cap - periodAllocTotal;
             document.getElementById('tUtil').textContent = cap > 0 ? Math.round((periodAllocTotal / cap) * 100) + '%' : '0%';
 
-            renderChart(stats, totalDays);
-            renderTable(stats, totalDays);
+            renderChart(stats, totalPeriodDays);
+            renderTable(stats, totalPeriodDays);
         }
 
         function renderChart(stats, maxDays) {
@@ -1959,7 +2012,15 @@
                 sDate = new Date(weekParts[0] + 'T00:00:00');
                 eDate = new Date(weekParts[1] + 'T00:00:00');
             }
-            const totalPeriodDays = Math.ceil((eDate - sDate) / 86400000) + 1;
+            const exclude = document.getElementById('chkExcludeHolidays').checked;
+            let totalPeriodDaysExport = 0;
+            let iterCapExport = new Date(sDate);
+            while (iterCapExport <= eDate) {
+                if (!exclude || isWorkingDay(iterCapExport)) {
+                    totalPeriodDaysExport++;
+                }
+                iterCapExport.setDate(iterCapExport.getDate() + 1);
+            }
 
             const exportData = machines.map(m => {
                 const allocatedDates = new Set();
@@ -1970,20 +2031,22 @@
                     const ie = (ae < eDate) ? ae : eDate;
                     
                     while (iter <= ie) {
-                        allocatedDates.add(toISO(iter));
+                        if (!exclude || isWorkingDay(iter)) {
+                            allocatedDates.add(toISO(iter));
+                        }
                         iter.setDate(iter.getDate() + 1);
                     }
                 });
                 
                 const allocCount = allocatedDates.size;
-                const util = totalPeriodDays > 0 ? Math.min(100, Math.round((allocCount / totalPeriodDays) * 100)) : 0;
+                const util = totalPeriodDaysExport > 0 ? Math.min(100, Math.round((allocCount / totalPeriodDaysExport) * 100)) : 0;
                 
                 return {
                     name: m.name,
                     id: m.machineId,
-                    capacity: totalPeriodDays,
+                    capacity: totalPeriodDaysExport,
                     allocated: allocCount,
-                    idle: Math.max(0, totalPeriodDays - allocCount),
+                    idle: Math.max(0, totalPeriodDaysExport - allocCount),
                     util: util
                 };
             });

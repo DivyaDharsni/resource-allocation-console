@@ -100,22 +100,21 @@
         }
 
         header {
-            padding: 40px 40px 20px;
-            text-align: center;
+            padding: 25px 30px 5px;
         }
 
         .logo-box {
-            width: 80px;
-            height: 80px;
+            width: 50px;
+            height: 50px;
             background: #fff;
-            border-radius: 20px;
-            margin: 0 auto 20px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
             border: 1px solid var(--border);
-            padding: 12px;
+            padding: 8px;
+            flex-shrink: 0;
         }
 
         .logo-box img {
@@ -123,21 +122,46 @@
             object-fit: contain;
         }
 
+        .header-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .brand-info {
+            text-align: left;
+        }
+
         .brand-title {
-            font-size: 1.8rem;
-            font-weight: 800;
+            font-size: 1.4rem;
+            font-weight: 900;
             color: var(--brand-primary);
             letter-spacing: -0.5px;
             text-transform: uppercase;
+            line-height: 1;
         }
 
         .brand-subtitle {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--accent-teal);
-            letter-spacing: 1.5px;
+            font-size: 0.6rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
             text-transform: uppercase;
-            margin-top: 2px;
+            margin-top: 3px;
+            opacity: 0.8;
+        }
+
+        .system-title {
+            text-align: center;
+            font-size: 1rem;
+            font-weight: 800;
+            color: #008080;
+            letter-spacing: 0.2px;
+            text-transform: uppercase;
+            padding: 10px 0;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            width: 100%;
         }
 
         /* ── FORM ── */
@@ -427,12 +451,17 @@
             <div class="top-accent"></div>
 
             <header>
-                <div class="logo-box">
-                    <img src="asset/image.png" alt="Danprel Logo"
-                        onerror="this.src='https://via.placeholder.com/80?text=D'">
+                <div class="header-top">
+                    <div class="logo-box">
+                        <img src="asset/image.png" alt="Danprel Logo"
+                            onerror="this.src='https://via.placeholder.com/80?text=D'">
+                    </div>
+                    <div class="brand-info">
+                        <h1 class="brand-title">DANPREL</h1>
+                        <p class="brand-subtitle">Engineering Automation Pvt Ltd</p>
+                    </div>
                 </div>
-                <h1 class="brand-title">DANPREL</h1>
-                <p class="brand-subtitle">Engineering Automation Pvt Ltd</p>
+                <div class="system-title">Resource Allocation Dashboard</div>
             </header>
 
             <main class="card-content">

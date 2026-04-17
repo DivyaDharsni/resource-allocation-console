@@ -3836,34 +3836,88 @@
         /* =========================================================
            WEEK / MONTH HELPERS
         ========================================================= */
-        function getWeeksOfYear(year) {
+        function getWeeksBetweenDates(startStr, endStr) {
             const weeks = [];
-            function makeWeek(num, startDate) {
-                const sm = startDate.getMonth();
-                const end = new Date(startDate.getTime() + 6 * 86400000);
-                const em = (end.getFullYear() === year) ? end.getMonth() : sm;
-                return {
-                    weekNum: num, date: new Date(startDate),
-                    label: startDate.getDate().toString().padStart(2, '0') + ' ' + MONTH_NAMES[sm],
-                    day: DAY_ABBR[startDate.getDay()], startMonth: sm, endMonth: em, shared: sm !== em
-                };
+            let d = new Date(startStr + 'T00:00:00');
+            const endLimit = new Date(endStr + 'T00:00:00');
+            
+            let wNum = 1;
+            while (d <= endLimit) {
+                const wStart = new Date(d);
+                const sm = wStart.getMonth();
+                const sy = wStart.getFullYear();
+                
+                weeks.push({
+                    weekNum: wNum++,
+                    date: wStart,
+                    label: wStart.getDate().toString().padStart(2, '0') + ' ' + MONTH_NAMES[sm],
+                    day: DAY_ABBR[wStart.getDay()],
+                    startMonth: sm,
+                    startYear: sy,
+                    endMonth: 0,
+                    endYear: 0,
+                    shared: false
+                });
+
+                if (wNum === 2) {
+                    // W2 starts on the very next Monday after W1
+                    let daysToMonday = (8 - d.getDay()) % 7;
+                    if (daysToMonday === 0) daysToMonday = 7;
+                    d.setDate(d.getDate() + daysToMonday);
+                } else {
+                    d.setDate(d.getDate() + 7);
+                }
             }
-            const jan1 = new Date(year, 0, 1);
-            weeks.push(makeWeek(1, jan1));
-            let d = new Date(year, 0, 2);
-            while (d.getDay() !== 1) d.setDate(d.getDate() + 1);
-            let wNum = 2;
-            while (d.getFullYear() === year) { weeks.push(makeWeek(wNum, d)); d.setDate(d.getDate() + 7); wNum++; }
+
+            // Secondary pass: compute end dates and shared status for headers
+            for (let i = 0; i < weeks.length; i++) {
+                const w = weeks[i];
+                const wEnd = (i < weeks.length - 1)
+                    ? new Date(weeks[i + 1].date.getTime() - 86400000)
+                    : new Date(w.date.getTime() + 6 * 86400000);
+                w.endMonth = wEnd.getMonth();
+                w.endYear = wEnd.getFullYear();
+                w.shared = (w.startMonth !== w.endMonth || w.startYear !== w.endYear);
+            }
             return weeks;
         }
 
-        function groupWeeksByMonth(weeks) {
-            const widths = new Array(12).fill(0);
+        function groupWeeksByMonthYear(weeks, endLimitStr) {
+            const groups = [];
+            const eLimit = new Date(endLimitStr + 'T00:00:00');
+            const limitVal = eLimit.getFullYear() * 12 + eLimit.getMonth();
+
             weeks.forEach(w => {
-                if (w.shared) { widths[w.startMonth] += WEEK_W / 2; widths[w.endMonth] += WEEK_W / 2; }
-                else { widths[w.startMonth] += WEEK_W; }
+                const sy = w.startYear;
+                const sm = w.startMonth;
+                const ey = w.endYear;
+                const em = w.endMonth;
+
+                if (w.shared) {
+                    addWidth(sm, sy, WEEK_W / 2);
+                    // Only add width to the second month if it starts before or on the month of the filter limit
+                    if ((ey * 12 + em) <= limitVal) {
+                        addWidth(em, ey, WEEK_W / 2);
+                    } else {
+                        // If the overflow month is beyond the filter, keep the header area for the current month
+                        addWidth(sm, sy, WEEK_W / 2);
+                    }
+                } else {
+                    addWidth(sm, sy, WEEK_W);
+                }
             });
-            return Array.from({ length: 12 }, (_, i) => ({ month: i, width: widths[i] })).filter(g => g.width > 0);
+
+            function addWidth(m, y, w) {
+                let g = groups.find(x => x.month === m && x.year === y);
+                if (!g) {
+                    g = { month: m, year: y, width: 0 };
+                    groups.push(g);
+                }
+                g.width += w;
+            }
+
+            groups.sort((a, b) => (a.year * 12 + a.month) - (b.year * 12 + b.month));
+            return groups;
         }
 
         /* =========================================================
@@ -3966,41 +4020,39 @@
         /* =========================================================
            GANTT HEADERS
         ========================================================= */
-        function buildGanttHeaders(year, start = null, end = null) {
-            let weeks = getWeeksOfYear(year);
-
-            // Filter to custom range if provided
-            if (start && end) {
-                const s = new Date(start + 'T00:00:00'), e = new Date(end + 'T00:00:00');
-                weeks = weeks.filter(w => {
-                    const wEnd = new Date(w.date.getTime() + 7 * 86400000);
-                    return w.date <= e && wEnd >= s;
-                });
-            }
-
-            const groups = groupWeeksByMonth(weeks);
+        function buildGanttHeaders(startStr, endStr) {
+            const weeks = getWeeksBetweenDates(startStr, endStr);
+            const groups = groupWeeksByMonthYear(weeks, endStr);
             const mH = document.getElementById('mHeader');
             const wH = document.getElementById('wHeader');
+            
             while (mH.children.length > 1) mH.removeChild(mH.lastChild);
             while (wH.children.length > 1) wH.removeChild(wH.lastChild);
 
+            const showYear = groups.length > 0 && (groups[0].year !== groups[groups.length - 1].year);
+
             groups.forEach(g => {
-                const c = document.createElement('div'); c.className = 'm-cell';
-                c.style.width = c.style.minWidth = g.width + 'px'; c.style.flexShrink = '0';
-                c.textContent = MONTH_NAMES[g.month]; mH.appendChild(c);
+                const c = document.createElement('div');
+                c.className = 'm-cell';
+                c.style.width = c.style.minWidth = g.width + 'px';
+                c.style.flexShrink = '0';
+                c.textContent = MONTH_NAMES[g.month] + (showYear ? ' ' + g.year : '');
+                mH.appendChild(c);
             });
+            
             weeks.forEach(w => {
-                const c = document.createElement('div'); c.className = 'w-cell';
-                c.style.width = c.style.minWidth = WEEK_W + 'px'; c.style.flexShrink = '0';
+                const c = document.createElement('div');
+                c.className = 'w-cell';
+                c.style.width = c.style.minWidth = WEEK_W + 'px';
+                c.style.flexShrink = '0';
                 c.innerHTML = `<div class="w-num">W${w.weekNum}</div><div class="w-date">${w.label}</div><div class="w-day">${w.day}</div>`;
                 wH.appendChild(c);
             });
+            
             window._ganttWeeks = weeks;
-
-            // Fix sticky-head clipping in overflow-x:auto container
             const totalW = FIX_COL_W + weeks.length * WEEK_W;
             const sh = document.querySelector('.gantt-sticky-head');
-            sh.style.minWidth = mH.style.minWidth = wH.style.minWidth = totalW + 'px';
+            if (sh) sh.style.minWidth = mH.style.minWidth = wH.style.minWidth = totalW + 'px';
         }
 
         /* =========================================================
@@ -4018,14 +4070,15 @@
            CORE RENDER
         ========================================================= */
         function renderUI() {
-            const year = parseInt(document.getElementById('fYear').value);
             const fDept = document.getElementById('fDept').value;
             const fProj = document.getElementById('fProject').value;
             const fFrom = document.getElementById('fFrom').value;
             const fTo = document.getElementById('fTo').value;
 
+            if (!fFrom || !fTo) return;
+
             // Update visualization weeks based on selected date range
-            buildGanttHeaders(year, fFrom, fTo);
+            buildGanttHeaders(fFrom, fTo);
 
             // Filter people
             const filtered = registryData.filter(r => {
@@ -4131,18 +4184,18 @@
                 // 2. Lane assignment — greedy interval scheduling
                 //    Sort by start date, then assign each project to the
                 //    lowest lane whose last bar has ended before this one starts.
-                const sorted = [...myProjects].sort((a, b) => new Date(a.start) - new Date(b.start));
+                const sorted = [...myProjects].sort((a, b) => new Date(a.start + 'T00:00:00') - new Date(b.start + 'T00:00:00'));
                 const laneEnds = [];   // laneEnds[i] = Date when lane i is free again
                 const laneOf = [];   // laneOf[i]   = lane index assigned to sorted[i]
 
                 sorted.forEach((p, i) => {
-                    const pStart = new Date(p.start);
+                    const pStart = new Date(p.start + 'T00:00:00');
                     let assigned = -1;
                     for (let l = 0; l < laneEnds.length; l++) {
                         if (laneEnds[l] <= pStart) { assigned = l; break; }
                     }
                     if (assigned === -1) { assigned = laneEnds.length; laneEnds.push(null); }
-                    laneEnds[assigned] = new Date(p.end);
+                    laneEnds[assigned] = new Date(p.end + 'T00:00:00');
                     laneOf[i] = assigned;
                 });
 
@@ -4150,7 +4203,7 @@
                 const rowH = LANE_PAD + numLanes * LANE_H + LANE_PAD + 4;
 
                 // 3. Build HTML for each project bar
-                const fmt = ds => { const d = new Date(ds); return d.getDate() + '/' + (d.getMonth() + 1); };
+                const fmt = ds => { const d = new Date(ds + 'T00:00:00'); return d.getDate() + '/' + (d.getMonth() + 1); };
 
                 const barsHtml = sorted.map((p, i) => {
                     const bStyle = getBarStyle(p.start, p.end);
@@ -4593,7 +4646,7 @@
             const preview = document.getElementById('durationPreview');
             const durText = document.getElementById('durationText');
             if (s && e && e >= s) {
-                const days = Math.ceil((new Date(e) - new Date(s)) / 86400000);
+                const days = Math.ceil((new Date(e + 'T00:00:00') - new Date(s + 'T00:00:00')) / 86400000) + 1;
                 preview.style.display = 'flex';
                 durText.textContent = `${days} day${days !== 1 ? 's' : ''} selected  (${new Date(s + 'T00:00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}  →  ${new Date(e + 'T00:00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })})`;
             } else {
@@ -4611,9 +4664,9 @@
             if (!proj) return showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#f59e0b"></i>Please select a project first.');
             if (!start) return showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#f59e0b"></i>Please enter a start date.');
             if (!end) return showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#f59e0b"></i>Please enter an end date.');
-            if (new Date(end) <= new Date(start)) return showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>End date must be after start date.');
+            if (new Date(end + 'T00:00:00') <= new Date(start + 'T00:00:00')) return showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>End date must be after start date.');
 
-            const days = Math.ceil((new Date(end) - new Date(start)) / 86400000);
+            const days = Math.ceil((new Date(end + 'T00:00:00') - new Date(start + 'T00:00:00')) / 86400000) + 1;
             const target = registryData[empIdx];
 
             try {
@@ -4682,7 +4735,7 @@
             const preview = document.getElementById('editDurationPreview');
             const durText = document.getElementById('editDurationText');
             if (s && e && e >= s) {
-                const days = Math.ceil((new Date(e) - new Date(s)) / 86400000);
+                const days = Math.ceil((new Date(e + 'T00:00:00') - new Date(s + 'T00:00:00')) / 86400000) + 1;
                 preview.style.display = 'flex';
                 durText.textContent = `${days} day${days !== 1 ? 's' : ''} selected  (${new Date(s + 'T00:00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}  →  ${new Date(e + 'T00:00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })})`;
             } else {
@@ -4700,9 +4753,9 @@
             const newE = document.getElementById('newAEnd').value;
 
             if (!newS || !newE) return showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#f59e0b"></i>Please select both dates.');
-            if (new Date(newE) <= new Date(newS)) return showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>End date must be after start date.');
+            if (new Date(newE + 'T00:00:00') <= new Date(newS + 'T00:00:00')) return showToast('<i class="bi bi-exclamation-triangle-fill me-2" style="color:#ef4444"></i>End date must be after start date.');
 
-            const days = Math.ceil((new Date(newE) - new Date(newS)) / 86400000);
+            const days = Math.ceil((new Date(newE + 'T00:00:00') - new Date(newS + 'T00:00:00')) / 86400000) + 1;
 
             try {
                 const res = await fetch(`${API_BASE}/update-assignment`, {
@@ -5305,8 +5358,6 @@
                 setInterval(updateClock, 1000);
 
                 window.addEventListener('resize', () => {
-                    const year = parseInt(document.getElementById('fYear').value);
-                    buildGanttHeaders(year);
                     renderUI();
                 });
             }

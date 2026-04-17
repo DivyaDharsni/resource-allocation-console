@@ -281,7 +281,7 @@ const server = http.createServer(async (req, res) => {
         if (apiPath === '/update-assignment' && req.method === 'POST') {
             try {
                 const data = JSON.parse(await readBody(req));
-                const days = data.days || Math.ceil((new Date(data.newEnd) - new Date(data.newStart)) / 86400000);
+                const days = data.days || (Math.ceil((new Date(data.newEnd) - new Date(data.newStart)) / 86400000) + 1);
                 await Assignment.updateOne(
                     { empId: data.empId, projCode: data.oldProjCode, start: data.oldStart, end: data.oldEnd },
                     { projCode: data.newProjCode, start: data.newStart, end: data.newEnd, days: days }
@@ -312,7 +312,7 @@ const server = http.createServer(async (req, res) => {
         if (apiPath === '/add-machine-assignment' && req.method === 'POST') {
             try {
                 const a = JSON.parse(await readBody(req));
-                const days = a.days || Math.ceil((new Date(a.end) - new Date(a.start)) / 86400000);
+                const days = a.days || (Math.ceil((new Date(a.end) - new Date(a.start)) / 86400000) + 1);
                 await MachineAssignment.findOneAndUpdate(
                     { machineId: a.machineId, projCode: a.projCode, start: a.start, end: a.end },
                     { days: days },
@@ -326,7 +326,7 @@ const server = http.createServer(async (req, res) => {
         if (apiPath === '/update-machine-assignment' && req.method === 'POST') {
             try {
                 const data = JSON.parse(await readBody(req));
-                const days = data.days || Math.ceil((new Date(data.newEnd) - new Date(data.newStart)) / 86400000);
+                const days = data.days || (Math.ceil((new Date(data.newEnd) - new Date(data.newStart)) / 86400000) + 1);
                 await MachineAssignment.updateOne(
                     { machineId: data.machineId, projCode: data.oldProjCode, start: data.oldStart, end: data.oldEnd },
                     { projCode: data.newProjCode, start: data.newStart, end: data.newEnd, days: days }

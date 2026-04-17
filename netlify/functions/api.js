@@ -186,10 +186,10 @@ exports.handler = async (event, context) => {
         // POST: Update Assignment
         if (path === '/update-assignment' && method === 'POST') {
             const data = JSON.parse(event.body);
-            const days = data.days || Math.ceil((new Date(data.newEnd) - new Date(data.newStart)) / 86400000);
+            const days = data.days || (Math.ceil((new Date(data.newEnd + 'T00:00:00') - new Date(data.newStart + 'T00:00:00')) / 86400000) + 1);
             await Assignment.updateOne(
-                { empId: data.empId, projCode: data.projCode, start: data.oldStart, end: data.oldEnd },
-                { start: data.newStart, end: data.newEnd, days: days }
+                { empId: data.empId, projCode: data.oldProjCode, start: data.oldStart, end: data.oldEnd },
+                { projCode: data.newProjCode, start: data.newStart, end: data.newEnd, days: days }
             );
             return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
         }
@@ -220,7 +220,7 @@ exports.handler = async (event, context) => {
         // POST: Add Machine Assignment
         if (path === '/add-machine-assignment' && method === 'POST') {
             const a = JSON.parse(event.body);
-            const days = a.days || Math.ceil((new Date(a.end) - new Date(a.start)) / 86400000);
+            const days = a.days || (Math.ceil((new Date(a.end + 'T00:00:00') - new Date(a.start + 'T00:00:00')) / 86400000) + 1);
             await MachineAssignment.findOneAndUpdate(
                 { machineId: a.machineId, projCode: a.projCode, start: a.start, end: a.end },
                 { days: days },
@@ -232,10 +232,10 @@ exports.handler = async (event, context) => {
         // POST: Update Machine Assignment
         if (path === '/update-machine-assignment' && method === 'POST') {
             const data = JSON.parse(event.body);
-            const days = data.days || Math.ceil((new Date(data.newEnd) - new Date(data.newStart)) / 86400000);
+            const days = data.days || (Math.ceil((new Date(data.newEnd + 'T00:00:00') - new Date(data.newStart + 'T00:00:00')) / 86400000) + 1);
             await MachineAssignment.updateOne(
-                { machineId: data.machineId, projCode: data.projCode, start: data.oldStart, end: data.oldEnd },
-                { start: data.newStart, end: data.newEnd, days: days }
+                { machineId: data.machineId, projCode: data.oldProjCode, start: data.oldStart, end: data.oldEnd },
+                { projCode: data.newProjCode, start: data.newStart, end: data.newEnd, days: days }
             );
             return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
         }
