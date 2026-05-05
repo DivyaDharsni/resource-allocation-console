@@ -260,6 +260,61 @@ exports.handler = async (event, context) => {
             return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
         }
 
+        // POST: Update Project
+        if (path === '/update-project' && method === 'POST') {
+            const project = JSON.parse(event.body);
+            if (!project.days) {
+                project.days = Math.ceil((new Date(project.end) - new Date(project.start)) / 86400000);
+            }
+            await Project.updateOne({ code: project.oldCode }, project);
+            
+            // If code changed, update all assignments
+            if (project.code !== project.oldCode) {
+                await Assignment.updateMany({ projCode: project.oldCode }, { projCode: project.code });
+                await MachineAssignment.updateMany({ projCode: project.oldCode }, { projCode: project.code });
+            }
+            return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
+        }
+
+        // POST: Delete Project
+        if (path === '/delete-project' && method === 'POST') {
+            const { code } = JSON.parse(event.body);
+            await Project.deleteOne({ code });
+            await Assignment.deleteMany({ projCode: code });
+            await MachineAssignment.deleteMany({ projCode: code });
+            return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
+        }
+
+        // POST: Delete Member
+        if (path === '/delete-member' && method === 'POST') {
+            const { id } = JSON.parse(event.body);
+            await Member.deleteOne({ id });
+            await Assignment.deleteMany({ empId: id });
+            return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
+        }
+
+        // POST: Delete Assignment
+        if (path === '/delete-assignment' && method === 'POST') {
+            const { empId, projCode, start, end } = JSON.parse(event.body);
+            await Assignment.deleteOne({ empId, projCode, start, end });
+            return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
+        }
+
+        // POST: Delete Machine
+        if (path === '/delete-machine' && method === 'POST') {
+            const { machineId } = JSON.parse(event.body);
+            await Machine.deleteOne({ machineId });
+            await MachineAssignment.deleteMany({ machineId });
+            return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
+        }
+
+        // POST: Delete Machine Assignment
+        if (path === '/delete-machine-assignment' && method === 'POST') {
+            const { machineId, projCode, start, end } = JSON.parse(event.body);
+            await MachineAssignment.deleteOne({ machineId, projCode, start, end });
+            return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
+        }
+
         return { statusCode: 404, headers, body: JSON.stringify({ error: "Path not found: " + path }) };
 
     } catch (err) {

@@ -4401,12 +4401,15 @@
                 if (isEdit) {
                     const idx = projectRegistry.findIndex(p => p.code === oldCode);
                     projectRegistry[idx] = { ...projectRegistry[idx], ...payload, id: projectRegistry[idx].id };
-                    // If code changed, update in-memory member assignments
-                    if (code !== oldCode) {
-                        registryData.forEach(member => {
-                            member.projects.forEach(t => { if (t.code === oldCode) t.code = code; });
+                    // Update in-memory member assignments (Both Code and Name)
+                    registryData.forEach(member => {
+                        member.projects.forEach(t => {
+                            if (t.code === oldCode) {
+                                if (code !== oldCode) t.code = code;
+                                t.name = name;
+                            }
                         });
-                    }
+                    });
                 } else {
                     projectRegistry.push({ ...payload, id: Date.now() });
                 }
