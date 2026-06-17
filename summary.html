@@ -1600,6 +1600,13 @@
                 </select>
             </div>
             <div class="fp-divider"></div>
+            <div class="fp-item">
+                <div class="form-check form-switch m-0 d-flex align-items-center gap-2">
+                    <input class="form-check-input" type="checkbox" id="chkExcludeHolidays" onchange="updateAnalysis()" style="cursor: pointer; width: 36px; height: 18px;">
+                    <label class="fp-label mb-0" for="chkExcludeHolidays" style="cursor: pointer; color: var(--navy-dark);">Exclude Sundays & Holidays</label>
+                </div>
+            </div>
+            <div class="fp-divider"></div>
             <!-- Hidden inputs to stay compatible with existing logic -->
             <input type="hidden" id="fromDate">
             <input type="hidden" id="toDate">
@@ -1719,6 +1726,27 @@
         const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June',
             'July', 'August', 'September', 'October', 'November', 'December'];
         const DAY_ABBR = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+        // Tamil Nadu Government Fixed Holidays 2026
+        const TN_HOLIDAYS_2026 = [
+            '2026-01-14', // Pongal
+            '2026-01-15', // Thiruvalluvar Day
+            '2026-01-16', // Uzhavar Thirunal
+            '2026-01-26', // Republic Day
+            '2026-04-14', // Tamil New Year / Dr. B.R. Ambedkar's Birthday
+            '2026-05-01', // May Day
+            '2026-08-15', // Independence Day
+            '2026-10-02', // Gandhi Jayanti
+            '2026-12-25', // Christmas
+        ];
+
+        function isWorkingDay(date) {
+            const day = date.getDay();
+            if (day === 0) return false; // Sunday
+            const iso = toISO(date);
+            if (TN_HOLIDAYS_2026.includes(iso)) return false; // Holiday
+            return true;
+        }
 
         /* ══════════════════════════════════════════════════════
            INIT
@@ -1934,9 +1962,20 @@
         function handleWeekChange() { updateFromToDates(false); updateAnalysis(); }
 
         function updateRangeBadge(start, end) {
-            const days = daysBetween(start, end);
-            document.getElementById('rangeBadge').textContent = `${days} Days`;
-            return days;
+            const excludeEl = document.getElementById('chkExcludeHolidays');
+            const exclude = excludeEl ? excludeEl.checked : false;
+            let count = 0;
+            let iter = new Date(start);
+            while (iter <= end) {
+                if (exclude) {
+                    if (isWorkingDay(iter)) count++;
+                } else {
+                    count++;
+                }
+                iter.setDate(iter.getDate() + 1);
+            }
+            document.getElementById('rangeBadge').textContent = `${count} ${exclude ? 'Working ' : ''}Days`;
+            return count;
         }
 
         /* ══════════════════════════════════════════════════════
@@ -1947,7 +1986,18 @@
 
             const from = new Date(document.getElementById('fromDate').value);
             const to = new Date(document.getElementById('toDate').value);
-            const days = daysBetween(from, to);
+            const excludeEl = document.getElementById('chkExcludeHolidays');
+            const exclude = excludeEl ? excludeEl.checked : false;
+
+            // Calculate active working days in range
+            let activeDays = 0;
+            let iter = new Date(from);
+            while (iter <= to) {
+                if (!exclude || isWorkingDay(iter)) {
+                    activeDays++;
+                }
+                iter.setDate(iter.getDate() + 1);
+            }
 
             const y = parseInt(document.getElementById('selYear').value);
             const m = parseInt(document.getElementById('selMonth').value);
@@ -1955,7 +2005,7 @@
             const weekText = selW.value === 'ALL' ? '' : ` — ${selW.options[selW.selectedIndex].textContent}`;
             
             document.getElementById('chartSubtitle').textContent =
-                `${MONTH_NAMES[m].toUpperCase()} ${y}${weekText}`;
+                `${MONTH_NAMES[m].toUpperCase()} ${y}${weekText}${exclude ? ' (EXCL. SUNDAYS & HOLIDAYS)' : ''}`;
 
             /* ── All unique departments (X-axis) ── */
             const depts = [...new Set(registryData.map(r => r.dept))].sort();
@@ -1982,7 +2032,9 @@
                         const iter = new Date(Math.max(from, aStart));
                         const oEnd = new Date(Math.min(to, aEnd));
                         while (iter <= oEnd) {
-                            allocatedDates.add(toISO(iter));
+                            if (!exclude || isWorkingDay(iter)) {
+                                allocatedDates.add(toISO(iter));
+                            }
                             iter.setDate(iter.getDate() + 1);
                         }
                     });
@@ -1993,7 +2045,7 @@
                 });
                 const allocatedCount = allocIds.size;
 
-                const totalCapacity = totalCount * days;
+                const totalCapacity = totalCount * activeDays;
                 const finalAllocated = Math.min(totalCapacity, deptAllocatedManDays);
                 const finalFree = Math.max(0, totalCapacity - finalAllocated);
 
@@ -2008,7 +2060,9 @@
                             const iter = new Date(Math.max(from, aStart));
                             const oEnd = new Date(Math.min(to, aEnd));
                             while (iter <= oEnd) {
-                                projDates.add(toISO(iter));
+                                if (!exclude || isWorkingDay(iter)) {
+                                    projDates.add(toISO(iter));
+                                }
                                 iter.setDate(iter.getDate() + 1);
                             }
                         });
@@ -2023,25 +2077,25 @@
                     allocatedManDays: finalAllocated, 
                     freeDays: finalFree, 
                     totalDays: totalCapacity, 
-                    byProject, days
+                    byProject, days: activeDays
                 };
             });
 
             /* ── Totals banner ── */
             const sumTotalMembers = deptStats.reduce((a, d) => a + d.total, 0);
             const sumAllocatedManDays = deptStats.reduce((a, d) => a + d.allocatedManDays, 0);
-            const sumCapacityManDays = sumTotalMembers * days;
+            const sumCapacityManDays = sumTotalMembers * activeDays;
             const sumFreeManDays = Math.max(0, sumCapacityManDays - sumAllocatedManDays);
 
             document.getElementById('tTotalEmp').textContent = sumTotalMembers;
             document.getElementById('tManDays').textContent = sumCapacityManDays;
             document.getElementById('tAllocated').textContent = sumAllocatedManDays;
             document.getElementById('tFree').textContent = sumFreeManDays;
-            document.getElementById('tDays').textContent = days;
+            document.getElementById('tDays').textContent = activeDays;
 
             currentDeptStats = deptStats; // Save for export
 
-            renderChart(deptStats, activeProjCodes, days);
+            renderChart(deptStats, activeProjCodes, activeDays);
             renderCards(deptStats, activeProjCodes);
         }
 
@@ -2273,7 +2327,18 @@
 
             const from = document.getElementById('fromDate').value;
             const to = document.getElementById('toDate').value;
-            const days = daysBetween(new Date(from), new Date(to));
+            
+            const excludeEl = document.getElementById('chkExcludeHolidays');
+            const exclude = excludeEl ? excludeEl.checked : false;
+            let activeDays = 0;
+            let iter = new Date(from);
+            while (iter <= new Date(to)) {
+                if (!exclude || isWorkingDay(iter)) {
+                    activeDays++;
+                }
+                iter.setDate(iter.getDate() + 1);
+            }
+
             const genDate = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
             const title = `Resource_Allocation_Summary_${from}_to_${to}`;
 
@@ -2282,7 +2347,7 @@
                     const lines = [
                         `"DANPREL Engineering Automation"`,
                         `"Employee Allocation Summary Report"`,
-                        `"Period: ${from} to ${to} (${days} days)"`,
+                        `"Period: ${from} to ${to} (${activeDays} ${exclude ? 'working ' : ''}days)"`,
                         `"Generated: ${genDate}"`,
                         '',
                         `"Department","Total Members","Total Man-Days (Capacity)","Allocated Man-Days","Open for Work Man-Days","Allocation %"`,
@@ -2327,7 +2392,7 @@
                     doc.text('DANPREL Engineering Automation', 15, 15);
                     doc.setFontSize(12);
                     doc.text('Employee Allocation Summary Report', 15, 24);
-                    doc.text(`Period: ${from} to ${to}  |  Generated: ${genDate}`, 15, 30);
+                    doc.text(`Period: ${from} to ${to}  |  Generated: ${genDate}${exclude ? ' (Excl. Sundays & Holidays)' : ''}`, 15, 30);
 
                     // Totals Section
                     doc.setTextColor(0, 31, 63);
@@ -2339,7 +2404,7 @@
                         ['Total Man-Days', document.getElementById('tManDays').textContent],
                         ['Allocated Man-Days', document.getElementById('tAllocated').textContent],
                         ['Open for Work Man-Days', document.getElementById('tFree').textContent],
-                        ['Period Duration', `${days} Days`]
+                        ['Period Duration', `${activeDays} ${exclude ? 'Working ' : ''}Days`]
                     ];
 
                     doc.autoTable({
